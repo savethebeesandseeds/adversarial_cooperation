@@ -5,21 +5,21 @@ This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 Int
 
 For more details, see the [LICENSE](LICENSE) file in this repository.
 
-# Description
+## Description
 
 This is a work in progress. 
 
-# 
+## Create Enviroment
 docker run -it --name=adverarial_cooperation -v .:/src debian:11
 docker exec -it adverarial_cooperation /bin/bash
 
-# Install dependencies
+## Install dependencies
 apt update
 apt install --no-install-recommends texlive texlive-latex-extra texlive-lang-spanish latexmk
 apt install --no-install-recommends aspell aspell-en
 
-# Compile book
+## Compile book
 cd /src
 sh compile_latex.sh adversarial_cooperation.tex
 
-# Compile scripts
+## Compile scripts
