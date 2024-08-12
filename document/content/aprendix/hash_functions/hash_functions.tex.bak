@@ -1,0 +1,16 @@
+\chapter{Hash Functions}
+\section{Definition}
+Hashes are one-way functions $y = hash(x)$. Secure so long the input $x$ can't be known from the output $y$. 
+
+\section{Security Model}
+
+Hash function should be impossible to invert. 
+\begin{itemize}
+    \item First pre-Image resistance: Given $hash(\cdot), y$, the adversary knowns not an inverse function $x = hash^-1(y)$. 
+    \item Second pre-Image resistance: Given $hash(\cdot), y, x_{1}$ where $y = hash(x_{1})$, the adversary knowns not a second value such that $y = hash(x_{2})$. 
+    \item Colision resistance: Given $hash(\cdot)$, the adversary knows not a pair $x_{1} != x_{2}$ where $y = hash(x_{1}) = hash(x_2)$.
+    \item Avalanche effect: Given $hash(\cdot), x, y$, any change $\delta{}x$, ---however small, should produce an unpredictible and chaotic change $\delta{}y$.
+\end{itemize}
+
+
+

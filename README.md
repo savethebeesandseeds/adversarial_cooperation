@@ -17,6 +17,7 @@ docker exec -it adverarial_cooperation /bin/bash
 apt update
 apt install --no-install-recommends texlive texlive-latex-extra texlive-lang-spanish latexmk
 apt install --no-install-recommends aspell aspell-en
+apt install --no-install-recommends coreutils
 
 ## Compile book
 cd /src

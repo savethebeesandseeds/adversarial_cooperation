@@ -1,4 +1,8 @@
 \contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
 \contentsline {section}{\numberline {1.1}Section Title}{1}{section.1.1}%
 \contentsline {section}{\numberline {1.2}Mathematics}{1}{section.1.2}%
-\contentsline {chapter}{Appendix Title}{3}{appendix*.2}%
+\contentsline {chapter}{\numberline {2}Hash Functions}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Definition}{3}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Security Model}{3}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Examples}{3}{section.2.3}%
+\contentsline {chapter}{Appendix Title}{5}{appendix*.2}%

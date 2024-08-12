@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2024.8.5)  5 AUG 2024 10:41
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2024.8.5)  5 AUG 2024 23:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -298,7 +298,7 @@ File: l3backend-pdftex.def 2020-01-29 L3 backend support: PDF output (pdfTeX)
 \l__pdf_internal_box=\box49
 )
 (temp/adversarial_cooperation.aux (temp/content/introduction.aux)
-(temp/content/appendix.aux))
+(temp/content/hash_functions/hash_functions.aux) (temp/content/appendix.aux))
 \openout1 = `adversarial_cooperation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
@@ -424,43 +424,62 @@ Chapter 1.
 ) [1
 
 
-] [2
+]
+\openout2 = `content/hash_functions/hash_functions.aux'.
+
+ (./content/hash_functions/hash_functions.tex [2
+
 
 
 
 ]
+Chapter 2.
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 1
+7.
+(/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+) [3]) [4]
 \openout2 = `content/appendix.aux'.
 
- (./content/appendix.tex) [3
+
+(./content/appendix.tex) [5
+
+
+
 
 
 ] (temp/adversarial_cooperation.aux
-(temp/content/introduction.aux) (temp/content/appendix.aux)) ) 
+(temp/content/introduction.aux) (temp/content/hash_functions/hash_functions.aux
+) (temp/content/appendix.aux)) ) 
 Here is how much of TeX's memory you used:
- 7479 strings out of 481190
- 108186 string characters out of 5913951
- 413896 words of memory out of 5000000
- 24275 multiletter control sequences out of 15000+600000
- 419615 words of font info for 70 fonts, out of 8000000 for 9000
+ 7511 strings out of 481190
+ 109250 string characters out of 5913951
+ 417270 words of memory out of 5000000
+ 24294 multiletter control sequences out of 15000+600000
+ 419928 words of font info for 71 fonts, out of 8000000 for 9000
  40 hyphenation exceptions out of 8191
- 76i,6n,77p,322b,343s stack positions out of 5000i,500n,10000p,200000b,80000s
- </root/.texlive2
-020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </root/.texlive2020/t
-exmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </root/.texlive2020/texmf-
-var/fonts/pk/ljfour/jknappen/ec/ecbx1728.600pk> </root/.texlive2020/texmf-var/f
-onts/pk/ljfour/jknappen/ec/ecsl1200.600pk> </root/.texlive2020/texmf-var/fonts/
-pk/ljfour/jknappen/ec/ecbx1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/lj
-four/jknappen/ec/ecbx2488.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/
-jknappen/ec/ecrm1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknap
-pen/ec/ecrm1440.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/e
-c/ecrm2074.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmbx12.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12
-.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></
-usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on temp/adversarial_cooperation.pdf (7 pages, 82218 bytes).
+ 76i,6n,77p,322b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
+ </root/.texlive2020/texmf-var/fonts/pk/ljfour/
+jknappen/ec/ectt1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknap
+pen/ec/ecti1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/e
+c/tcrm1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecb
+x1728.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsl1200
+.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600p
+k> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </
+root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </root/
+.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1440.600pk> </root/.texl
+ive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk></usr/share/texliv
+e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/
+type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
+ublic/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
+/cm/cmsy8.pfb>
+Output written on temp/adversarial_cooperation.pdf (9 pages, 128708 bytes).
 PDF statistics:
- 224 PDF objects out of 1000 (max. 8388607)
- 66 compressed objects within 1 object stream
+ 315 PDF objects out of 1000 (max. 8388607)
+ 83 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

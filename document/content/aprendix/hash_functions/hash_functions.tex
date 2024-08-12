@@ -1,0 +1,63 @@
+\chapter{Hash Functions}
+\section{Definition}
+Hashes are one-way functions $y = hash(x)$. 
+
+\section{Usages}
+\begin{itemize}
+    \item used to express $x$ without revealing it. 
+    \item Anonimusity.
+    \item key size reduction.
+    \item Information integrity protection.
+    \item Message authentication.
+    \item Digital signatures.
+\end{itemize}
+
+
+
+\section{Security Model}
+Hash function should be impossible to invert. 
+\begin{itemize}
+    \item First pre-Image resistance: Given $hash(\cdot), y$, the adversary knows not an inverse function $x = hash^-1(y)$. 
+    \item Second pre-Image resistance: Given $hash(\cdot), y, x_{1}$ where $y = hash(x_{1})$, the adversary known not a second value such that $y = hash(x_{2})$. 
+    \item Collision resistance: Given $hash(\cdot)$, the adversary knows not a pair $x_{1} != x_{2}$ where $y = hash(x_{1}) = hash(x_2)$.
+    \item Avalanche effect: Given $hash(\cdot), x, y$, any change $\delta{}x$, ---however small, should produce an unpredictable and chaotic change $\delta{}y$.
+\end{itemize}
+
+It is expected of a hash function, where n is the output size, that finding a preimage requires $O(2^n)$ hash computations and producing a collision $O(2^{n/2})$ 
+hash computations. It's much easer to find a collision, this is know as the birthday attack. 
+
+\section{Complexity Model}
+
+
+\section{Examples}
+
+\begin{verbatim}
+    ~$ echo -n "Hello, World!" | md5sum 
+    65a8e27d8879283831b664bd8b7f0ad4
+    
+    ~$ echo -n "ello, World!" | md5sum 
+    d41d8cd98f00b204e9800998ecf8427e
+\end{verbatim}
+
+echo "" | xxd -r -p | md5sum
+echo "" | xxd -r -p | md5sum
+echo "" | xxd -r -p | md5sum
+echo "" | xxd -r -p | md5sum
+
+echo "d131dd02c5e6eec4693d9a0698aff95c 2fcab58712467eab4004583eb8fb7f89 55ad340609f4b30283e488832571415a 085125e8f7cdc99fd91dbdf280373c5b d8823e3156348f5bae6dacd436c919c6 dd53e2b487da03fd02396306d248cda0 e99f33420f577ee8ce54b67080a80d1e c69821bcb6a8839396f965ab6ff72a70" | xxd -r -p | md5sum
+echo "d131dd02c5e6eec4693d9a0698aff95c 2fcab50712467eab4004583eb8fb7f89 55ad340609f4b30283e4888325f1415a 085125e8f7cdc99fd91dbd7280373c5b d8823e3156348f5bae6dacd436c919c6 dd53e1b487da03fd02396306d248cda0 e99f33420f577ee8ce54b67280a80d1e c69821bcb6a8839396f965ab6ff72a70" | xxd -r -p | md5sum
+
+
+
+echo -n  | md5sum 
+echo -n  | md5sum 
+
+echo -n " 2dd31d1 c4eee6c5 69a3d69 5cf9af98 87b5ca2f ab7e4612 3e580440 897ffbb8 
+ 634ad55 2b3f409 8388e483 5a417125 e8255108 9fc9cdf7 f2bd1dd9 5b3c3780" | md5sum 
+
+
+echo -n " d11d0b96 9c7b41dc f497d8e4 d555655a c79a7335 cfdebf0 66f12930 8fb109d1
+ 797f2775 eb5cd530 baade822 5c15cc79 ddcb74ed 6dd3c55f d80a9bb1 e3a7cc35" | md5sum 
+
+
+echo -n "d131dd02c5e6eec4693d9a0698aff95c2fcab50712467eab4004583eb8fb7f89 55ad340609f4b30283e4888325f1415a085125e8f7cdc99fd91dbd7280373c5b d8823e3156348f5bae6dacd436c919c6dd53e23487da03fd02396306d248cda0 e99f33420f577ee8ce54b67080280d1ec69821bcb6a8839396f965ab6ff72a70 " | md5sum 
