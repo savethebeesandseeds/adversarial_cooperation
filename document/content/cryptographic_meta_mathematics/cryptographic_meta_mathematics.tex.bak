@@ -1,0 +1,16 @@
+
+NOTE! 
+    this is important, this is how we set up a game of coopeartive agents that allows for individual adventages. 
+
+Godel's unprovable truths. 
+    Can be seen as speaking of a missing axiom in axiomatic systems. 
+    take Continous_hipotesis/Large_cardinal_axioms as extensions to ZFC. 
+
+This has us thinking, 
+    Cooperating adversaries can commit to hiden axioms. 
+        - There be public and secret axioms. 
+        - Hidden axioms are the parties game adventage. 
+        - But proves need to hold for all hiden and poublic axioms. 
+
+This is to say that, 
+    We can hide an axiom and prove behaviour compliance with this hiden and all public axioms via Zero Knowledge Proofs. 

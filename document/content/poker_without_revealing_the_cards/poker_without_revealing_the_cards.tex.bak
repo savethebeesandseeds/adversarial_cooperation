@@ -1,0 +1,29 @@
+\chapter{POKER without revealing the Cards}
+
+\section{Section Title}
+This is how to play Texas Holdem Poker without showing your cards to reclaim a win, 
+with any number of viable parties and without a trusted intermediary. 
+
+\section{Section Title}
+\begin{enumerate}
+    \item Shuffle a new round, generate a random number. 
+    \item ask parties to join or deny to join. 
+    \item Make a random seeded hased commitment on the cards you hold, before the river and the flush. 
+        \scriptsize{Show you cards at the start, without revealing it} make the commitment visible to all parties. 
+    \item Hash compare the deck is complete after parties exchange. 
+    \item prevent parties from asociating 
+    (for this, parties must not be shown their cards, until the end, they are given the commitment of the 
+    cards instead of the cards, they are only given the seed random number). But then, how do we 
+    have people decide on holding or betting, so, it's impractical to the game rules to gurantee 
+    no two parties are joining efforts. 
+    \item hold or bet
+    \item hold or bet
+    \item hold or bet
+    \item Assing values by the Poker rule convention to each commitment
+    \item Introduce Compute the value of the final cards. on homomirphic space with the cards in the table. 
+    \item Have all parties validate the commitment demonstration of winning. 
+\end{enumerate}
+
+
+also a construct on how to play any other cards game in a way. 
+

@@ -1,0 +1,133 @@
+% Compile with: latexmk -xelatex -interaction=nonstopmode -outdir=. acceptance_letter_CN.tex
+\documentclass[conference]{IEEEtran}
+\usepackage{ctex}  % Enables Chinese characters
+\usepackage{amsmath, amssymb} % 用于数学公式
+\usepackage{graphicx} % 用于插入图像
+\usepackage{cite} % 用于管理参考文献
+\usepackage{array} % 控制 p{} 列宽
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+
+\date{\today}
+
+\begin{document}
+
+\title{面向对抗性合作的密码学协议实用框架研究}
+
+\author{
+    \IEEEauthorblockN{S. Restrepo Ruiz}
+    \IEEEauthorblockA{waajacu.com \\ 电子邮件: santiago.restrepo.ruiz@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+本研究旨在探讨信息理论在对抗性环境中设计密码学协议所起的作用。通过利用安全多方计算，在研究过程中我们将构建一个\textit{开源}软件库，用以演示研究成果。
+\end{abstract}
+
+\section{引言}
+为了缓解冲突，我们提出在一个经过加密结构化的环境中让对立方进行合作。此环境通过密码学手段在信任方面提供保证。\\
+——实现信息安全且可验证的加密协议，确保博弈论中协调一致的安全性，以及隐私保护的共享决策。
+
+\section{文献回顾}
+密码学不仅限于加密，它是数字信任的基础。本研究所用的工具包括：
+\textcolor{blue}{\textit{零知识证明 (Zero-knowledge proofs)}}, 
+\textcolor{blue}{\textit{同态计算 (Homomorphic Computation)}}, 
+\textcolor{blue}{\textit{加密电路 (Garbled Circuits)}}, 
+\textcolor{blue}{\textit{无痕传输 (Oblivious Transfer)}}, 
+\textcolor{blue}{\textit{区块链 (Blockchains)}}, 
+\textcolor{blue}{\textit{差分隐私 (Differential Privacy)}}, 
+以及 
+\textcolor{blue}{\textit{门限密码学 (Threshold Cryptography)}}。\\
+——将这些安全单元组合起来，可在对抗性合作中实现广泛的协作式问题求解，进而被认为是关键的技术路径。
+
+\vspace{5pt}
+\section{研究问题}
+
+\begin{tabular}{lp{210pt}}
+    {\small \textbf{1)}} & {\small 如何将密码学应用于合作场景？} \\
+    {\small \textbf{2)}} & {\small 在跨学科协作中，如何改进所提出的密码学协议？}
+\end{tabular}
+    
+\vspace{5pt}
+\section{研究目标}
+
+\begin{tabular}{lp{210pt}}
+    {\small \textbf{1)}} & {\small 针对经典博弈论问题进行演示。} \\
+    {\small \textbf{2)}} & {\small 基于此研究成果，开源一个软件库。} 
+\end{tabular}
+
+\vspace{15pt}
+
+\section{研究方法}
+\vspace{5pt}
+本研究将聚焦于以下结构化博弈：
+\vspace{5pt}
+
+\begin{tabular}{lp{210pt}}
+    {\small \textbf{1)}} & {\textcolor{blue}{\textit{在不暴露手牌的情况下打牌：}} \linebreak---演示如何在纸牌游戏中声明胜利而无需暴露手牌。} \\[6pt]
+    {\small \textbf{2)}} & {\textcolor{blue}{\textit{在不暴露策略的情况下下棋（井字棋）：}} \linebreak---演示玩家如何在井字棋博弈中证明自己有制胜策略，同时不公开具体走法。} \\[6pt]
+    {\small \textbf{3)}} & {\textcolor{blue}{\textit{经典对抗性“围猎鹿”博弈：}} \linebreak---在这一典型的对抗性合作博弈中，展示如何实现均衡路径。} 
+\end{tabular}
+
+\section{录取信请求及理由}
+我恳请尊敬的学院成员考虑并支持我申请 \textit{北京航空航天大学} 网络空间安全硕士项目。
+
+哥伦比亚的大学目前在该领域缺乏研究项目。我已连续数年努力学习中文，深知在中国学术环境中无缝沟通与协作的重要性。\\
+我对在中国学习与研究充满热情，并期待向中国充满活力的学术社区学习并作出贡献。我相信这份奖学金不仅能帮助我实现职业愿景，也能为两国之间的学术交流做出积极贡献。
+
+%\section{Target Universities and Programs}
+%\vspace{5pt}
+%{\small English-taught program:} \\
+%
+%\begin{tabular}{rl}
+%    \textcolor{blue}{\small\textit{Beihang University}} & {\small Master's Cyberspace Security}\\
+%    % \textcolor{blue}{\small\textit{Beihang University}} & {\small Master's Integrated Circuit Engineering}
+%\end{tabular}
+
+\section{预期成果}
+
+\begin{tabular}{lp{210pt}}
+    {\small \textbf{1)}} & {\small 在博弈论场景中演示对抗性合作的可行性。} \\
+    {\small \textbf{2)}} & {\small 开发一套开源的密码学协议工具包，为对抗性合作提供可行方案。} \\
+    {\small \textbf{3)}} & {\small 展示密码学在冲突中如何推动信任的建立。}
+\end{tabular}
+
+\section{结论}
+本研究旨在展示，如何利用密码学技术来促进和平与建立信任。
+
+\begin{thebibliography}{99}
+
+\bibitem{Yao1982}
+A. C. Yao, ``Protocols for secure computations,'' in *Proceedings of the 23rd Annual Symposium on Foundations of Computer Science*, 1982.
+
+\bibitem{Goldwasser1989}
+S. Goldwasser, S. Micali, and C. Rackoff, ``The Knowledge Complexity of Interactive Proof Systems,'' in *SIAM Journal on Computing*, 1989.
+
+\bibitem{Gentry2009}
+C. Gentry, ``Fully Homomorphic Encryption Using Ideal Lattices,'' in *Proceedings of the 41st ACM Symposium on Theory of Computing (STOC)*, 2009.
+
+\bibitem{Dwork2006}
+C. Dwork, ``Differential Privacy,'' in *Proceedings of the International Colloquium on Automata, Languages, and Programming (ICALP)*, 2006.
+
+\bibitem{Canetti2000}
+R. Canetti, ``Security and Composition of Multi-Party Cryptographic Protocols,'' in *Journal of Cryptology*, 2000.
+
+\bibitem{Rosen2004}
+A. Rosen, ``Concurrent Zero-Knowledge,'' in *Springer*, 2004.
+
+\bibitem{Menezes1996}
+A. J. Menezes, P. C. van Oorschot, and S. A. Vanstone, *Handbook of Applied Cryptography*, CRC Press, 1996.
+
+\bibitem{Zhu2021}
+T. Zhu, G. Li, W. Zhou, and P. Xiong, *Differential Privacy and Applications*, Springer, 2021.
+
+\bibitem{Cramer2015}
+R. Cramer, I. Damgård, and J. B. Nielsen, *Secure Multiparty Computation and Secret Sharing: An Information-Theoretic Approach*, Cambridge University Press, 2015.
+
+\end{thebibliography}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

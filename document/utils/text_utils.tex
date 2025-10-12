@@ -6,6 +6,54 @@
 \usepackage{graphicx}       % Enhanced support for graphics
 \usepackage{hyperref}       % Interactive, clickable links
 \usepackage{xcolor} % For colored text
+\usepackage{float}
 
 % Define a new command for bold text with custom color
 \newcommand{\highlight}[1]{\textbf{\color{red}#1}}
+
+% Abstract
+\newenvironment{abstract}
+  {\begin{quote}\small\noindent\textbf{Abstract.}~}
+  {\end{quote}}
+
+\floatstyle{plain}
+\newfloat{protocol}{htbp}{lop}
+\floatname{protocol}{Protocol}
+
+% -- five-index symbol -----------------------------------------
+% Robust   : survives moving arguments (\section, captions, …)
+% Math-safe: \ensuremath switches to math mode only when needed.
+% Spacing  : \! pulls the left indices snugly against the symbol.
+
+\RequirePackage{amsmath} % for \mathop (optional but recommended)
+
+\DeclareRobustCommand{\cosa}[5]{%
+  \ensuremath{%
+    \mathop{}^{#1}_{#2}\!{#3}^{#4}_{#5}%
+  }%
+}
+
+
+\DeclareRobustCommand{\wkmodel}[1]{%
+  \ensuremath{%
+    \mathop{}^{\lambda_{i}}_{\mathcal{N}_{p}}\!{\Lambda}^{\Pi_{n}}_{#1}%
+  }%
+}
+
+\DeclareRobustCommand{\mcaln}[1]{%
+  \ensuremath{%
+    \mathop{}{\mathcal{N}}_{#1}%
+  }%
+}
+
+\DeclareRobustCommand{\mcalnp}[1]{%
+  \ensuremath{%
+    \mathop{}{\mcaln{p}}_{#1}%
+  }%
+}
+
+\DeclareRobustCommand{\mcalk}[1]{%
+  \ensuremath{%
+    k_{i,n}=\Lambda_{i}\bigl(\Pi_{n}\bigr)\bigr|_{\mathcal N_p}
+  }%
+}

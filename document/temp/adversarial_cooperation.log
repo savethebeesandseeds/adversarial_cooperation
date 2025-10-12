@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2024.8.5)  5 AUG 2024 23:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/Debian) (preloaded format=pdflatex 2025.7.21)  22 JUL 2025 00:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -219,8 +219,18 @@ Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1368.
 Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1369.
 Package xcolor Info: Model `Gray' substituted by `gray' on input line 1370.
 Package xcolor Info: Model `wave' substituted by `hsb' on input line 1371.
-))
-(./utils/math_utils.tex
+)
+(/usr/share/texlive/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count199
+\float@exts=\toks19
+\float@box=\box47
+\@float@everytoks=\toks20
+\@floatcapt=\box48
+)
+\@float@every@protocol=\toks21
+\c@protocol=\count266
+
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
 Package: amsmath 2020/09/23 v2.17i AMS math features
 \@mathmargin=\skip50
@@ -231,7 +241,7 @@ Package: amstext 2000/06/29 v2.01 AMS text
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
-\@emptytoks=\toks19
+\@emptytoks=\toks22
 \ex@=\dimen153
 ))
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty
@@ -241,44 +251,45 @@ Package: amsbsy 1999/11/29 v1.2d Bold Symbols
 (/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty
 Package: amsopn 2016/03/08 v2.02 operator names
 )
-\inf@bad=\count199
+\inf@bad=\count267
 LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count266
-\leftroot@=\count267
+\uproot@=\count268
+\leftroot@=\count269
 LaTeX Info: Redefining \overline on input line 399.
-\classnum@=\count268
-\DOTSCASE@=\count269
+\classnum@=\count270
+\DOTSCASE@=\count271
 LaTeX Info: Redefining \ldots on input line 496.
 LaTeX Info: Redefining \dots on input line 499.
 LaTeX Info: Redefining \cdots on input line 620.
-\Mathstrutbox@=\box47
-\strutbox@=\box48
+\Mathstrutbox@=\box49
+\strutbox@=\box50
 \big@size=\dimen155
 LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
 LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count270
-\c@MaxMatrixCols=\count271
+\macc@depth=\count272
+\c@MaxMatrixCols=\count273
 \dotsspace@=\muskip17
-\c@parentequation=\count272
-\dspbrk@lvl=\count273
-\tag@help=\toks20
-\row@=\count274
-\column@=\count275
-\maxfields@=\count276
-\andhelp@=\toks21
+\c@parentequation=\count274
+\dspbrk@lvl=\count275
+\tag@help=\toks23
+\row@=\count276
+\column@=\count277
+\maxfields@=\count278
+\andhelp@=\toks24
 \eqnshift@=\dimen156
 \alignsep@=\dimen157
 \tagshift@=\dimen158
 \tagwidth@=\dimen159
 \totwidth@=\dimen160
 \lineht@=\dimen161
-\@envbody=\toks22
+\@envbody=\toks25
 \multlinegap=\skip51
 \multlinetaggap=\skip52
-\mathdisplay@stack=\toks23
+\mathdisplay@stack=\toks26
 LaTeX Info: Redefining \[ on input line 2923.
 LaTeX Info: Redefining \] on input line 2924.
-)
+))
+(./utils/math_utils.tex
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
@@ -290,15 +301,105 @@ LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 )
-\c@theorem=\count277
+(/usr/share/texlive/texmf-dist/tex/latex/mathtools/mathtools.sty
+Package: mathtools 2020/03/24 v1.24 mathematical typesetting tools
+
+(/usr/share/texlive/texmf-dist/tex/latex/tools/calc.sty
+Package: calc 2017/05/25 v4.3 Infix arithmetic (KKT,FJ)
+\calc@Acount=\count279
+\calc@Bcount=\count280
+\calc@Adimen=\dimen162
+\calc@Bdimen=\dimen163
+\calc@Askip=\skip53
+\calc@Bskip=\skip54
+LaTeX Info: Redefining \setlength on input line 80.
+LaTeX Info: Redefining \addtolength on input line 81.
+\calc@Ccount=\count281
+\calc@Cskip=\skip55
 )
+(/usr/share/texlive/texmf-dist/tex/latex/mathtools/mhsetup.sty
+Package: mhsetup 2017/03/31 v1.3 programming setup (MH)
+)
+LaTeX Info: Thecontrolsequence`\('isalreadyrobust on input line 130.
+LaTeX Info: Thecontrolsequence`\)'isalreadyrobust on input line 130.
+LaTeX Info: Thecontrolsequence`\['isalreadyrobust on input line 130.
+LaTeX Info: Thecontrolsequence`\]'isalreadyrobust on input line 130.
+\g_MT_multlinerow_int=\count282
+\l_MT_multwidth_dim=\dimen164
+\origjot=\skip56
+\l_MT_shortvdotswithinadjustabove_dim=\dimen165
+\l_MT_shortvdotswithinadjustbelow_dim=\dimen166
+\l_MT_above_intertext_sep=\dimen167
+\l_MT_below_intertext_sep=\dimen168
+\l_MT_above_shortintertext_sep=\dimen169
+\l_MT_below_shortintertext_sep=\dimen170
+\xmathstrut@box=\box51
+\xmathstrut@dim=\dimen171
+)
+\c@theorem=\count283
+
+(/usr/share/texlive/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
+Package: algorithm2e 2017/07/18 v5.2 algorithms environments
+\c@AlgoLine=\count284
+
+(/usr/share/texlive/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\algocf@hangindent=\skip57
+
+(/usr/share/texlive/texmf-dist/tex/latex/ifoddpage/ifoddpage.sty
+Package: ifoddpage 2016/04/23 v1.1 Conditionals for odd/even page detection
+\c@checkoddpage=\count285
+)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/xspace.sty
+Package: xspace 2014/10/28 v1.13 Space after command names (DPC,MH)
+)
+(/usr/share/texlive/texmf-dist/tex/latex/relsize/relsize.sty
+Package: relsize 2013/03/29 ver 4.1
+)
+\skiptotal=\skip58
+\skiplinenumber=\skip59
+\skiprule=\skip60
+\skiphlne=\skip61
+\skiptext=\skip62
+\skiplength=\skip63
+\algomargin=\skip64
+\skipalgocfslide=\skip65
+\algowidth=\dimen172
+\inoutsize=\dimen173
+\inoutindent=\dimen174
+\interspacetitleruled=\dimen175
+\interspacealgoruled=\dimen176
+\interspacetitleboxruled=\dimen177
+\algocf@ruledwidth=\skip66
+\algocf@inoutbox=\box52
+\algocf@inputbox=\box53
+\AlCapSkip=\skip67
+\AlCapHSkip=\skip68
+\algoskipindent=\skip69
+\algocf@nlbox=\box54
+\algocf@hangingbox=\box55
+\algocf@untilbox=\box56
+\algocf@skipuntil=\skip70
+\algocf@capbox=\box57
+\algocf@lcaptionbox=\skip71
+\algoheightruledefault=\skip72
+\algoheightrule=\skip73
+\algotitleheightruledefault=\skip74
+\algotitleheightrule=\skip75
+\c@algocfline=\count286
+\c@algocfproc=\count287
+\c@algocf=\count288
+\algocf@algoframe=\box58
+\algocf@algobox=\box59
+))
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2020-01-29 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count278
-\l__pdf_internal_box=\box49
+\l__color_backend_stack_int=\count289
+\l__pdf_internal_box=\box60
 )
-(temp/adversarial_cooperation.aux (temp/content/introduction.aux)
-(temp/content/hash_functions/hash_functions.aux) (temp/content/appendix.aux))
+(temp/adversarial_cooperation.aux
+(temp/content/trust_establishment/trust_establishment.aux))
 \openout1 = `adversarial_cooperation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
@@ -354,17 +455,17 @@ LaTeX Font Info:    ... okay on input line 12.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count279
-\scratchdimen=\dimen162
-\scratchbox=\box50
-\nofMPsegments=\count280
-\nofMParguments=\count281
-\everyMPshowfont=\toks24
-\MPscratchCnt=\count282
-\MPscratchDim=\dimen163
-\MPnumerator=\count283
-\makeMPintoPDFobject=\count284
-\everyMPtoPDFconversion=\toks25
+\scratchcounter=\count290
+\scratchdimen=\dimen178
+\scratchbox=\box61
+\nofMPsegments=\count291
+\nofMParguments=\count292
+\everyMPshowfont=\toks27
+\MPscratchCnt=\count293
+\MPscratchDim=\dimen179
+\MPnumerator=\count294
+\makeMPintoPDFobject=\count295
+\everyMPtoPDFconversion=\toks28
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
@@ -387,7 +488,7 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 (/usr/share/texlive/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count285
+\c@section@level=\count296
 )
 LaTeX Info: Redefining \ref on input line 12.
 LaTeX Info: Redefining \pageref on input line 12.
@@ -417,69 +518,73 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 [3] [4
 
 ]
-\openout2 = `content/introduction.aux'.
+\openout2 = `content/trust_establishment/trust_establishment.aux'.
 
- (./content/introduction.tex
+ (./content/trust_establishment/trust_establishment.tex
 Chapter 1.
+Package hyperref Info: bookmark level for unknown protocol defaults to 0 on inp
+ut line 20.
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 5
+0.
+(/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 ) [1
 
 
 ]
-\openout2 = `content/hash_functions/hash_functions.aux'.
 
- (./content/hash_functions/hash_functions.tex [2
-
+LaTeX Warning: Reference `step:model' on page 2 undefined on input line 61.
 
 
+LaTeX Warning: Reference `alg:pkd' on page 2 undefined on input line 61.
 
-]
-Chapter 2.
-LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 1
-7.
-(/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd
-File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-) [3]) [4]
-\openout2 = `content/appendix.aux'.
-
-
-(./content/appendix.tex) [5
-
+No file adversarial_cooperation.bbl.
+) [2] [3
 
 
 
 
 ] (temp/adversarial_cooperation.aux
-(temp/content/introduction.aux) (temp/content/hash_functions/hash_functions.aux
-) (temp/content/appendix.aux)) ) 
+(temp/content/trust_establishment/trust_establishment.aux))
+
+LaTeX Warning: There were undefined references.
+
+ ) 
 Here is how much of TeX's memory you used:
- 7511 strings out of 481190
- 109250 string characters out of 5913951
- 417270 words of memory out of 5000000
- 24294 multiletter control sequences out of 15000+600000
- 419928 words of font info for 71 fonts, out of 8000000 for 9000
- 40 hyphenation exceptions out of 8191
- 76i,6n,77p,322b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
- </root/.texlive2020/texmf-var/fonts/pk/ljfour/
-jknappen/ec/ectt1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknap
-pen/ec/ecti1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/e
-c/tcrm1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecb
-x1728.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecsl1200
-.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600p
-k> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx2488.600pk> </
-root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </root/
-.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1440.600pk> </root/.texl
-ive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk></usr/share/texliv
-e/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb></usr/share/texlive/texmf-dist
-/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/texlive/texmf-dist/fonts/
-type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/texmf-dist/fonts/type1/p
-ublic/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
-/cm/cmsy8.pfb>
-Output written on temp/adversarial_cooperation.pdf (9 pages, 128708 bytes).
+ 9172 strings out of 480603
+ 136511 string characters out of 5901436
+ 465399 words of memory out of 5000000
+ 26088 multiletter control sequences out of 15000+600000
+ 426143 words of font info for 79 fonts, out of 8000000 for 9000
+ 335 hyphenation exceptions out of 8191
+ 76i,12n,77p,366b,461s stack positions out of 5000i,500n,10000p,200000b,80000s
+ </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/eccc1200.600pk> </
+root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1200.600pk> </root/
+.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx0800.600pk> </root/.texl
+ive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecti1200.600pk> </root/.texlive20
+20/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1728.600pk> </root/.texlive2020/te
+xmf-var/fonts/pk/ljfour/jknappen/ec/ecti1095.600pk> </root/.texlive2020/texmf-v
+ar/fonts/pk/ljfour/jknappen/ec/ecrm1095.600pk> </root/.texlive2020/texmf-var/fo
+nts/pk/ljfour/jknappen/ec/ecbx1095.600pk> </root/.texlive2020/texmf-var/fonts/p
+k/ljfour/jknappen/ec/ecsl1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljf
+our/jknappen/ec/ecbx1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/j
+knappen/ec/ecbx2488.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknapp
+en/ec/ecrm1200.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec
+/ecrm1440.600pk> </root/.texlive2020/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm
+2074.600pk></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10
+.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
+/usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/sh
+are/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/share/tex
+live/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/share/texlive/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/share/texlive/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/share/texlive/texmf-dist/fonts
+/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1
+/public/amsfonts/cm/cmsy8.pfb></usr/share/texlive/texmf-dist/fonts/type1/public
+/amsfonts/symbols/msbm10.pfb>
+Output written on temp/adversarial_cooperation.pdf (7 pages, 165042 bytes).
 PDF statistics:
- 315 PDF objects out of 1000 (max. 8388607)
- 83 compressed objects within 1 object stream
+ 382 PDF objects out of 1000 (max. 8388607)
+ 104 compressed objects within 2 object streams
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

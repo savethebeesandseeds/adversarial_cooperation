@@ -1,0 +1,17 @@
+\chapter{Tic-Tac-Toe without revealing the strategy}
+
+A perfect strategy in Tic-Tak-Toe is an undefeaded one, (one that might wins or ties any games). 
+
+Here is a way to proof your adversay that you know the perfect stratgy, without 
+revealing the strategy. 
+
+\begin{enumerate}
+    \item commit to a session seed. 
+    \item avoid the adversay from clonning the strategy. 
+    \item proof loop (warning, a loop permits adversarial clonning)
+        \item adversay select the initial conditions
+        \item proof of undefeated all the montecarlo scenarios
+        \item proof that you can invert the matrix
+\end{enumerate}
+
+always include codes for demonstration. 

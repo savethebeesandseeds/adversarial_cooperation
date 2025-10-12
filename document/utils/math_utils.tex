@@ -4,6 +4,7 @@
 \usepackage{amsmath}        % Advanced math formatting
 \usepackage{amsfonts}       % Math fonts
 \usepackage{amssymb}        % Math symbols
+\usepackage{mathtools}
 
 % Define a new environment for theorem-like statements
 \newtheorem{theorem}{Theorem}
@@ -13,3 +14,18 @@
 \newcommand{\set}[1]{\mathcal{#1}}
 
 \newcommand{\dtorch}[5]{$_{#1}^{#2}\mathcal{#3}_{#4}^{#5}$}
+
+% ---------- algorithm2e refinements ----------
+\usepackage{amsmath,amssymb}
+
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+\DontPrintSemicolon                    % hide printed semicolons
+\SetKwComment{tcc}{// }{}
+\SetKwInOut{Input}{\textbf{Input}}
+\SetKwInOut{Output}{\textbf{Output}}
+
+
+
+% \usepackage{algorithm}
+% \usepackage{algpseudocode}   % <- algorithmicx front-end

@@ -1,17 +1,98 @@
 \chapter{Trust Establishment}
 
-Here in the book we want to distinguish an adversary and an enemy. Adversarial cooperation, but an enemy is not. 
+\label{chap:trust-establishment}
 
-Deffie-Hellman is vulnerable to Man-In-The-Middle attacks. 
+\begin{abstract}
+In cooperative systems the parties make no assumptions about channel security; this stage is therefore called \emph{trust establishment}.  
+Classical \emph{unauthenticated} key-exchange schemes provide confidentiality against passive eavesdroppers, yet they fall to active man-in-the-middle attacks.  
+Cooperation cannot rely on unverified assumptions.  
+Our sole assumption is access to a local true-random generator; parties remain vulnerable only to signal-loss. 
 
-Therefore the current. layout a protocol using Zero-Knowledge-Proofs able to stablish trust. 
+We propose that each participant first isolates and safeguards an experiment to measure a truly random source, then models the resulting noise according to their individual preferences.  
+No harm arises if other parties learn one another’s secret keys, secrets are tactical disadvantages. 
+\end{abstract}
 
-\begin{enumerate}
-    \item An enemy in the middle might do a denial of service attack, we here are trying to protect against active eavedropping attacks. 
-    \item How can an enemy proof something it does not know. 
-    \item The enemy cannot change the challenge, in which case the retrived proof would not be valid to what is expected. 
-\end{enumerate}
 
-Solve this, for it is a grail in cryptography. 
+\section{Topic}
+Let $\Lambda$ model $n$ raw entropy sources $\Pi^{}_{n}$, where $\lambda^{i}$ are the \emph{eigenvalues} of the covariance.  
 
-However intution tells me, the protocol needs to be form of extensive chanllenge steps to overthorw the enemy. 
+\begin{protocol}
+\caption{Private-key derivation from a random signal.}
+\label{prot:eczkmh}
+\begin{center}
+\[
+\mcaln{} \coloneqq (-1,1) \subset \mathbb{R}, 
+\qquad 
+\mcalnp{} =\mcaln{} \: \bmod{} p,
+\]
+\[
+\wkmodel{},
+\]
+\[
+\mcalk{}.
+\]
+\[
+\mathcal N := (-1,1)\subset\mathbb R,
+\qquad
+\mathcal N_p := Q_p\!\bigl[\mathcal N\bigr]\subset\mathbb Z_p,
+\;\;
+Q_p(x)=\bigl\lfloor(x+1)\tfrac{p-1}{2}\bigr\rfloor \pmod{p}.
+\]
+\end{center}
+\end{protocol}
+
+\begin{algorithm}[H]
+\caption{Entropy-Maximised Private-Key Derivation (\( \mathsf{Alt}\,1 \))}
+\label{alg:emp-max}
+\KwIn{Raw entropy batch $\Pi_n$, participant index $i$, target prime $p$}
+\KwOut{Private key $k_n^{\,i}$}
+
+\textbf{Isolate} local entropy experiment\tcc*[r]{Physical shielding}
+\nl $\pi \gets \textsc{MeasureRandomSource}(\Pi_n)$\;
+\nl $\Lambda^{i} \gets \textsc{SolveMaxEntropyModel}\bigl(\pi,\mathrm{constraints}_i\bigr)$\;
+\nl $\mathcal{N}_p \gets \textsc{OptimiseQuantiser}\bigl(\Lambda^{i},p\bigr)$\;
+\nl $u \gets \Lambda^{i}(\pi)$\tcp*{continuous $(0,1)$ value}
+\nl $k_n^{\,i} \gets \bigl\lfloor u\cdot p \bigr\rfloor \bmod p$\;
+\nl $k_n^{\,i} \gets \textsc{ExtractUniformBits}\!\bigl(k_n^{\,i}\bigr)$\tcp*{e.g.\ HKDF}
+\KwRet{$k_n^{\,i}$}
+\end{algorithm}
+
+
+Step~\ref{step:model} of Algorithm~\ref{alg:pkd}
+embeds user preferences into~$\Lambda^{i}$.
+
+
+
+
+
+This is not finish, algorithm is just a sketch. 
+
+
+
+\section{Coordination vs Secrecy}
+
+Independent, perfectly random seeds do not let isolated parties land on the same secret value; information-theoretic results forbid it.
+
+
+In this sense we can either have, secrecy or coordination. 
+
+| Setting                                                                                         | Mutual information $I(X;Y)$ between Alice’s and Bob’s raw bits | Can a shared secret key be distilled?                                                                                                              |
+| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Truly independent RNGs**                                                                      | $I=0$                                                          | **No.** Shannon (1949) already implies the eavesdropper can simulate either party as well as the other.                                            |
+| **Correlated observations of the same phenomenon** (noise on a wire, channel reciprocity, etc.) | $I>0$ but $<H$                                                 | **Yes** – Maurer/Wolf key-agreement theorems (1993-2003) show you can squeeze a key of length $\le I$ by error-correction + privacy-amplification. |
+| **Pre-shared seed / entanglement / trusted beacon**                                             | Explicit common randomness                                     | **Trivial** – seed → PRF → key stream.                                                                                                             |
+
+
+
+When I(X;Y)=0, the lemma’s bound collapses to “no extractor can give both parties matching uniform bits except with guessing probability.”
+
+Note: Market is a shared channel where I(X;Y)>0 
+
+Unique-optimal-strategy coordination
+If a publicly-known optimisation problem has a single global optimum, then any rational agent will converge to the same action deterministically.
+Example: both routers run Dijkstra on the same published topology file; they pick the same shortest path and forward packets identically.
+Limit: an eavesdropper can run the same algorithm, so secrecy ≈ 0.
+
+%%%% ------------------------------
+\bibliographystyle{plain}
+\bibliography{references}
