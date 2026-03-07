@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+OUT_DIR="${ROOT_DIR}/demostrations/.build/pdf"
+TMP_DIR="${ROOT_DIR}/.temp/book_sources"
+
+usage() {
+  cat <<'EOF'
+Usage:
+  book -pdf <target>
+  book -list
+  book -h | --help
+
+Targets:
+  section_poker   Build poker demonstration section PDF
+
+Examples:
+  ./book -pdf section_poker
+EOF
+}
+
+list_targets() {
+  cat <<'EOF'
+section_poker -> demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex
+EOF
+}
+
+target_to_tex() {
+  local target="$1"
+  case "$target" in
+    section_poker)
+      printf '%s\n' "demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+compile_pdf_target() {
+  local target="$1"
+  local section_tex_rel section_tex_abs wrapper_tex
+
+  section_tex_rel="$(target_to_tex "$target")" || {
+    echo "Unknown target: $target" >&2
+    echo "Run './book -list' to see available targets." >&2
+    exit 1
+  }
+
+  section_tex_abs="${ROOT_DIR}/${section_tex_rel}"
+  if [[ ! -f "$section_tex_abs" ]]; then
+    echo "Target tex file not found: $section_tex_abs" >&2
+    exit 1
+  fi
+
+  if ! command -v latexmk >/dev/null 2>&1; then
+    echo "latexmk is required but not installed." >&2
+    exit 1
+  fi
+
+  mkdir -p "$OUT_DIR" "$TMP_DIR"
+
+  wrapper_tex="${TMP_DIR}/${target}.tex"
+
+  cat >"$wrapper_tex" <<EOF
+\\documentclass[12pt]{book}
+\\input{${ROOT_DIR}/document/utils/text_utils.tex}
+\\input{${ROOT_DIR}/document/utils/math_utils.tex}
+\\begin{document}
+\\input{${section_tex_abs}}
+\\end{document}
+EOF
+
+  echo "Compiling target '${target}'..."
+  latexmk -pdf -interaction=nonstopmode -outdir="$OUT_DIR" "$wrapper_tex"
+
+  echo "PDF generated: ${OUT_DIR}/${target}.pdf"
+}
+
+main() {
+  if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+  fi
+
+  case "$1" in
+    -h|--help)
+      usage
+      ;;
+    -list)
+      list_targets
+      ;;
+    -pdf)
+      if [[ $# -ne 2 ]]; then
+        echo "Expected exactly one target after -pdf." >&2
+        usage
+        exit 1
+      fi
+      compile_pdf_target "$2"
+      ;;
+    *)
+      echo "Unknown command: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"

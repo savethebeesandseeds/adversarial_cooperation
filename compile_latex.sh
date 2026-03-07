@@ -47,8 +47,10 @@ else
 fi
 
 # ─────────────────────────  Compile (colourised)  ───────────────
-echo "Compiling $tex_file..."
-compile_cmd=(latexmk -cd -pdf -interaction=nonstopmode -outdir=temp "$tex_file")
+outdir=${LATEX_OUTDIR:-.temp}
+
+echo "Compiling $tex_file (outdir: $outdir)..."
+compile_cmd=(latexmk -cd -pdf -interaction=nonstopmode -outdir="$outdir" "$tex_file")
 
 "${compile_cmd[@]}" 2>&1 | awk -v RED="$RED" -v YEL="$YELLOW" -v MAG="$MAGENTA" -v NC="$NC" '
   # TeX errors (start with "!" or contain "error")

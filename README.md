@@ -24,3 +24,28 @@ cd /src
 sh compile_latex.sh adversarial_cooperation.tex
 
 ## Compile scripts
+
+Build section PDFs with the `book` helper script:
+
+```bash
+cd /src
+./book -list
+./book -pdf section_poker
+```
+
+Output:
+
+- `demostrations/.build/pdf/section_poker.pdf`
+
+## C demonstrations
+The repository now includes:
+
+- `src/`: C source code for game demonstrations.
+- `demostrations/`: `.tex` notes mirroring `document/content` structure.
+
+First implemented example:
+
+```bash
+cd /src
+make -C demostrations demo_poker
+```

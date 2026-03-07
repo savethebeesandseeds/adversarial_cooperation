@@ -1,29 +1,172 @@
-\chapter{POKER without revealing the Cards}
+\chapter{Poker Without Revealing the Cards}
 
-\section{Section Title}
-This is how to play Texas Hold-em Poker without showing your cards to reclaim a win, 
-with any number of viable parties and without a trusted intermediary. 
+\label{chap:poker-without-revealing-the-cards}
 
-\section{Section Title}
+\begin{abstract}
+This chapter studies a dealer-free construction for the dealing phase of Texas
+Hold'em among mutually distrustful parties. The objective is not yet to
+implement the full game, but to isolate the minimal cryptographic mechanisms
+required to instantiate a hand without disclosing private cards before
+showdown. We decompose the problem into four stages: deck randomization,
+secure multi-party shuffling, secure dealing, and public commitment to private
+hands. The current implementation is an instructional demonstrator rather than
+a production protocol: it illustrates confidentiality and integrity properties
+of the deal while deferring betting, hand evaluation, malicious security, and
+network transport.
+\end{abstract}
+
+\section{Problem Setting}
+Suppose a collection of players wishes to emulate the role of a trusted dealer
+in Texas Hold'em. A satisfactory protocol must preserve at least the following
+properties:
 \begin{enumerate}
-    \item Shuffle a new round, generate a random number. 
-    \item ask parties to join or deny to join. 
-    \item Make a random seeded hased commitment on the cards you hold, before the river and the flush. 
-        \scriptsize{Show you cards at the start, without revealing it} make the commitment visible to all parties. 
-    \item Hash compare the deck is complete after parties exchange. 
-    \item prevent parties from associating 
-    (for this, parties must not be shown their cards, until the end, they are given the commitment of the 
-    cards instead of the cards, they are only given the seed random number). But then, how do we 
-    have people decide on holding or betting, so, it's impractical to the game rules to guarantee 
-    no two parties are joining efforts. 
-    \item hold or bet
-    \item hold or bet
-    \item hold or bet
-    \item Assign values by the Poker rule convention to each commitment
-    \item Introduce Compute the value of the final cards. on homophobic space with the cards in the table. 
-    \item Have all parties validate the commitment demonstration of winning. 
+    \item \textbf{Card privacy.} No player should learn another player's hole
+    cards before the designated reveal phase.
+    \item \textbf{Dealing integrity.} No card may be duplicated, omitted, or
+    substituted without detection.
+    \item \textbf{Transcript consistency.} The participants must agree on a
+    single public record of the shuffled deck and the subsequent public cards.
+    \item \textbf{Showdown verifiability.} When a player eventually reveals a
+    hand, the rest of the table must be able to verify that the hand was fixed
+    in advance.
 \end{enumerate}
 
+The present chapter restricts attention to the dealing problem. That is, it
+addresses how cards are generated, shuffled, privately assigned, and later
+committed to, without yet formalizing betting rounds or final winner
+determination.
 
-also a construct on how to play any other cards game in a way. 
+\section{Assumptions and Scope}
+The current demonstrator makes three explicit assumptions.
+\begin{enumerate}
+    \item Each player has access to local randomness.
+    \item The players can publish values to a shared transcript visible to all
+    participants.
+    \item The implementation uses a commutative-encryption toy model in order
+    to expose the protocol structure clearly.
+\end{enumerate}
 
+The third point is important. The demonstrator is useful as a protocol sketch
+and as an executable reference for the staged construction, but it should not
+yet be interpreted as a hardened cryptographic system. In particular, no claim
+is presently made regarding resistance to malicious deviations, adaptive
+adversaries, collusion strategies, or implementation-level side channels.
+
+\section{Four-Stage Construction}
+We organize the protocol into four stages so that each requirement can be
+examined independently.
+\begin{enumerate}
+    \item \textbf{Deck randomization.} Establish a hidden permutation of a
+    canonical 52-card deck.
+    \item \textbf{Secure multi-party shuffling.} Have each player transform the
+    deck so that no single player controls the final ordering.
+    \item \textbf{Secure dealing.} Deliver hole cards privately and community
+    cards publicly.
+    \item \textbf{Hand commitment and showdown validation.} Bind each player to
+    the dealt hand before revelation.
+\end{enumerate}
+
+\section{Stage 1: Deck Randomization}
+Let \(D = (c_1,\dots,c_{52})\) denote the canonical deck. The first stage
+applies a random permutation to \(D\), thereby producing a deck order that is
+not publicly revealed. A public digest of the resulting state is then
+published. This digest does not expose the order of the cards, but it fixes a
+reference point for the subsequent transcript and prevents ambiguity about
+which deck instance is under discussion.
+
+\section{Stage 2: Secure Multi-Party Shuffling}
+Each player next applies two transformations to the entire deck: a private
+shuffle and a private commutative-encryption layer. Because the encryption
+operations commute, the layers may later be removed in different orders
+without changing the final plaintext card. This makes it possible to deliver a
+private card to one player without disclosing it to the others.
+
+After each player finishes the transformation, a public commitment to the
+encrypted deck is published. These intermediate commitments do not reveal the
+card values, but they bind the protocol to a single encrypted deck state after
+each participant's action.
+
+At the end of this stage, the protocol also publishes a hashed commitment for
+each encrypted card that is about to be dealt. Thus, before any decryption
+occurs, all participants can see a public digest of the sampled ciphertexts
+corresponding to future hole cards and community cards. These digests do not
+reveal the dealt cards, but they certify that the later deal came from the
+jointly shuffled deck rather than from an after-the-fact substitution.
+
+\section{Stage 3: Secure Dealing}
+The dealing phase consumes cards from the jointly shuffled encrypted deck.
+Private hole cards are obtained by removing encryption layers in an order that
+leaves the final plaintext visible only to the intended recipient. Community
+cards are obtained by jointly removing all layers, after which the cards become
+public.
+
+At the end of this phase, the transcript should certify that the deal is
+internally consistent. In the current demonstrator this is checked by verifying
+that no plaintext card identifier appears twice among the dealt hole cards and
+community cards. In addition, each drawn encrypted card is checked against the
+public hash published in Stage~2, so that the plaintext revealed in this stage
+can be traced back to a previously committed random sample from the encrypted
+deck.
+
+\section{Stage 4: Commitment to Private Hands}
+Once the hole cards have been privately assigned, each player \(P_i\) samples a
+private nonce \(N_i\) and publishes a commitment
+\[
+    C_i = H\!\left(N_i \parallel 2 \parallel h_{i,1} \parallel h_{i,2}\right),
+\]
+where \(h_{i,1}\) and \(h_{i,2}\) are the player's hole cards and \(H\) is a
+cryptographic hash function.
+
+This commitment serves two purposes. First, it binds the player to a specific
+private hand before showdown. Second, it does so without disclosing the hand,
+provided that the nonce remains secret and the hash function resists inversion
+and collisions at the intended security level. At showdown, the player reveals
+\(N_i\) together with the private cards, and every participant recomputes
+\(C_i\) to validate consistency with the earlier commitment.
+
+\section{Security Interpretation}
+The four-stage decomposition isolates the central ideas behind dealer-free
+poker:
+\begin{enumerate}
+    \item secrecy of the final deck order,
+    \item joint control over the shuffle,
+    \item private delivery of hole cards,
+    \item and delayed public verifiability of private hands.
+\end{enumerate}
+
+This already captures a substantial portion of the informational structure of
+the game. However, it does not yet resolve the full strategic problem of
+poker. A complete construction must additionally specify how actions are
+recorded, how betting rounds are synchronized, how hand values are computed,
+and how disputes are resolved when one or more parties deviate from the stated
+protocol.
+
+\section{Implementation Companion}
+The executable demonstrator associated with this chapter lives in the source
+directory \path{/src/src/poker_without_revealing_the_cards/}. The primary file
+is \texttt{poker\_without\_revealing\_the\_cards.c}.
+It can be run with:
+\begin{verbatim}
+cd /src
+make -C demostrations demo_poker
+\end{verbatim}
+
+The implementation prints stage-by-stage logs, deck commitments, encrypted deck
+previews, dealt cards, and showdown validation data. Its purpose is to make the
+construction inspectable rather than to claim final protocol completeness.
+
+\section{Limitations and Next Steps}
+The current chapter and implementation deliberately stop short of a full poker
+system. The following components remain open:
+\begin{enumerate}
+    \item betting and action privacy,
+    \item hand-ranking evaluation,
+    \item authenticated network transport,
+    \item protection against malicious rather than merely cooperative or
+    semi-honest execution,
+    \item and stronger proofs for shuffle correctness and commitment validity.
+\end{enumerate}
+
+These omissions are not accidental; they define the next research layers. The
+current contribution is the disciplined decomposition of the dealing problem
+into verifiable stages that can be refined independently.

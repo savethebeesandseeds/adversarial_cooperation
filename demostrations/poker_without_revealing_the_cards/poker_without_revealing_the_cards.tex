@@ -1,0 +1,101 @@
+\chapter{Poker Without Revealing the Cards}
+
+\section{Objective}
+This document accompanies the executable poker demonstrator and presents the
+same construction in a more formal order. The implementation does not yet
+attempt to solve the full game of Texas Hold'em; it isolates the dealing
+problem into four stages that can be inspected in code and in runtime logs.
+
+\section{Scientific Scope}
+The present demonstrator addresses the following narrow question:
+
+\begin{quote}
+Can mutually distrustful parties instantiate a poker hand without a trusted
+dealer while preserving privacy of hole cards until showdown?
+\end{quote}
+
+The current answer is partial rather than complete. The demonstrator models:
+\begin{enumerate}
+    \item randomization of a canonical deck,
+    \item secure multi-party shuffling,
+    \item secure dealing of private and public cards,
+    \item public commitment to private hands.
+\end{enumerate}
+
+It does not yet model betting, hand-ranking evaluation, or adversarial network
+execution.
+
+\section{Source Mapping}
+\begin{itemize}
+    \item C source directory:
+    \path{/src/src/poker_without_revealing_the_cards/}
+    \item Primary implementation file:
+    \texttt{poker\_without\_revealing\_the\_cards.c}
+    \item Build entrypoint: \texttt{demostrations/Makefile}
+    \item PDF helper: \texttt{./book -pdf section\_poker}
+\end{itemize}
+
+\section{Protocol Decomposition}
+\subsection*{Stage 1: Deck Randomization}
+A standard 52-card deck is permuted and a public digest of the resulting state
+is published. The digest fixes the transcript without revealing the deck order.
+
+\subsection*{Stage 2: Secure Multi-Party Shuffling}
+Each player privately shuffles the deck and applies a commutative-encryption
+layer. After each transformation, the encrypted deck is committed to publicly.
+Once the final encrypted deck is fixed, the demonstrator also publishes a hash
+for each encrypted card that will later be dealt. These public hashes are the
+visible form of the sampled cards during this stage.
+
+\subsection*{Stage 3: Secure Dealing}
+Hole cards are privately recovered by removing encryption layers in a
+player-specific order. Community cards are jointly decrypted and become public.
+Before each decryption, the demonstrator verifies that the drawn encrypted card
+matches the Stage~2 hash commitment for that deal slot. It also validates that
+no plaintext card appears twice.
+
+\subsection*{Stage 4: Hand Commitments}
+If player \(P_i\) holds hole cards \(h_{i,1}, h_{i,2}\), the player samples a
+nonce \(N_i\) and publishes
+\[
+    C_i = H\!\left(N_i \parallel 2 \parallel h_{i,1} \parallel h_{i,2}\right).
+\]
+Later, \(N_i\) and the private cards are revealed so that every participant can
+recompute \(C_i\).
+
+\section{Build and Run}
+\begin{verbatim}
+cd /src
+make -C demostrations demo_poker
+\end{verbatim}
+
+Alternative suit rendering modes:
+\begin{verbatim}
+make -C demostrations demo_poker POKER_ARGS="--suits ascii"
+make -C demostrations demo_poker POKER_ARGS="--suits unicode"
+POKER_SUIT_MODE=unicode make -C demostrations demo_poker
+\end{verbatim}
+
+\section{Observed Runtime Structure}
+The program emits a staged trace of the form:
+\begin{verbatim}
+Stage 1  Randomization of the deck
+Stage 2  Secure multi-party shuffling
+Stage 3  Secure multi-party dealing
+Stage 4  Hand commitments and validation
+\end{verbatim}
+The log also records public commitments, encrypted deck previews, dealt cards,
+sampled-card hash commitments, sampled-card verification, and commitment
+verification at showdown.
+
+\section{Limitations}
+The current demonstrator should be interpreted as a protocol sketch with an
+executable transcript, not as a final cryptographic poker engine. Open work
+includes:
+\begin{enumerate}
+    \item betting rounds and action synchronization,
+    \item formal hand evaluation,
+    \item authenticated transport,
+    \item malicious-security guarantees,
+    \item stronger proof obligations for correct shuffle and deal operations.
+\end{enumerate}
