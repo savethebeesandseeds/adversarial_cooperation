@@ -1,1 +1,703 @@
-This section is on how do two people that can see eachother moves in advance can cooperate. 
+\chapter{Two Oracles Play Rock--Paper--Scissors}
+\label{chap:two-oracles-rps}
+
+\begin{quote}
+\textbf{Author's Intuition.}
+
+\emph{This section is on how do two people that can see eachother moves in advance can cooperate.}
+\end{quote}
+
+The sentence above is preserved exactly as the original research question. In
+this chapter we study one narrow interpretation of it. We do not assume literal
+prophecy. Instead, ``seeing a move in advance'' means learning the other
+participant's plaintext choice before fixing one's own. The purpose of the
+protocol is to remove that timing advantage while preserving each
+participant's move until the reveal phase. Whether the oracle metaphor also
+contains a deeper strategic problem remains open.
+
+\begin{abstract}
+This chapter gives an educational two-party commit--reveal protocol for
+Rock--Paper--Scissors. Alice and Bob each fix a private move, exchange
+session-bound commitments, and reveal only after both commitments have been
+accepted. A valid reveal is checked against the corresponding prior
+commitment. The construction replaces a trusted referee's early collection of
+plaintext moves, but it does not reproduce a referee's ability to release both
+moves fairly. In particular, the participant who receives the first reveal can
+learn the result and then refuse to reveal. The chapter therefore treats
+selective abort as a central counterexample, not as a minor implementation
+detail. The companion C code is an instructional state machine, not a
+production protocol, and the exact hash-based commitment has a limited
+random-oracle-style security argument rather than a formal proof.
+\end{abstract}
+
+\section{Cooperation Problem}
+
+Rock--Paper--Scissors is normally described as simultaneous choice. Over a
+network, however, messages arrive in an order. If Alice sends
+\texttt{rock} in plaintext and Bob receives it before choosing, Bob can choose
+\texttt{paper}. Reversing the order only reverses the advantage.
+
+Alice and Bob have a shared interest in obtaining a well-defined game, but
+their interests diverge over its outcome. Neither should have to reveal first
+without protection, and neither should have to trust the other to ignore an
+early plaintext move. The protocol question is therefore:
+
+\begin{quote}
+Can both participants fix their moves before either learns the other's move,
+and can each later verify that an accepted reveal matches the earlier choice?
+\end{quote}
+
+This is a chronology problem. It is not a method for choosing a wise move,
+making either participant honest, or making completion rational.
+
+\section{Trusted-Referee and Plaintext Baselines}
+
+With a trusted referee, Alice and Bob privately submit their moves. The referee
+waits for both, fixes them, and releases both moves or the result. The referee
+provides three services:
+
+\begin{enumerate}
+    \item it receives each move without disclosing it to the other participant;
+    \item it prevents either move from changing after submission; and
+    \item it can release the result to both participants together.
+\end{enumerate}
+
+Plaintext exchange provides none of these services without an ordering
+advantage. Commit--reveal protocols have a long history in remote joint-choice
+problems; Blum's coin-flipping work is an early point of reference
+\cite{blum1983coinflipping}. That citation records prior context. It is not a
+claim that the construction in this chapter is Blum's exact protocol.
+
+The present protocol replaces the referee's first two services under explicit
+computational assumptions. It does not replace the third. That difference is
+the boundary between simultaneous choice and fair output.
+
+\section{Parties, Moves, Secrets, and Outputs}
+
+There are exactly two fixed roles:
+
+\begin{itemize}
+    \item Alice, written \(A\), with private move \(m_A\);
+    \item Bob, written \(B\), with private move \(m_B\).
+\end{itemize}
+
+The canonical move encoding is
+
+\[
+    \mathsf{Rock}=0,\qquad
+    \mathsf{Paper}=1,\qquad
+    \mathsf{Scissors}=2.
+\]
+
+Before the round begins, both parties agree on the protocol version, the
+commitment version, one public 32-byte session identifier, their role
+assignment, a nonzero 32-bit round number, the move encoding, and their local
+timeout policies.
+
+Before reveal, each participant's move and fresh 32-byte commitment nonce are
+private. The protocol version, session identifier, round, roles, commitment
+digests, message timing, and message lengths are public. At successful
+completion, both moves, both nonces, and the result are public. Repeated games
+therefore reveal a history from which strategies might be inferred.
+
+The session identifier separates executions. It is not a secret, a signature,
+an identity, or proof of freshness by itself.
+
+For completed moves, define
+
+\[
+    d=(m_A-m_B+3)\bmod 3.
+\]
+
+The result is a tie when \(d=0\), Alice wins when \(d=1\), and Bob wins when
+\(d=2\).
+
+\section{Threat Model, Channels, and Setup}
+
+The intended analysis has a classical, computationally bounded adversary that
+statically corrupts at most one participant. A corrupted participant may
+choose any legal move or nonce; send malformed, duplicate, replayed,
+reordered, or context-mismatched messages; send a random commitment for which
+it knows no opening; open inconsistently; delay; remain silent; or abort at any
+time.
+
+The transport is assumed to provide origin authentication and message
+integrity for messages accepted as coming from the peer. The transport may
+still expose, delay, drop, duplicate, or reorder messages. Identity
+establishment and authenticated transport are external assumptions: this
+chapter does not implement them. In particular, a role byte and a session
+identifier do not authenticate a human being.
+
+An honest participant is assumed to have:
+
+\begin{itemize}
+    \item a functioning operating-system cryptographic random source;
+    \item protected local memory for its move and nonce until reveal;
+    \item an agreed and unique protocol context; and
+    \item eventual delivery of every valid message when honest completion is
+    being claimed.
+\end{itemize}
+
+Adaptive corruption, endpoint malware, memory disclosure, coercion, traffic
+analysis, crash recovery, concurrent sessions, compromised randomness,
+quantum attackers, and side channels beyond digest-comparison discipline are
+outside the model.
+
+\section{Idealized Referee and Exact Real Contract}
+
+The idealized referee receives both moves privately and releases the result to
+both parties together. It is a comparison baseline, not a functionality that
+this chapter claims to realize.
+
+The exact real contract is weaker: \emph{simultaneous choice with abort}.
+
+\begin{enumerate}
+    \item Each honest participant fixes its own move and nonce before
+    processing a peer message.
+    \item An honest participant reveals only after it has sent its own
+    commitment and accepted the peer's context-valid commitment.
+    \item A peer reveal is accepted only when it opens the previously accepted
+    commitment in the same protocol, session, round, and role context.
+    \item The participant-local API reports a completed outcome only after the
+    local reveal has been emitted and the peer's reveal has validated.
+    \item A peer, host, or network may nevertheless prevent completion.
+\end{enumerate}
+
+For this chapter, \emph{strong fairness} means that either both parties obtain
+the result or neither does. \emph{Guaranteed output delivery} means that an
+honest party eventually obtains its output despite peer deviation. The real
+protocol provides neither property.
+
+\section{Non-Goals}
+
+This slice does not provide:
+
+\begin{itemize}
+    \item networking, identity establishment, PKI, or authenticated transport;
+    \item proof at commit time that the sender knows a valid opening;
+    \item strong fairness, guaranteed output delivery, or denial-of-service
+    resistance;
+    \item deposits, penalties, a blockchain, trusted hardware, or a dispute
+    authority;
+    \item zero knowledge, non-repudiation, deniability, or coercion resistance;
+    \item secrecy after reveal or protection against strategy inference across
+    repeated games; or
+    \item production, post-quantum, adaptive, or composable security.
+\end{itemize}
+
+It also does not claim that committing to a move makes that move random,
+rational, cooperative, or good.
+
+\section{Commitment Primitive}
+
+Commitment schemes are commonly described through two properties:
+\emph{hiding}, which protects the committed value before opening, and
+\emph{binding}, which prevents a committer from opening the same commitment as
+two different values. Naor gives a formal commitment construction from
+pseudorandomness \cite{naor1991bitcommitment}. That work supplies background
+for the vocabulary, but it does not prove the different hash-based construction
+used here.
+
+For public context \(x\), move byte \(m\), and fresh 32-byte nonce \(r\), the
+educational construction computes
+
+\[
+    C=\operatorname{BLAKE2b}_{256}
+      \bigl(\operatorname{EncodeV1}(x,r,m)\bigr).
+\]
+
+The exact 16-byte commitment-domain string is the following ASCII text, without
+a terminating NUL:
+
+\begin{center}
+\texttt{AC-COMMITMENT-V1}
+\end{center}
+
+The 16-byte RPS protocol identifier contains ASCII \texttt{AC-RPS} followed by
+ten zero bytes.
+The canonical commitment preimage is:
+
+\begin{verbatim}
+scheme-domain[16]
+scheme-version:u16be
+protocol-id-length:u16be
+protocol-id[16]
+protocol-version:u16be
+session-id-length:u16be
+session-id[32]
+round:u32be
+committer-role:u8
+recipient-role:u8
+payload-type:u16be
+nonce-length:u16be
+nonce[32]
+payload-length:u64be
+payload[payload-length]
+\end{verbatim}
+
+All integer fields are unsigned and big-endian. Version 1 fixes the scheme,
+protocol, session, and nonce lengths but encodes the lengths explicitly so the
+byte sequence retains one meaning. No native C structure, padding byte,
+pointer, NUL terminator, or ambiguous text concatenation is hashed.
+
+The implementation uses a 32-byte unkeyed BLAKE2b digest. RFC 7693 specifies
+BLAKE2b and labels this parameter set with a \(2^{128}\) collision-security
+target \cite{saarinen2015blake2}. The RFC also declines to make an independent
+security assertion about the algorithm. The parameter label is therefore not
+a proof of this commitment construction. A fresh nonce matters because the
+move has only three possible values. A bare digest of the move would allow
+anyone to try all three possibilities.
+
+\subsection{A note on references and dependencies}
+
+A DOI in the bibliography is a persistent identifier for a paper. An RFC is a
+technical specification. Neither is code that the program imports. The
+protocol definition above is independent of any library. The C companion uses
+only one external cryptographic library, libsodium, which was already a project
+dependency. Its documentation identifies the generic-hash backend as BLAKE2b
+and documents its random-byte interface
+\cite{libsodium-generichash,libsodium-randombytes}. Protocol state, message
+encoding, and game logic remain ordinary C11.
+
+\section{Commit--Commit--Reveal--Reveal}
+
+Each participant maintains a separate local state. No protocol object contains
+both private moves.
+
+\begin{enumerate}
+    \item Alice and Bob independently initialize the same public context. Each
+    fixes its local move and samples a fresh secret nonce before processing a
+    peer message.
+    \item Alice emits \(C_A\), and Bob emits \(C_B\). Either commitment may
+    arrive first.
+    \item Each side parses the peer commitment and checks protocol version,
+    session, round, sender, recipient, type, and length before accepting it.
+    \item Only after both commitments exist may an honest participant emit a
+    reveal containing its move and nonce.
+    \item On receiving a reveal, the participant reconstructs the exact
+    commitment context and recomputes the digest.
+    \item A mismatched move, nonce, digest, role, session, round, or version is
+    rejected. A valid opening records the peer move.
+    \item Once the local reveal has been emitted and the peer opening has
+    validated, the participant computes the outcome.
+    \item A local abort, accepted peer abort, timeout, or established in-session
+    violation terminates the local execution without a completed outcome.
+\end{enumerate}
+
+Accepting \(C_A\) or \(C_B\) does not prove that its sender knows a valid
+opening. Any 32-byte string has valid commitment-message syntax. Knowledge is
+tested only when an opening arrives.
+
+\section{Messages, State Machine, and Transcript}
+
+Every message has this canonical envelope:
+
+\begin{verbatim}
+magic[4]                 = "ACRP"
+wire-version:u16be       = 1
+session-id[32]
+round:u32be
+sender-role:u8           = 1 (Alice) or 2 (Bob)
+recipient-role:u8        = 1 (Alice) or 2 (Bob)
+message-type:u8
+payload-length:u16be
+payload[payload-length]
+\end{verbatim}
+
+The header is exactly 47 bytes. Version 1 has three message types:
+
+\begin{itemize}
+    \item \texttt{COMMIT} (type 1): a 32-byte commitment digest, 79 bytes
+    total;
+    \item \texttt{REVEAL} (type 2): one move byte followed by a 32-byte
+    nonce, 80 bytes total;
+    \item \texttt{ABORT} (type 3): one enumerated reason byte, 48 bytes
+    total.
+\end{itemize}
+
+Version 1 names reason values \texttt{UNSPECIFIED}=1,
+\texttt{APPLICATION\_REQUEST}=2, and \texttt{PROTOCOL\_POLICY}=3. A reason is
+the sender's declaration; it is not independently verified evidence of cause
+or motive.
+
+The parser rejects truncation, trailing bytes, mismatched lengths, unknown
+values, equal sender and recipient roles, wrong recipient, zero round, and an
+all-zero session identifier. It does not cast a byte buffer to a C structure.
+
+The participant-local states are
+
+\begin{quote}
+\raggedright
+\texttt{READY}, \texttt{COMMIT\_SENT}, and
+\texttt{COMMIT\_RECEIVED};\\
+\texttt{BOTH\_COMMITTED}, \texttt{REVEAL\_SENT}, and
+\texttt{REVEAL\_RECEIVED};\\
+\texttt{COMPLETE}, \texttt{ABORTED\_LOCAL}, and
+\texttt{ABORTED\_PEER};\\
+\texttt{TIMED\_OUT} and \texttt{FAILED}.
+\end{quote}
+
+The central transitions are:
+
+\begin{center}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.22\textwidth}|
+                  >{\raggedright\arraybackslash}p{0.42\textwidth}|
+                  >{\raggedright\arraybackslash}p{0.22\textwidth}|}
+\hline
+State & Accepted action or peer message & Next state \\
+\hline
+\texttt{READY} & send local commitment & \texttt{COMMIT\_SENT} \\
+\hline
+\texttt{READY} & receive peer commitment & \texttt{COMMIT\_RECEIVED} \\
+\hline
+one commitment present & add the other valid commitment & \texttt{BOTH\_COMMITTED} \\
+\hline
+\texttt{BOTH\_COMMITTED} & send local reveal & \texttt{REVEAL\_SENT} \\
+\hline
+\texttt{BOTH\_COMMITTED} & receive valid peer reveal & \texttt{REVEAL\_RECEIVED} \\
+\hline
+one reveal present & add the other valid reveal & \texttt{COMPLETE} \\
+\hline
+any nonterminal state & local abort, peer abort, or local timeout & matching terminal state \\
+\hline
+\end{tabular}
+\end{center}
+
+Version 1 fails closed on a syntactically valid in-session premature reveal,
+duplicate, replay, conflicting commitment, or invalid opening. It does not
+buffer and recover from arbitrary network reordering. This protects state
+meaning at the cost of availability.
+
+The canonical transcript stores accepted raw messages in fixed logical slots:
+Alice commitment, Bob commitment, Alice reveal, Bob reveal, Alice abort, and
+Bob abort. Its header contains magic \texttt{ACRT}, transcript version,
+session identifier, round, and a six-slot count. Each fixed-order slot contains
+a slot identifier, a presence byte, a 16-bit big-endian message length, and the
+canonical message when present. An absent slot has presence zero and length
+zero. Six slot headers plus the largest possible messages give a version-1
+maximum of 481 bytes. It does not store rejected packets or local arrival
+order. Honest completed peers can therefore export identical bytes when every emitted
+message was delivered and accepted. A dropped message can produce different
+local transcripts. Local timeout and failure observations remain outside the
+shared-message transcript.
+
+The transcript is not signed. It is a canonical record of one participant's
+accepted bytes, not consensus, identity proof, non-repudiation, proof of
+delivery, or proof of motive.
+
+\section{Conditional Correctness}
+
+\textbf{Proposition.} Suppose Alice and Bob are honest, begin with identical
+valid public context, successfully compute their commitments, and eventually
+receive every canonical message before either local timeout. Then both enter
+\texttt{COMPLETE}, accept the same pair \((m_A,m_B)\), and report the same
+outcome.
+
+\textbf{Proof.} Each party's move and nonce are fixed during initialization.
+Both commitments are therefore available before either honest reveal is
+emitted. Each received reveal is accepted only if recomputation in the agreed
+context equals the corresponding earlier digest. Hence Alice and Bob accept
+the same two encoded moves. Both evaluate the same deterministic expression
+\(d=(m_A-m_B+3)\bmod 3\). For the nine possible pairs, \(d=0\) exactly for
+equal moves; \(d=1\) for paper over rock, scissors over paper, and rock over
+scissors; and \(d=2\) for the reverse cases. Therefore both report the same
+tie or winner. \(\square\)
+
+This proposition is conditional. It says nothing about completion under
+message loss, malicious abort, compromised randomness, or a broken hash
+assumption.
+
+\section{Claims and Evidence Status}
+
+\begin{center}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.20\textwidth}|
+                  >{\raggedright\arraybackslash}p{0.27\textwidth}|
+                  >{\raggedright\arraybackslash}p{0.39\textwidth}|}
+\hline
+Property & Status & Boundary \\
+\hline
+Honest correctness & Conditional proposition & Requires identical context, honest parties, successful operations, and eventual delivery before timeout. \\
+\hline
+Hiding before reveal & Computational security argument & Depends on a fresh secret 256-bit nonce and a random-oracle-style assumption; timing and context remain visible. \\
+\hline
+Binding after commit & Computational security argument & Depends on collision and alternate-opening difficulty for the exact canonical encoding; no formal reduction is supplied. \\
+\hline
+Knowledge of opening & Not achieved at commit time & A sender may submit a random digest and later fail to open it. \\
+\hline
+Context separation & Protocol invariant & Domain, versions, session, round, roles, and payload type are bound into the digest; this is not authentication. \\
+\hline
+Parsing and state behavior & Implementation evidence only & Unit and adversarial tests can establish enumerated behavior, not cryptographic hardness. \\
+\hline
+Strong fairness and guaranteed output & Not achieved & The second revealer may learn the result and then withhold its reveal. \\
+\hline
+Transcript accountability & Not achieved & The local unsigned transcript does not prove identity, delivery, or motive to a third party. \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Security-Argument Status}
+
+\subsection{Hiding argument}
+
+The move alone has only three possibilities. Hiding therefore comes from the
+fresh secret nonce, not from the move and not from the word ``hash.'' In a
+random-oracle-style model, an observer trying to distinguish the committed
+move must query the correct context, move, and 256-bit nonce or obtain an
+equivalent collision. With an independently sampled nonce that remains secret,
+this search is intended to be infeasible for a classical computationally
+bounded observer.
+
+This is only a heuristic security argument for a concrete hash function. The
+guarantee is not information theoretic, and the argument does not formally
+prove that BLAKE2b behaves as a random oracle. Nonce reuse, prediction,
+logging, early disclosure, or endpoint compromise invalidates the argument.
+
+\subsection{Binding argument}
+
+To open one digest as two different canonical messages, a committer would need
+two distinct encodings that produce the same 32-byte digest. For a fixed
+honest commitment, an adversary seeking another opening faces an
+alternate-opening or second-preimage problem. For a malicious committer that
+chooses both encodings, the relevant concern is collision finding.
+
+The encoding removes simple ambiguity attacks, but it does not prove the
+assumed properties of the hash. No reduction from a formal commitment game to
+a named BLAKE2b assumption is supplied here.
+
+\subsection{Context separation}
+
+Changing a protocol version, session, round, role, or payload type changes the
+canonical preimage. This prevents an otherwise valid opening from being
+accepted in a different context when the parser and state machine enforce the
+same fields. It does not stop an unauthenticated attacker from inventing a new
+message; that remains the transport layer's responsibility.
+
+\section{Attacks and Counterexamples}
+
+The implementation and chapter explicitly preserve the following failures:
+
+\begin{itemize}
+    \item \textbf{Commit without knowledge.} A malicious peer can send a
+    context-valid random digest for which it knows no opening.
+    \item \textbf{Wrong opening.} Changing the move or nonce causes
+    verification failure, but does not compel a correct opening.
+    \item \textbf{Cross-context replay.} A message from another session,
+    version, role, or round must be rejected; context fields are not identity
+    credentials.
+    \item \textbf{Premature reveal and duplicates.} Version 1 enters a failed
+    terminal state for an established in-session violation rather than
+    recovering.
+    \item \textbf{Silence.} A timeout is only the local observation that a
+    message did not arrive. It proves neither cause nor intent.
+    \item \textbf{Same-process demonstration.} Two independent state objects
+    help test ownership and chronology, but one teaching process is not a real
+    confidentiality boundary.
+    \item \textbf{Selective abort.} The second revealer can learn the result
+    and refuse to complete. This is developed next.
+\end{itemize}
+
+\section{Selective Abort, Timeout, and Fairness}
+
+Consider the following valid prefix of an execution:
+
+\begin{enumerate}
+    \item Alice and Bob accept both commitments.
+    \item Alice reveals first.
+    \item Bob validates Alice's opening. Because Bob already knows his own
+    move, Bob can now compute the result.
+    \item Bob's participant-local API still refuses to report a completed
+    outcome because Bob has not emitted his reveal. This API rule does not
+    erase what the malicious host can compute from its own memory.
+    \item If the result is unfavorable, Bob withholds his reveal or sends an
+    abort message.
+    \item Alice has only Bob's hiding commitment. She records the abort or
+    times out without learning Bob's move or the result. Neither local session
+    reaches \texttt{COMPLETE}.
+\end{enumerate}
+
+Bob has learned more than Alice and can bias which games reach completion. An
+explicit abort makes the peer's declaration visible within the assumed
+authenticated session, but it does not deliver the missing move. Silence gives
+Alice only a local timeout. The unsigned transcript proves neither delivery nor
+motive to a third party.
+
+Declaring the incomplete game a tie or automatically awarding a winner would
+not be a cryptographic repair. It would add an enforcement and utility
+mechanism whose authority, incentives, and abuse cases require a separate
+model.
+
+\section{C Implementation Companion}
+
+The companion is divided so that the game is not hidden inside a library call:
+
+\begin{description}
+    \item[Commitment interface.] \leavevmode\\
+    \path{include/ac/commitment.h} exposes typed
+    context, nonce, digest, computation, verification, and clearing operations.
+    \item[Commitment implementation.] \leavevmode\\
+    \path{src/primitives/commitment.c}
+    performs canonical incremental hashing and checked library operations.
+    \item[RPS interface.] \leavevmode\\
+    \path{include/ac/rps.h} exposes participant-local
+    initialization, message creation and receipt, timeout, typed abort reason,
+    outcome, transcript, and cleanup operations.
+    \item[RPS implementation.] \leavevmode\\
+    \path{src/protocols/rps.c} owns the parser,
+    state transitions, opening verification, outcome, and transcript.
+    \item[Teaching driver.] \leavevmode\\
+    \path{src/two_oracles_play_rock_paper_scissors/rps_demo.c} creates two
+    separate local states and transfers serialized messages between them. It is
+    not a network or process-isolation simulation.
+    \item[Tests.] The test artifacts are separated by purpose:
+    \begin{itemize}
+        \item \path{tests/test_commitment.c}\par
+        \noindent Deterministic commitment and mutation checks.\par
+        \item \path{tests/test_rps.c}\par
+        \noindent Honest games and core state behavior.\par
+        \item \path{tests/test_rps_adversarial.c}\par
+        Malformed, replay, invalid-opening, abort, timeout, and transcript
+        attacks.\par
+        \item \path{test-vectors/commitment-v1.md}\par
+        \noindent The frozen encoding vector.\par
+    \end{itemize}
+\end{description}
+
+The public interface maps to the protocol as follows:
+
+\begin{itemize}
+    \item initialize with \path{ac_rps_session_init}; deterministic tests alone
+    use \path{ac_rps_session_init_with_nonce_for_test};
+    \item emit messages with \path{ac_rps_make_commit},
+    \path{ac_rps_make_reveal}, and \path{ac_rps_make_abort};
+    \item process every peer message through \path{ac_rps_receive};
+    \item observe timeout, abort reason, and outcome through
+    \path{ac_rps_mark_timeout}, \path{ac_rps_get_abort_reason}, and
+    \path{ac_rps_get_outcome}; and
+    \item export or clear local state through \path{ac_rps_export_transcript}
+    and \path{ac_rps_session_clear}.
+\end{itemize}
+
+Ordinary execution obtains nonces from libsodium's operating-system-backed
+random interface. Tests inject fixed nonces through a separately named path.
+The library backend supplies hashing, random bytes, constant-time digest
+comparison, and memory-clearing helpers; the protocol itself remains visible
+as C11 state and byte encoding.
+
+The demonstration must print an educational, non-production warning, state the
+authenticated-transport assumption, and show both honest completion and the
+asymmetric selective-abort trace. It must not print a move or nonce before the
+corresponding reveal.
+
+\section{Tests and Experiments}
+
+The companion test suite is intended to check:
+
+\begin{itemize}
+    \item a deterministic commitment vector with the full canonical preimage;
+    \item mutation of every commitment context field, payload, nonce, and
+    digest;
+    \item all nine honest move pairs from both perspectives;
+    \item Alice-first and Bob-first legal message orders;
+    \item truncation, trailing data, invalid values, and length mismatches;
+    \item duplicate, replayed, reflected, reordered, and premature messages;
+    \item random commitments with no known opening and invalid openings;
+    \item abort before commitment, after both commitments, and after one reveal;
+    \item timeout, dropped delivery, terminal-state behavior, and transcript
+    disagreement; and
+    \item the selective-abort asymmetry described above.
+\end{itemize}
+
+A passing test establishes behavior for the exercised implementation and
+configuration. It does not establish computational hiding, binding, fairness,
+or production readiness. Tool versions and actual pass/fail results belong in
+the implementation report rather than being predicted by this chapter.
+
+\section{Ethical and Institutional Analysis}
+
+The protocol replaces one narrow trust relation: neither party must trust the
+other not to exploit an early plaintext move. It does so by fixing chronology
+in a transcript that can later reject inconsistent openings.
+
+It also creates choices that cryptography cannot settle. Who defines the
+timeout? What consequence follows from refusal? Can a weaker participant
+leave without punishment? Who can audit an alleged abort? Does an external
+penalty authority have too much power? A technically correct commitment does
+not answer those questions.
+
+The selective-abort trace is especially important institutionally. Detecting
+that cooperation stopped is not the same as restoring symmetry, and attaching
+punishment may create a new coercive institution. Later mechanisms must be
+judged both for their cryptographic properties and for who controls them.
+
+\section{What Cryptography Does Not Solve}
+
+Cryptography can help fix a move before disclosure and detect an inconsistent
+opening. It does not:
+
+\begin{itemize}
+    \item decide which move is good;
+    \item make either participant choose randomly or rationally;
+    \item force a participant or network to deliver a reveal;
+    \item give both parties the result at the same instant;
+    \item establish human identity or a trustworthy channel;
+    \item explain why a participant aborted;
+    \item prevent learning from the public history of completed games; or
+    \item turn a game rule or enforcement mechanism into a just one.
+\end{itemize}
+
+The protocol can constrain a small universe. It cannot choose the purpose of
+that universe for its inhabitants.
+
+\section{Limitations}
+
+This is a two-party, one-round educational construction. The security
+discussion is classical and non-composable. The exact hash commitment has no
+formal proof here. The channel assumption is not implemented. The state
+machine fails closed rather than recovering from arbitrary reordering or
+duplication. Local transcripts may disagree under message loss. The teaching
+driver runs both participant states in one process. The protocol provides no
+fair output, guaranteed delivery, crash recovery, persistence, concurrency,
+coercion resistance, or strategy privacy after reveal.
+
+These limitations are part of the result. Removing them requires additional
+mechanisms and assumptions, not stronger adjectives.
+
+\section{Open Problems}
+
+\begin{enumerate}
+    \item Does the original oracle sentence intend a problem beyond the narrow
+    timing interpretation used here?
+    \item Can the exact commitment be replaced by a comparably clear
+    construction with a directly applicable formal proof and equally minimal
+    implementation dependency?
+    \item What is the smallest mechanism that improves fairness without
+    introducing a trusted adjudicator, coercive penalty, or hidden new
+    assumption?
+    \item How should an authenticated transport expose delay, duplication, and
+    retry without making the protocol state ambiguous?
+    \item What information about strategy is inevitably leaked by repeated
+    completed rounds?
+    \item Under what institutional conditions is an abort consequence
+    legitimate rather than coercive?
+\end{enumerate}
+
+\section{Exercises}
+
+\begin{enumerate}
+    \item Enumerate all nine move pairs and verify the outcome formula.
+    \item Show why hashing only one of three move bytes does not hide the move.
+    \item Construct two messages from different sessions and identify every
+    field that prevents cross-session acceptance.
+    \item Write the local states observed by Alice and Bob in the selective-
+    abort trace. Which facts are shared, and which are merely local?
+    \item Explain why refusing to return an outcome from an API before both
+    reveals does not prevent a malicious host from learning it early.
+    \item Propose one fairness mechanism. List the new trusted power,
+    assumption, cost, and abuse case that it introduces.
+\end{enumerate}
+
+The bibliography for this chapter is emitted by the book or standalone-section
+wrapper. The chapter intentionally contains no independent bibliography
+declaration.

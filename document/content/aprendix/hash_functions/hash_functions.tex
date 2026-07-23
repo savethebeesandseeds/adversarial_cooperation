@@ -1,63 +1,390 @@
 \chapter{Hash Functions}
-\section{Definition}
-Hashes are one-way functions $y = hash(x)$. 
+\label{chap:hash-functions}
+\raggedbottom
 
-\section{Usages}
-\begin{itemize}
-    \item used to express $x$ without revealing it. 
-    \item Anonimusity.
-    \item key size reduction.
-    \item Information integrity protection.
-    \item Message authentication.
-    \item Digital signatures.
-\end{itemize}
+\section*{Author's Intuition}
 
+The original draft sought a way to use a digest to ``express \(x\) without
+revealing it.'' That is an important question, especially in adversarial
+cooperation, but a bare hash does not answer it in general. This chapter keeps
+the intuition visible and draws the boundary precisely: a digest is a public,
+deterministic fingerprint of exact bytes. Whether it hides anything depends on
+the input distribution and on a larger construction.
 
+\begin{abstract}
+This appendix introduces cryptographic hash functions as deterministic maps
+from byte strings to fixed-length digests. It separates preimage,
+second-preimage, and collision resistance; derives the familiar generic work
+factors only in an idealized model; and distinguishes an observed avalanche
+effect from a security proof. It then explains why an unkeyed digest is not
+encryption, anonymity, a message-authentication code, a signature, a
+commitment, password hashing, or a key-derivation function. The C companion
+uses the repository's sole cryptographic backend, libsodium, to compute
+BLAKE2b-256 test vectors. MD5 appears only as a historical collision example.
+\end{abstract}
 
-\section{Security Model}
-Hash function should be impossible to invert. 
-\begin{itemize}
-    \item First pre-Image resistance: Given $hash(\cdot), y$, the adversary knows not an inverse function $x = hash^-1(y)$. 
-    \item Second pre-Image resistance: Given $hash(\cdot), y, x_{1}$ where $y = hash(x_{1})$, the adversary known not a second value such that $y = hash(x_{2})$. 
-    \item Collision resistance: Given $hash(\cdot)$, the adversary knows not a pair $x_{1} != x_{2}$ where $y = hash(x_{1}) = hash(x_2)$.
-    \item Avalanche effect: Given $hash(\cdot), x, y$, any change $\delta{}x$, ---however small, should produce an unpredictable and chaotic change $\delta{}y$.
-\end{itemize}
+\section{A Function on Bytes}
 
-It is expected of a hash function, where n is the output size, that finding a pre-image requires $O(2^n)$ hash computations and producing a collision $O(2^{n/2})$ 
-hash computations. It's much easier to find a collision, this is know as the birthday attack. 
+For this appendix, an \emph{unkeyed \(n\)-bit hash function} is an efficiently
+computable deterministic function
+\[
+    H : \{0,1\}^{*} \longrightarrow \{0,1\}^{n}.
+\]
+It accepts an arbitrary finite byte string and returns an \(n\)-bit digest.
+The same bytes always produce the same digest. Different bytes are allowed to
+produce the same digest: because the domain is larger than the finite range,
+collisions necessarily exist. The cryptographic objective is not to abolish
+collisions, but to make specified adversarial searches computationally
+difficult.
 
-\section{Complexity Model}
+This functional definition does not say that \(H\) is ``one way.'' One-wayness
+is a security property defined by an experiment, an input or challenge
+distribution, an adversary's resources, and its success probability. Formal
+treatments also distinguish fixed functions from keyed hash-function families
+and give several non-equivalent versions of the basic notions
+\cite{rogaway2004hashbasics}. The experiments below are a deliberately compact
+teaching model, not a replacement for those definitions.
 
+\subsection{Bytes, not meanings}
 
-\section{Examples}
+The hash function sees neither words nor objects. It sees bytes. These inputs
+are distinct:
 
 \begin{verbatim}
-    ~$ echo -n "Hello, World!" | md5sum 
-    65a8e27d8879283831b664bd8b7f0ad4
-    
-    ~$ echo -n "ello, World!" | md5sum 
-    d41d8cd98f00b204e9800998ecf8427e
+61 62 63          ASCII "abc"
+61 62 63 0a       ASCII "abc" followed by a newline
+61 62 63 00       ASCII "abc" followed by a NUL byte
 \end{verbatim}
 
-echo "" | xxd -r -p | md5sum
-echo "" | xxd -r -p | md5sum
-echo "" | xxd -r -p | md5sum
-echo "" | xxd -r -p | md5sum
+Text encoding, normalization, field order, lengths, and terminators therefore
+belong to the protocol specification. A digest cannot repair an ambiguous or
+inconsistent encoding.
 
-echo "d131dd02c5e6eec4693d9a0698aff95c 2fcab58712467eab4004583eb8fb7f89 55ad340609f4b30283e488832571415a 085125e8f7cdc99fd91dbdf280373c5b d8823e3156348f5bae6dacd436c919c6 dd53e2b487da03fd02396306d248cda0 e99f33420f577ee8ce54b67080a80d1e c69821bcb6a8839396f965ab6ff72a70" | xxd -r -p | md5sum
-echo "d131dd02c5e6eec4693d9a0698aff95c 2fcab50712467eab4004583eb8fb7f89 55ad340609f4b30283e4888325f1415a 085125e8f7cdc99fd91dbd7280373c5b d8823e3156348f5bae6dacd436c919c6 dd53e1b487da03fd02396306d248cda0 e99f33420f577ee8ce54b67280a80d1e c69821bcb6a8839396f965ab6ff72a70" | xxd -r -p | md5sum
+\section{Three Different Resistance Experiments}
 
+Let \(H\) be fixed for the following informal experiments. A complete formal
+statement would additionally specify how challenges are sampled and bound the
+adversary's time, memory, queries, and success probability.
 
+\subsection{Preimage resistance}
 
-echo -n  | md5sum 
-echo -n  | md5sum 
+A challenge digest \(y\) is generated according to a stated experiment. The
+adversary receives \(y\) and succeeds if it returns any \(x'\) such that
+\[
+    H(x') = y.
+\]
+The notation \(H^{-1}(y)\) can be misleading: a compressing hash is generally
+many-to-one and has no unique inverse. The question is whether the adversary
+can find one member of the preimage set under the stated challenge model.
 
-echo -n " 2dd31d1 c4eee6c5 69a3d69 5cf9af98 87b5ca2f ab7e4612 3e580440 897ffbb8 
- 634ad55 2b3f409 8388e483 5a417125 e8255108 9fc9cdf7 f2bd1dd9 5b3c3780" | md5sum 
+\subsection{Second-preimage resistance}
 
+The adversary receives a particular input \(x\) and succeeds if it returns a
+different input \(x'\) such that
+\[
+    x' \ne x
+    \qquad\text{and}\qquad
+    H(x') = H(x).
+\]
+Here the first message is fixed by the experiment; the adversary does not get
+to choose both messages freely.
 
-echo -n " d11d0b96 9c7b41dc f497d8e4 d555655a c79a7335 cfdebf0 66f12930 8fb109d1
- 797f2775 eb5cd530 baade822 5c15cc79 ddcb74ed 6dd3c55f d80a9bb1 e3a7cc35" | md5sum 
+\subsection{Collision resistance}
 
+The adversary succeeds if it returns any pair \((x,x')\) satisfying
+\[
+    x \ne x'
+    \qquad\text{and}\qquad
+    H(x) = H(x').
+\]
+This is a different task because the adversary chooses both inputs. A practical
+collision attack does not automatically give an efficient preimage attack for
+a separately specified target digest.
 
-echo -n "d131dd02c5e6eec4693d9a0698aff95c2fcab50712467eab4004583eb8fb7f89 55ad340609f4b30283e4888325f1415a085125e8f7cdc99fd91dbd7280373c5b d8823e3156348f5bae6dacd436c919c6dd53e23487da03fd02396306d248cda0 e99f33420f577ee8ce54b67080280d1ec69821bcb6a8839396f965ab6ff72a70 " | md5sum 
+The three names are related intuitions, not interchangeable labels. Even basic
+implications depend on the chosen formalization and the amount of compression
+\cite{rogaway2004hashbasics}.
+
+\section{Idealized Generic Work Factors}
+
+Suppose only for this calculation that distinct queries behave like independent
+uniform samples from an \(n\)-bit range, and consider a classical generic
+attacker.
+
+For a fixed target \(y\), one trial succeeds with probability \(2^{-n}\). After
+\(q\) independent trials, the success probability is approximately
+\[
+    \frac{q}{2^n}
+\]
+while that ratio remains small. A constant success probability therefore
+appears at a scale near \(2^n\) trials.
+
+Among \(q\) sampled outputs there are \(q(q-1)/2\) pairs. The expected number
+of colliding pairs is approximately
+\[
+    \frac{q(q-1)}{2^{n+1}}.
+\]
+This becomes constant when \(q\) is on the scale of \(2^{n/2}\), the birthday
+scale.
+
+These are generic query estimates in an idealized model. They are not
+universal Big-O guarantees for every concrete function, and they are not a
+claim that no structural cryptanalysis can do better. This chapter makes no
+quantum work-factor claim.
+
+\section{Diffusion Is Not a Security Proof}
+
+The draft called the avalanche effect a security property. It is better treated
+here as an empirical diffusion observation: a small input change often changes
+many digest bits.
+
+The companion hashes two 32-byte messages that differ in one input bit. Their
+BLAKE2b-256 digests differ in 130 of 256 positions. This is visually useful,
+but it proves neither preimage resistance, second-preimage resistance, nor
+collision resistance. A deliberately weak construction can be made to look
+well diffused on selected examples.
+
+\section{What an Unkeyed Digest Can Establish}
+
+An unkeyed digest is useful as a reproducible fingerprint of exact bytes. A
+mismatch against an authentic reference detects that the bytes differ. Digest
+equality, however, is conditional evidence: collisions exist. Against an
+adversary, the needed assumption depends on the experiment---second-preimage
+resistance when one fixed original is already bound, or collision resistance
+when an attacker can prepare both alternatives. An attacker who can replace
+both a file and its reference digest can always make the replacement internally
+consistent.
+
+\begin{center}
+\small
+\begin{tabular}{|>{\raggedright\arraybackslash}p{0.25\textwidth}|>{\centering\arraybackslash}p{0.14\textwidth}|>{\raggedright\arraybackslash}p{0.45\textwidth}|}
+\hline
+Goal & Bare digest? & What is additionally required \\
+\hline
+Reproducible fingerprint & Yes & Exact bytes, algorithm, parameters, and output length \\
+\hline
+Detect change & Conditional & Authentic reference, exact encoding, and the relevant resistance assumption \\
+\hline
+Authenticate a sender & No & A specified MAC or signature construction and keys \\
+\hline
+Hide a guessable value & No & A defined hiding construction and its assumptions \\
+\hline
+Store a password & No & A salted, costed password-hashing scheme \\
+\hline
+Derive key material & Not generally & A specified KDF or extractor and entropy assumptions \\
+\hline
+Provide anonymity & No & An anonymity system with a leakage and adversary model \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Low-entropy inputs are guessable}
+
+Publishing \(H(\mathtt{paper})\) does not hide an RPS move. An observer hashes
+the three public candidates \(\mathtt{rock}\), \(\mathtt{paper}\), and
+\(\mathtt{scissors}\), then compares the results. The C demonstration performs
+this complete dictionary attack and recovers \(\mathtt{paper}\).
+
+The commitment in the book's Rock--Paper--Scissors chapter therefore hashes a
+canonical context, the move, and a fresh secret high-entropy nonce. Even that
+larger construction retains explicitly conditional hiding and binding
+arguments; the bare hash alone supplies neither property.
+
+\section{Adjacent Constructions Are Separate Protocols}
+
+\paragraph{Message authentication.}
+A MAC includes a secret key and a specified construction. HMAC, for example,
+is not the operation \(H(m)\); it is a keyed construction defined separately
+\cite{rfc2104hmac}. BLAKE2 also has a keyed mode, but this appendix's wrapper
+deliberately exposes only unkeyed hashing.
+
+\paragraph{Digital signatures.}
+A signature scheme defines key generation, signing, and verification. Many
+schemes hash an encoded message internally, but a digest by itself identifies
+no signer and provides no signature.
+
+\paragraph{Commitments.}
+A commitment needs both a hiding objective and a binding objective, plus a
+defined opening procedure and context. A bare digest of a predictable value is
+not hiding. The project's educational commitment is catalogued separately in
+the primitive registry.
+
+\paragraph{Password hashing.}
+Fast general-purpose hashing makes offline guessing cheap. Password storage
+needs a dedicated salted scheme with tunable resource costs. The official
+libsodium documentation explicitly says that its BLAKE2b generic-hash API is
+not suitable for password hashing \cite{libsodium-generichash}.
+
+\paragraph{Key derivation.}
+Hash functions can be components of KDFs and extractors, but a defined KDF does
+more than shorten bytes. Hashing weak or predictable material does not create
+entropy.
+
+\paragraph{Confidentiality and anonymity.}
+An unkeyed digest is deterministic and public. It is not encryption, and it
+can create stable linkable identifiers. Confidentiality and anonymity require
+their own constructions, threat models, and leakage analyses.
+
+\section{Structured Inputs and Domain Separation}
+
+Raw concatenation is ambiguous:
+\[
+    \mathtt{ab} \mathbin\| \mathtt{c}
+    =
+    \mathtt{a} \mathbin\| \mathtt{bc}
+    =
+    \mathtt{abc}.
+\]
+This equality is not a hash collision; both sides are literally the same byte
+string. A protocol must encode boundaries before hashing, for example with
+fixed-width fields or unambiguous lengths. Standard derived functions such as
+TupleHash likewise encode tuple elements so different tuples remain different
+inputs \cite{nist800185}.
+
+A public domain label and version can also prevent the same bytes from being
+silently interpreted as different protocol objects. Domain separators are
+context, not secrets. They do not replace a MAC key, encryption key, nonce, or
+password salt.
+
+\section{The Project's BLAKE2b-256 Profile}
+
+The companion fixes one profile:
+
+\begin{itemize}
+    \item algorithm: unkeyed BLAKE2b;
+    \item output length: 32 bytes;
+    \item implementation backend: libsodium; and
+    \item input: the exact caller-supplied byte string and length.
+\end{itemize}
+
+RFC~7693 specifies BLAKE2b and lists the 32-byte parameter set with a
+\(2^{128}\) collision-security target label \cite{saarinen2015blake2}. The same
+RFC explicitly makes no independent assertion of BLAKE2's security. The table
+label is therefore recorded as a design target, not as a proof.
+
+The output length is part of BLAKE2 initialization. BLAKE2b-256 is not defined
+as the first 32 bytes of a BLAKE2b-512 digest. Algorithm name, parameters, and
+exact input bytes all belong beside a published digest.
+
+\section{MD5: A Historical Collision Failure}
+
+The old draft intended to demonstrate an MD5 collision. That instinct is worth
+preserving, but the recorded blocks contained corrupted nibbles and did not
+collide. The active chapter replaces them with a verified historical vector in
+\path{test-vectors/hash-foundations-v1.md}; the untouched backup preserves the
+original draft.
+
+The short examples are:
+
+\begin{verbatim}
+MD5("Hello, World!") = 65a8e27d8879283831b664bd8b7f0ad4
+MD5("ello, World!")  = 2f695452b98fa1028dc11e1e60f17614
+MD5(empty)           = d41d8cd98f00b204e9800998ecf8427e
+\end{verbatim}
+
+The former chapter incorrectly printed the empty-input digest for
+\texttt{ello, World!}. Correcting a test vector does not rehabilitate MD5.
+RFC~6151 concludes that MD5 is no longer acceptable where collision resistance
+is required, including digital signatures \cite{rfc6151md5}. The verified
+128-byte pair in the vector file consists of distinct messages with the same
+MD5 digest, illustrating the collision task studied by Wang and Yu
+\cite{wang2005md5}.
+
+MD5 is not compiled or linked into this project's C companion. It remains only
+an attack-history exercise. The example also teaches a useful distinction: a
+collision break does not mean that every preimage problem has become equally
+easy.
+
+\section{C Implementation Companion}
+
+The public interface is \path{include/ac/hash.h}; the implementation is
+\path{src/primitives/hash.c}; and the teaching driver is
+\path{src/hash_functions/hash_demo.c}.
+
+The public operation is intentionally narrow:
+
+\begin{verbatim}
+ac_status ac_hash_blake2b_256(
+    ac_hash_blake2b_256_digest *digest,
+    const uint8_t *input,
+    size_t input_len);
+\end{verbatim}
+
+It validates the null/length policy, pins the algorithm and output length,
+checks library initialization and return values, and clears a non-null output
+on detected failure. It does not expose a generic framework, keyed mode,
+password API, or libsodium state type. The input and output buffers must not
+overlap.
+
+Run the fixed public demonstration with:
+
+\begin{verbatim}
+cd /src
+make -C demostrations demo_hash
+\end{verbatim}
+
+The demonstration prints an explicit warning, the empty and \texttt{abc}
+vectors, the one-bit diffusion observation, the complete three-choice guessing
+attack, and the ambiguous-concatenation lesson.
+
+\section{Tests and Evidence Boundary}
+
+The deterministic vectors live in
+\path{test-vectors/hash-foundations-v1.md}. The C test in
+\path{tests/test_hash.c} checks:
+
+\begin{itemize}
+    \item BLAKE2b-256 of the empty input and \texttt{abc};
+    \item all byte values from \texttt{00} through \texttt{ff};
+    \item binary lengths, including \texttt{abc} versus \texttt{abc\textbackslash0};
+    \item determinism and the exact 130-bit diffusion observation;
+    \item recovery of a bare-hashed three-choice input; and
+    \item invalid-argument handling and output clearing.
+\end{itemize}
+
+The MD5 collision was independently reproduced with a standard-library tool
+that is not a project runtime dependency. The two messages also have distinct
+BLAKE2b-256 digests, as recorded in the vector file.
+
+Passing these tests establishes exact behavior for the recorded implementation
+and inputs. It does not establish computational hardness, resistance to an
+unknown attack, production suitability, or the security of a larger protocol.
+
+\section{What Cryptography Does Not Solve}
+
+A digest records a deterministic relationship between bytes. It does not
+determine whether those bytes are truthful, whether their author is
+trustworthy, or whether their interpretation is just. An unkeyed digest does
+not authenticate its own reference value, conceal a guessable input, repair
+ambiguous serialization, protect a compromised endpoint, force a party to
+reveal a commitment, or guarantee the security of a larger protocol. Those
+properties require additional constructions and assumptions.
+
+\section{Limitations and Open Questions}
+
+This appendix does not formalize all seven notions catalogued by Rogaway and
+Shrimpton, survey BLAKE2 cryptanalysis, analyze quantum queries, benchmark
+implementations, or approve an algorithm for production deployment. It gives a
+fixed educational profile and the minimum distinctions required by later
+chapters. Each later construction must state which property it needs and why
+its complete encoding and threat model justify that use.
+
+\section{Exercises}
+
+\begin{enumerate}
+    \setlength{\itemsep}{0.25em}
+    \item Hash \texttt{abc}, \texttt{abc\textbackslash n}, and
+    \texttt{abc\textbackslash0}; record the exact input bytes.
+    \item Explain why publishing \(H(\mathtt{rock})\) does not hide an RPS move.
+    \item Construct an active replacement attack when a file and its digest
+    share an unauthenticated channel.
+    \item Derive the approximate collision probability after \(q\) ideal
+    \(n\)-bit queries.
+    \item Explain why a collision pair need not solve a chosen preimage.
+    \item Repair \(\mathtt{a}\|\mathtt{bc}\) versus
+    \(\mathtt{ab}\|\mathtt{c}\) with an explicit canonical encoding.
+    \item Reproduce the historical MD5 pair; state which property it falsifies.
+    \item Reproduce the commitment vector; distinguish byte correctness from
+    conditional hiding and binding.
+\end{enumerate}
+\flushbottom

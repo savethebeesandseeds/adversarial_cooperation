@@ -1,17 +1,839 @@
-\chapter{Tic-Tac-Toe without revealing the strategy}
+\chapter{Tic-Tac-Toe without Revealing the Strategy}
+\label{chap:tic-tac-toe-private-strategy}
 
-A perfect strategy in Tic-Tak-Toe is an undefeated one, (one that might wins or ties any games). 
+\begin{quote}
+\textbf{Author's Intuition.}
 
-Here is a way to proof your adversary that you know the perfect strategy, without 
-revealing the strategy. 
+\emph{A perfect strategy in Tic-Tak-Toe is an undefeated one, one that might
+win or tie any game. Here is a way to prove to your adversary that you know the
+perfect strategy without revealing the strategy. Commit to a session seed;
+avoid the adversary cloning the strategy; let the adversary select the initial
+conditions; inspect all the Monte Carlo scenarios; investigate whether one can
+invert the matrix; and always include code for demonstration.}
+\end{quote}
+
+These notes contain several distinct research questions. This chapter
+preserves them, but it does not present them as one completed mechanism. A
+session identifier, commitment randomness, and a policy-generation seed are
+different objects. Random sampling is not an exhaustive proof. No matrix has
+yet been defined whose inverse implies anything about Tic-Tac-Toe. These are
+open directions, not hidden steps in the construction below.
+
+\begin{center}
+\fbox{\begin{minipage}{0.91\textwidth}
+\textbf{Current Result: Public Verification by Full Disclosure.}
+
+The current C companion checks a complete, disclosed deterministic policy
+through three public representations: a recursive diagnostic checker, a fixed
+bottom-up game-DAG evaluator, and deterministic role-specialized Boolean
+circuits called \(\mathsf{Core\mbox{-}X}\) and
+\(\mathsf{Core\mbox{-}O}\). The circuits check the public game version,
+claimant role, empty initial board, complete canonical policy, and fixed-DAG
+root value. The policy remains plaintext. ``Witness'' names an input-wire
+range; it does not confer secrecy. The circuits contain no
+\(\mathsf{Bind}\), commitment, proof system, zero-knowledge mechanism,
+authentication, or anti-cloning mechanism.
+\end{minipage}}
+\end{center}
+
+\begin{abstract}
+This chapter separates a private-strategy aspiration from the public predicate
+that any later private proof would have to establish. For ordinary
+three-by-three Tic-Tac-Toe, we define legal reachable states, a canonical
+deterministic positional policy, and a non-loss condition for a fixed player
+role. A plain C11 diagnostic checker validates a fully disclosed policy and
+exhaustively branches over every legal opponent move from the standard empty
+board. A second C11 evaluator expresses the same verdict as a fixed bottom-up
+recurrence over the reachable game DAG, without recursion or a
+policy-selected successor address. A third dependency-free C11 component emits
+and evaluates fixed XOR/AND circuits for the game predicate
+\(\mathsf{Core}\). All three remain disclosure baselines, not a solution to
+the chapter title. We distinguish
+knowledge of a committed policy, policy legality, global non-loss, private
+per-state evaluation, and resistance to extraction through repeated queries.
+We then state a candidate committed-policy relation for future zero-knowledge
+argument-of-knowledge research, compare bounded implementation routes, and
+complete the backend-neutral Boolean-circuit step for
+\(\mathsf{Core}\). The separate \(\mathsf{Bind}\) predicate, both
+commitment layers, and every proof transformation remain open. We identify the
+leakage, abort, composition, and setup questions that remain open.
+\end{abstract}
+
+\section{Cooperation Problem}
+
+A player may wish to demonstrate that it possesses a strategy that cannot be
+defeated while retaining the particular strategy as private information. The
+verifier wants evidence stronger than one successful game, but the player does
+not want to disclose a complete response table.
+
+The parties are only partially aligned. Both benefit from a precise and
+checkable claim. The claimant benefits from keeping its policy private, while
+the verifier benefits from finding a losing branch or extracting useful
+responses. The narrow research question is:
+
+\begin{quote}
+Can a claimant prove knowledge of one fixed, legal, non-losing policy for a
+specified role and initial state without revealing that policy beyond the
+truth of the claim?
+\end{quote}
+
+The first public slice answered a prerequisite question instead: what exact
+predicate should be checked if the policy is disclosed? The second fixed its
+game-DAG recurrence, and the present slice freezes that recurrence as public
+Boolean netlists. None of these steps hides the policy. Defining the predicate
+first prevents a future proof system from hiding an ambiguous or incorrect
+computation.
+
+\section{Disclosure and Trusted-Evaluator Baselines}
+
+Under full disclosure, the claimant sends the complete strategy to the
+verifier. The verifier can check every entry and simulate every opponent
+continuation. This provides transparent verification but no policy privacy.
+
+A trusted evaluator offers another baseline. The claimant privately supplies
+the policy; the evaluator checks it and announces a verdict. This hides the
+policy from the verifier only by moving trust to the evaluator, who learns the
+policy and may misreport, retain, or redistribute it.
+
+The public checker in this chapter implements the first baseline. A future
+cryptographic construction would seek some of the evaluator's confidentiality
+without inheriting its discretionary power. Cryptography is relevant only
+after the statement, witness, verifier, and leakage have been fixed.
+
+\section{Fixed Game Model}
+
+The game is ordinary three-by-three Tic-Tac-Toe. Number the cells from $0$
+through $8$ in row-major order. Each cell is empty, X, or O. X moves first;
+the roles alternate; a row, column, or diagonal of one mark wins; and play
+stops immediately after a win. A full board without a winner is a draw. The
+initial state $s_0$ is the empty board.
+
+A state is \emph{legal and reachable} only if it occurs along such a play from
+$s_0$. In particular, boards with impossible mark counts, simultaneous
+winners, or moves after a win are not reachable game states.
+
+Encode cell values as
+
+\[
+    \mathsf{EMPTY}=0,\qquad \mathsf{X}=1,\qquad \mathsf{O}=2,
+\]
+
+and encode a board $b$ by
+
+\[
+    \operatorname{index}(b)=\sum_{i=0}^{8} b_i 3^i.
+\]
+
+Thus there are $3^9=19{,}683$ possible byte-addressable board encodings,
+although most do not describe legal reachable states. Exhaustive enumeration
+from the empty board, without expanding terminal states, gives 5,478 reachable
+boards: 2,423 nonterminal X-to-move boards, 2,097 nonterminal O-to-move boards,
+and 958 terminal boards. The C tests use these independently expected counts
+as finite-model cross-checks, not as cryptographic evidence.
+
+\section{Canonical Deterministic Policy}
+
+Fix a claimant role $p\in\{\mathsf{X},\mathsf{O}\}$. Let $S_p$ be the set
+of legal reachable nonterminal states in which $p$ moves, and let $A(s)$
+be the empty cells in state $s$. A deterministic positional policy is a
+function
+
+\[
+    \pi:S_p\longrightarrow\{0,\ldots,8\},
+    \qquad \pi(s)\in A(s)\text{ for every }s\in S_p.
+\]
+
+Canonical Policy Version~1 represents this function as a 19,683-byte table.
+At an index corresponding to a state in $S_p$, the byte is one legal cell
+number from $0$ to $8$. Every invalid board, opponent-turn board, terminal
+board, and other non-required position contains the distinguished byte
+\texttt{0xff}. Consequently, the encoding has no semantically ignored bytes.
+
+The claimant role is a separate public input. The table does not encode the
+claimant's identity, authorship, originality, randomness, session, or promise
+to follow the policy later.
+
+The original note proposes committing to a session seed. A seed alone commits
+to nothing. A binding commitment to that seed can bind the selected policy
+only if a public deterministic algorithm
+
+\[
+    \pi=\mathsf{GeneratePolicy}(\mathit{seed})
+\]
+
+is fixed and that equality is included in the checked relation. Without such
+a rule, a seed and a policy are unrelated strings. A unique public session
+identifier distinguishes execution context only when it is incorporated into
+the committed message, public statement, or authenticated transcript;
+commitment randomness is private opening material used by a hiding
+construction; and a generation seed may compactly select a policy. None
+substitutes for the others.
+
+\section{Legal, Non-Losing, and Minimax-Optimal}
+
+These terms must not be merged.
+
+\begin{itemize}
+    \item A \emph{legal} policy selects an empty cell at every required
+    claimant-turn state and has the canonical no-move byte everywhere else.
+    \item A policy is \emph{non-losing from $s_0$} if, when it is followed
+    at every claimant turn and the opponent may make any legal move, every
+    terminal branch is a claimant win or a draw.
+    \item A policy is \emph{locally minimax-optimal} if its choice has optimal
+    game-theoretic value at every state under consideration.
+\end{itemize}
+
+For ordinary Tic-Tac-Toe, the value of the empty board under optimal play is a
+draw. A non-losing policy therefore realizes the optimal value from $s_0$,
+but it need not choose an optimal move at every legal off-path state. The
+current checker establishes non-loss only from the fixed empty board. It does
+not establish local optimality at every state, uniqueness, or superiority to
+another non-losing policy.
+
+Allowing a verifier to choose arbitrary initial conditions changes the claim.
+Some legal states are already forced losses for one role. A challenged-state
+protocol must define a public allowed set, include the initial state in the
+statement, and distinguish a bad continuation from a position whose value was
+already losing. This remains open.
+
+\section{Public Exhaustive Predicate}
+
+For a role $p$ and canonical policy $\pi$, define
+$\mathsf{PublicNonLose}(p,\pi)=1$ exactly when:
 
 \begin{enumerate}
-    \item commit to a session seed. 
-    \item avoid the adversary from cloning the strategy. 
-    \item proof loop (warning, a loop permits adversarial cloning)
-        \item adversary select the initial conditions
-        \item proof of undefeated all the montecarlo scenarios
-        \item proof that you can invert the matrix
+    \item every required entry is present and selects an empty cell;
+    \item every non-required entry is \texttt{0xff}; and
+    \item from $s_0$, following $\pi$ at claimant turns and branching over
+    every legal opponent move never reaches an opponent win.
 \end{enumerate}
 
-always include codes for demonstration. 
+The verifier first classifies the complete legal reachable-state graph. It
+rejects missing, out-of-range, occupied-cell, and unexpected entries. It then
+performs a deterministic depth-first traversal. At a claimant turn it follows
+the policy's single move. At an opponent turn it explores every empty cell in
+ascending order. It stops at every win or full-board draw. On the first
+opponent win it returns the complete chronological move sequence.
+
+This is exhaustive enumeration, not Monte Carlo sampling. A random sample can
+miss the sole losing branch of an otherwise successful policy, and therefore
+cannot by itself establish the universal no-loss predicate. Sampling could
+support a separately stated statistical test under a named distribution and
+error bound, but that would be a different claim.
+
+The original matrix-inversion note is also not part of this predicate. No
+matrix, encoding, or theorem currently connects invertibility to legal play or
+non-loss. If such a connection is discovered, it should first be stated as a
+separate mathematical relation and compared with direct exhaustive checking.
+
+\section{C Implementation Companion and Evidence}
+
+\begin{sloppypar}
+The preserved public-checker interface is \path{include/ac/ttt.h}; both
+evaluators remain in \path{src/protocols/ttt.c}; and their tests remain in
+\path{tests/test_ttt.c}. The Boolean interface is split between
+\path{include/ac/bool_circuit.h} and
+\path{include/ac/ttt_core_circuit.h}; its implementations are
+\path{src/circuits/bool_circuit.c} and
+\path{src/circuits/ttt_core_circuit.c}; and its tests are
+\path{tests/test_bool_circuit.c} and
+\path{tests/test_ttt_core_circuit.c}. The demonstration is
+\path{src/tic_tac_toe_without_revealing_the_strategy/ttt_demo.c}. The protected
+checker interface, implementation, and original 13-test suite remain
+byte-identical independent baselines. The implementation uses C11,
+caller-owned storage, and the standard library only. It performs no heap
+allocation, randomness, hashing, commitment, network communication, or
+libsodium call.
+\end{sloppypar}
+
+Both evaluators distinguish API execution from the mathematical verdict. Null
+pointers and invalid roles are API errors. A malformed but readable policy is
+a successfully computed invalid-policy verdict. A canonical policy with an
+opponent-winning continuation is a losing verdict accompanied by a replayable
+trace from the recursive checker. The fixed-DAG report deliberately contains
+no invented trace or DFS exploration count. The public reference-policy
+generator uses deterministic backward
+induction; it is a convenience for demonstrations and tests, not a secret or
+cryptographic mechanism.
+
+The test suite checks both roles, an independent graph and history census,
+malformed encodings, late losing branches, deterministic repeated reports,
+terminal-state handling, every legal one-entry alternative of both generated
+reference policies, and a deterministic set of multi-entry policies. The
+single-entry sweep contains 6,208 X policies and 5,439 O policies. It is
+exhaustive only at Hamming distance one from those two reference tables, not
+over all canonical policies. Such tests establish enumerated implementation
+behaviour for tested builds. The induction argument below establishes the
+mathematical recurrence; neither it nor the tests are machine-checked formal
+verification of the C program. They do not establish policy privacy, zero
+knowledge, knowledge extraction, authorship, or future behaviour.
+
+Most importantly, the checker receives the entire 19,683-byte table. It does
+not implement the title's non-revelation goal.
+
+\section{Five Claims That Must Remain Separate}
+
+\subsection{Knowledge of a Strategy}
+
+A commitment-shaped value does not demonstrate that its sender knows an
+opening. Formal proof of knowledge requires an extractor-based definition
+relating verifier acceptance to recovery of a witness
+\cite{bellare1993definingknowledge}. The current checker has no commitment and
+no extractor.
+
+\subsection{Legality}
+
+Once a complete policy is disclosed, legality is an ordinary deterministic
+property. An unopened commitment cannot be scanned for missing, occupied, or
+unexpected moves. Merely committing to bytes proves none of their semantics.
+
+\subsection{Non-Loss}
+
+Once a legal policy is disclosed, finite exhaustive traversal establishes the
+implemented no-loss predicate. One successful game, a set of favourable
+examples, or an unspecified Monte Carlo loop does not cover every adversarial
+branch.
+
+\subsection{Private Per-State Evaluation}
+
+Returning $\pi(s)$ necessarily reveals that output. If the state and output
+are public, a future claimant might return the move with a zero-knowledge proof
+that it is consistent with the same committed policy. If the verifier's query
+state must also be hidden, the problem becomes private two-party computation.
+Neither mechanism is present here.
+
+\subsection{Resistance to Cloning}
+
+A reusable interface that returns the exact deterministic move on arbitrary
+states exposes the table one entry at a time. Cryptography cannot conceal an
+answer that the interface deliberately releases. Query restrictions,
+statefulness, fresh session policies, or randomized policies may change how
+quickly useful information accumulates, but each requires its own leakage
+definition.
+
+\section{Future Committed-Policy Relation}
+
+Commitment schemes formalize hiding and binding properties under stated
+assumptions; Naor's construction is one foundational reference
+\cite{naor1991bitcommitment}. That work does not prove the repository's
+instructional hash commitment or the Tic-Tac-Toe predicate.
+
+A future protocol may use the public instance
+
+\[
+ x=(v_G,p,s_0,C,\mathit{ctx})
+\]
+
+and the private witness
+
+\[
+ w=(\pi,r),
+\]
+
+where $v_G$ fixes the game and policy versions, $s_0$ fixes the initial state,
+$C$ is a policy commitment, $\mathit{ctx}$ fixes the protocol and session
+context, and $r$ is its opening information. Define the relation
+
+\[
+ \begin{aligned}
+ R(x,w)=1 \quad\Longleftrightarrow\quad{}
+ &v_G=1 \;\land\; p\in\{\mathsf{X},\mathsf{O}\}
+     \;\land\; s_0=\mathsf{EmptyBoard} \\
+ &{}\land\;\mathsf{Open}\bigl(C,\mathit{ctx},
+     \mathsf{Encode}(v_G,p,s_0,\pi),r\bigr)=1 \\
+ &{}\land\;\mathsf{PublicNonLose}(p,\pi)=1.
+ \end{aligned}
+\]
+
+Zero knowledge asks that the verifier learn no more from a proof than what is
+already implied by the public statement. The foundational definition is due
+to Goldwasser, Micali, and Rackoff
+\cite{goldwasser1989knowledgecomplexity}. Goldreich, Micali, and Wigderson show
+the conceptual breadth of zero-knowledge proofs for NP under their stated
+assumptions \cite{goldreich1991proofsvalidity}. This existence result does not
+select a practical backend, prove knowledge automatically, or establish the
+security of a concrete composition.
+
+The author's full technical goal would require an instantiated protocol having
+both a zero-knowledge property and a proof- or argument-of-knowledge property
+for $R$, under named setup, adversary, commitment, channel, and composition
+assumptions. The computational target selected below is an argument of
+knowledge. This chapter implements none of that machinery. In particular, the
+existing instructional hash commitment is not silently promoted into a proof
+system.
+
+\section{Selecting a Private-Proof Route}
+
+The immediate target is one global zero-knowledge argument of knowledge for the
+relation $R$, not a service that returns policy moves. The public instance and
+accept/reject outcome remain visible. A later instantiation that meets the
+selected zero-knowledge definition against a malicious verifier should reveal
+no additional information about the witness beyond that public instance and
+the truth of the statement. A per-state interface instead returns $\pi(s)$ and
+therefore reveals one policy output on every query. Private per-state
+evaluation is a separate two-party-computation problem with its own input
+privacy, output leakage, fairness, and repeated-query requirements.
+
+This target is provisional, not achieved. It concerns one standalone
+interactive execution by classical probabilistic polynomial-time algorithms:
+completeness is perfect or explicitly bounded; computational knowledge
+soundness is stated against a malicious prover through an extractor for the
+complete witness; and computational zero knowledge is stated against a
+malicious verifier. For the combinatorial soundness calculation, the honest
+verifier samples independent uniform challenges after the first proof-internal
+commitments. The malicious-verifier zero-knowledge target must instead handle
+arbitrary probabilistic polynomial-time verifier challenge strategies under the
+selected transformation. The security definitions concern the direct abstract
+prover--verifier transcript. Human identity, transport authentication, relays,
+delivery, timing, concurrency, resets, composition, endpoint compromise,
+fairness, and recovery are outside this initial target.
+
+The relation also has two costs that must remain visible. Write
+
+\[
+ R(x,w)=\mathsf{Core}(v_G,p,s_0,\pi)
+        \land \mathsf{Bind}(C,\mathit{ctx},v_G,p,s_0,\pi,r),
+\]
+
+The predicate $\mathsf{Core}$ checks the game version, valid role, and empty
+initial state. It also evaluates $\mathsf{PublicNonLose}$, which already
+includes complete canonical-policy validation. The predicate $\mathsf{Bind}$
+checks the exact commitment opening and context. Proving only $\mathsf{Core}$
+does not connect the policy to $C$. Proving only $\mathsf{Bind}$ says nothing
+about legality or non-loss.
+Dropping $C$ entirely would merely prove knowledge of some non-losing ordinary
+Tic-Tac-Toe policy, a capability that is already public and easy to reproduce.
+
+\subsection{Bounded Comparison}
+
+The foundational generic result of Goldreich, Micali, and Wigderson shows why
+an NP relation can be approached through zero knowledge
+\cite{goldreich1991proofsvalidity}. A generic reduction remains valuable
+theory, but implementing such a reduction as this chapter's companion would
+add substantial representation and communication machinery without teaching
+the structure of the finite-game predicate.
+
+The MPC-in-the-head method of Ishai, Kushilevitz, Ostrovsky, and Sahai converts
+a suitable multiparty computation into a zero-knowledge protocol
+\cite{ishai2007zeroknowledgemp}. ZKBoo develops a concrete version for Boolean
+circuits using symmetric primitives \cite{giacomelli2016zkboo}. Proposition
+4.2 of ZKBoo analyzes its basic three-message protocol in the
+commitment-hybrid model, assuming a correct, 2-private $(2,3)$-decomposition of
+the circuit computation. In that model it is a Sigma protocol with special
+honest-verifier zero knowledge and 3-special soundness. These properties do not
+automatically provide malicious-verifier zero knowledge.
+
+The proof-internal commitments to simulated views are distinct from the public
+policy commitment $C$ checked by $\mathsf{Bind}$. A concrete experiment must
+separately justify the binding and hiding of the view commitments, any
+pseudorandom-tape assumptions, their encodings and domains, and their transcript
+cost. Naming ZKBoo makes neither commitment layer compatible with the current
+instructional hash commitment.
+
+For one idealized repetition, a uniformly sampled challenge in
+$\{1,2,3\}$ leaves the combinatorial soundness term at most $2/3$. With
+independent repetitions and independently uniform challenges chosen after the
+first messages, that term is $(2/3)^r$; the smallest integer making only this
+term at most $2^{-128}$ is
+
+\[
+ r=\left\lceil\frac{128}{\log_2(3/2)}\right\rceil=219.
+\]
+
+This equation is not a total soundness bound or proof-size estimate for our
+relation. A concrete argument must also include the binding-failure term of its
+chosen view commitment. The Boolean cost of \(\mathsf{Core}\) is now measured
+for the frozen construction below. The costs of \(\mathsf{Bind}\),
+proof-internal commitments, simulated views, transformations, and transcripts
+remain unmeasured. A \(\mathsf{Core}\) gate count is not a proof-size
+estimate. Transformations beyond the basic Sigma protocol are required for the chapter's
+malicious-verifier zero-knowledge and knowledge target. Making the protocol
+non-interactive with Fiat--Shamir would additionally enter the random-oracle
+model and require exact transcript binding and challenge sampling. This chapter
+selects neither transformation yet.
+
+Transparent succinct systems offer a different tradeoff. Spartan, for
+example, provides argument-of-knowledge constructions for R1CS without a
+relation-specific trusted setup in its transparent variants
+\cite{setty2020spartan}. Its stack includes an arithmetic constraint system,
+sum-check, and both computation and polynomial commitments. This is a credible
+later production-oriented comparison point, but importing or reimplementing
+such machinery would violate the present objective of a small, inspectable
+next experiment.
+
+Accordingly, MPC in the head is the leading family for a later explicitly
+educational interactive experiment, conditional on circuit measurement and a
+separate analysis of the full zero-knowledge and knowledge transformations.
+It is not an implemented protocol, a selected production backend, or a current
+security claim. Generic NP reductions and succinct arithmetic systems remain
+comparison points; a trusted evaluator and private per-state computation remain
+separate baselines.
+
+\subsection{Completed Implementation Gate: A Fixed Game DAG}
+
+The second executable evaluator still contains no proof system. It expresses
+the public predicate as a fixed bottom-up directed acyclic graph and keeps the
+recursive checker as an independent diagnostic baseline.
+
+Independent finite enumeration gives 5,478 reachable states, of which 4,520
+are nonterminal and 958 are terminal. The terminal states comprise 626 X wins,
+316 O wins, and 16 draws. There are 8,631 legal edges out of X-turn states and
+7,536 out of O-turn states, or 16,167 public state edges in total. By contrast,
+the unmerged legal history tree has 549,946 nodes. The merged state graph is
+therefore the natural fixed computation; these counts do not estimate a
+cryptographic proof size. Independent tests also count 255,168 terminal legal
+games in that unmerged tree.
+
+The base-three board encoding supplies a particularly small topological
+schedule. If cell $a$ is empty and the public side to move has numeric encoding
+$t\in\{1,2\}$, then
+
+\[
+  \mathsf{child}(i,a)=i+t3^a>i.
+\]
+
+Consequently, one ascending scan of all 19,683 encodings can propagate
+reachability and classify the graph, and one descending scan can evaluate
+every child before its parent. A complete ascending scan between them validates
+every policy byte. The implementation needs no recursion, queue, heap, edge
+table, or stored ply schedule.
+
+Canonical validation is part of the relation rather than a precondition hidden
+from it. At every required state the evaluator compares the policy byte with
+each public cell number. It never reads a board or successor at an address
+chosen by that byte. It scans the full table, records the first malformed entry
+only for diagnostics, continues the fixed evaluation, and gives the
+invalid-policy verdict precedence over the root value. This prevents a missing
+or nonsensical move from being misreported merely as a losing policy.
+
+For every reachable state $i$, let $q_i$ denote whether the claimant avoids
+loss from that state while following the policy. The recurrence is
+well-founded from later plies to earlier plies; the implementation's
+descending index scan is an equivalent reverse topological order because every
+legal child index exceeds its parent index:
+
+\[
+q_i=
+\begin{cases}
+1, & i\text{ is terminal and is not an opponent win},\\
+0, & i\text{ is an opponent win},\\
+\displaystyle\bigvee_{a\in A(i)}
+ \left([\pi(i)=a]\land q_{\mathsf{child}(i,a)}\right),
+    & i\text{ is a claimant-turn state},\\
+\displaystyle\bigwedge_{a\in A(i)}q_{\mathsf{child}(i,a)},
+    & i\text{ is an opponent-turn state}.
+\end{cases}
+\]
+
+Here $[\pi(i)=a]$ is a Boolean equality bit. Every state, legal move $a$, and
+successor index is public; only the equality result and derived values depend
+on the policy. Canonical-policy validation ensures that exactly one legal move
+is selected at each claimant state. The $q_i$ values are deterministically
+constrained intermediates, not independent semantic witness inputs; a backend
+may nevertheless encode them as auxiliary wires or witness entries. The
+recurrence accepts exactly when the empty-board value is one.
+
+\noindent\textbf{Proposition.}
+\emph{DAG and recursive predicate equivalence.}
+For either claimant role and every Canonical Policy Version~1 table $\pi$, the
+fixed-DAG root value equals the Boolean verdict of the recursive checker.
+
+\textbf{Proof.}
+For a legal reachable state $s$, let $F(s)$ be the recursive semantic value
+after canonical validation: it is zero exactly for an opponent-win terminal;
+at a claimant turn it is the value of the single policy child; and at an
+opponent turn it is the conjunction of every legal child value. We prove
+$q(s)=F(s)$ by strong induction on the number of empty cells.
+
+At a terminal state the two definitions agree directly. At a nonterminal
+claimant state, canonical validity gives one legal move
+$a^*=\pi(s)$. Every selector equality except $[\pi(s)=a^*]$ is zero, so the
+disjunction reduces to $q(\mathsf{child}(s,a^*))$; the induction hypothesis
+makes this $F(\mathsf{child}(s,a^*))=F(s)$. At a nonterminal opponent state,
+both definitions are the conjunction of the values of all legal children, and
+the induction hypothesis applies to each child. Therefore $q(s)=F(s)$ at every
+reachable state and in particular at the empty board. $\square$
+
+Malformed-table agreement is a separate validation statement. Both
+implementations use the same required states, reason precedence, and first
+ascending-index error. The differential tests compare that evidence, but do
+not compare the recursive checker's first losing path or history-node counts
+with a DAG report.
+
+For claimant X, the C recurrence performs 8,631 policy-to-cell equalities,
+8,631 selector term conjunctions, 8,631 selector disjunction folds, and 7,536
+opponent conjunction folds. For claimant O, 7,536 replaces each selector
+count and there are 8,631 opponent folds. Both roles scan 19,683 graph slots,
+19,683 policy bytes, and 19,683 value slots; derive 5,478 reachable values; and
+visit 16,167 public edges. These are operations of this C evaluator, not gates
+in an optimized Boolean circuit.
+
+The explicit scratch payload is two 19,683-byte arrays, one for state kinds and
+one for values, plus a nine-byte board: 39,375 bytes in total. The serialized
+policy remains exactly 19,683 bytes. This count excludes scalar locals, the
+caller-owned report, compiler padding, and the call frame, so it is not a
+whole-process memory measurement.
+
+The differential corpus includes every legal Hamming-distance-one alternative
+of the two generated reference policies: 6,208 for X and 5,439 for O. It also
+includes 256 deterministically generated multi-entry policies per role and
+malformed representatives. This does not enumerate the full canonical spaces,
+whose sizes are
+
+\[
+  9\,7^{72}5^{756}3^{1372}
+  \quad\text{for X},\qquad
+  8^9 6^{252}4^{1140}2^{696}
+  \quad\text{for O}.
+\]
+
+The multi-entry cases are a reproducible corpus, not a random sample, and no
+probability bound is claimed. Tests can reveal implementation disagreement;
+the induction gives the mathematical reason the two recurrences agree and may
+still fail to expose a shared low-level C defect.
+
+This equivalence gate supplies the semantics for the Boolean construction
+below. The commitment computation remains separate rather than disappearing
+inside the game predicate. Proof-internal view commitments would be an
+additional cryptographic cost and assumption, not part of
+\(\mathsf{Bind}\).
+
+\subsection{Boolean Circuits for Core}
+
+The implementation emits two circuits, \(\mathsf{Core\mbox{-}X}\) and
+\(\mathsf{Core\mbox{-}O}\). Each specialization still receives and checks
+the public role byte. The public input is the four-byte sequence
+
+\begin{center}
+\texttt{[version][role][initial-index-high][initial-index-low]}.
+\end{center}
+
+The index is an unsigned big-endian integer. Version~1 accepts only its
+specialized role and initial index zero. The policy input is the unchanged
+19,683-byte Canonical Policy Version~1 table. The IR calls that range
+\emph{witness input}, but the evaluator receives every byte in plaintext.
+Within each packed byte, bit zero is assigned first.
+
+Wire zero is constant false and wire one is constant true. Public bits come
+next, followed by policy bits and then gate outputs. Every gate has two earlier
+wire operands and is either XOR or AND. Circuit shape, operands, and output wire
+depend on the public game and role specialization, not on policy contents.
+Required policy bytes reuse their legal-move equality wires between canonical
+validation and the claimant recurrence; non-required bytes are compared with
+\texttt{0xff}. The circuit follows the same public successor locations and
+descending board-index recurrence as the fixed-DAG evaluator.
+
+The canonical serialization is byte-defined rather than a dump of C structs.
+It has a 32-byte header, big-endian integer fields, and one nine-byte record per
+gate, for exactly \(32+9G\) bytes. Construction, evaluation, depth analysis,
+and serialization use caller-owned storage. Evaluation uses one byte per wire
+and applies a best-effort volatile wipe before returning. That wipe is not a
+guarantee about registers, compiler-created copies, operating-system state, or
+the caller-owned public and policy buffers.
+
+\begin{center}
+\begin{tabular}{l@{\hspace{1.5em}}r@{\hspace{2em}}r}
+\hline
+Quantity & \(\mathsf{Core\mbox{-}X}\) & \(\mathsf{Core\mbox{-}O}\) \\
+\hline
+Public input bits & 32 & 32 \\
+Policy/witness input bits & 157,464 & 157,464 \\
+AND gates & 215,022 & 209,313 \\
+XOR gates & 31,350 & 27,344 \\
+Total gates & 246,372 & 236,657 \\
+Total wires & 403,870 & 394,155 \\
+Output depth & 31 & 30 \\
+Gate storage (bytes) & 2,956,464 & 2,839,884 \\
+Evaluator scratch (bytes) & 403,870 & 394,155 \\
+Canonical serialization (bytes) & 2,217,380 & 2,129,945 \\
+\hline
+\end{tabular}
+\end{center}
+
+These are exact counts for this frozen construction, confirmed by separately
+analyzing and parsing the emitted circuits. They are not lower bounds,
+optimized backend costs, proof sizes, transcript sizes, running-time results,
+or security levels. The named builder scratch occupies 255,888 bytes on the
+tested C11 ABI; this records \texttt{sizeof} for that layout rather than an
+ABI-independent whole-process memory claim.
+
+The bounded differential corpus covers the two reference policies, known
+canonical losing policies, all 256 values at policy byte zero, named malformed
+classes, 256 stratified legal one-entry mutations and 128 deterministic
+canonical multi-entry policies per role, and invalid public version, role, and
+initial-index inputs. Representative cases use the scalar production
+evaluator. A separate test-only 64-lane interpreter reads the canonical bytes
+independently so many policies can be compared with both preserved C
+evaluators without changing the public API. This corpus is not exhaustive over
+the enormous canonical policy spaces, and testing is not formal verification.
+
+Serialization is not a commitment. Evaluating \(\mathsf{Core}\) does not
+evaluate the complete relation
+\(R=\mathsf{Core}\land\mathsf{Bind}\). The external policy commitment,
+proof-internal commitments, soundness, extraction, zero knowledge, privacy,
+interaction, and production security remain absent.
+
+\section{Repeated-Query Reconstruction}
+
+\textbf{Proposition (exact finite-oracle reconstruction).}
+Let $D$ be a finite domain and let $\pi:D\rightarrow A$ be deterministic.
+Any party permitted to query an oracle $O_\pi(s)=\pi(s)$ at every $s\in D$
+can reconstruct $\pi$ using $|D|$ distinct queries.
+
+\textbf{Proof.}
+Enumerate the elements of $D$. Query each element once and store the returned
+pair $(s,O_\pi(s))$. The resulting table agrees with $\pi$ at every member
+of its domain and is therefore the same function. No computational assumption
+is involved. $\square$
+
+For Canonical Policy Version~1, unrestricted access over all claimant-turn
+states reconstructs every required entry. If access is limited to games
+actually reached from $s_0$, the proposition does not imply recovery of
+unqueried off-path entries, even though those entries are legally reachable;
+nevertheless, every observed move reveals the policy at one visited state.
+Repeated adaptive games expose an expanding partial table.
+
+A randomized policy changes exact recovery into statistical estimation:
+repeated queries reveal samples from its output distribution. An anti-cloning
+claim would then need a query budget, a target approximation metric, and a
+definition of what counts as a successful clone.
+
+One global zero-knowledge argument for the non-loss relation avoids serving a
+per-state policy oracle. It can certify a property without offering the
+strategy as a service. It also does not prevent the verifier from independently
+constructing another non-losing Tic-Tac-Toe policy.
+
+\section{Attacks, Abort, Leakage, and Composition}
+
+The public checker is designed to expose malformed and losing policies rather
+than conceal them. Relevant cases include missing entries, out-of-range moves,
+occupied-cell moves, stray bytes on opponent or terminal states, role
+confusion, post-win boards, and a single losing line hidden behind many safe
+branches.
+
+Future private protocols add different risks:
+
+\begin{itemize}
+    \item a commitment may be replayed in a different game, role, or session
+    if its context is incomplete;
+    \item a malicious party may publish a syntactically valid value for which
+    it knows no opening;
+    \item a biased challenge or sampled checker may avoid the losing branch;
+    \item selected openings or policy responses accumulate information across
+    sessions;
+    \item an interactive prover may abort before the verifier accepts;
+    \item a recipient may learn a per-state output and then abort before
+    providing its own promised action; and
+    \item a protocol satisfying a stated zero-knowledge or knowledge-soundness
+    property in a stand-alone execution may not retain that property under
+    concurrent, reset, or adaptively interleaved executions.
+\end{itemize}
+
+No protocol can force a silent participant to send the next message. An abort
+establishes non-completion, not motive, guilt, or network cause. Fairness,
+guaranteed output delivery, availability, authentication, and recovery are
+therefore not consequences of the future relation $R$. They would require
+separate mechanisms and claims.
+
+\section{Ethical and Institutional Interpretation}
+
+The attractive general idea is broader than this small game: a party may wish
+to demonstrate that a private policy satisfies a public safety condition
+without surrendering every private preference. The separation between policy
+and proof can protect legitimate autonomy.
+
+It can also hide power. A proof establishes only the encoded predicate. It
+does not show that the predicate is fair, that excluded states were chosen
+justly, that affected people can appeal, or that the hidden policy lacks other
+harmful behaviour. In a consequential institution, the authority to define
+the state space, allowed initial conditions, objective, proof circuit, and
+update rules matters at least as much as witness privacy.
+
+Tic-Tac-Toe is intentionally harmless and finite. It is a laboratory for this
+distinction, not evidence that the same construction should govern people.
+
+\section{What Cryptography Does Not Solve}
+
+Even a correct future zero-knowledge argument of knowledge for $R$ would not:
+
+\begin{itemize}
+    \item decide whether non-loss is the right objective;
+    \item establish authorship, originality, identity, or exclusive knowledge;
+    \item prove that the claimant will follow the policy after the proof;
+    \item prevent independent discovery of another non-losing policy;
+    \item hide outputs intentionally released by a policy oracle;
+    \item force completion, explain an abort, or guarantee availability;
+    \item make arbitrary losing initial conditions winnable; or
+    \item give matrix inversion a role that has not been mathematically defined.
+\end{itemize}
+
+Zero knowledge can constrain what a transcript reveals about a witness. It
+cannot choose a just predicate or turn a public, easily computed capability
+into a unique strategic advantage.
+
+\section{Limitations and Open Problems}
+
+The current result is limited to fixed ordinary three-by-three Tic-Tac-Toe, a
+deterministic positional policy, one fixed role, and the standard empty board.
+The complete policy is disclosed in memory. The implementation contains no
+protocol-message parser, persistence, identity, transport, commitment, proof
+system, private computation, random policy, or generalized-game analysis.
+
+The following questions remain open:
+
+\begin{enumerate}
+    \item Which public deterministic generation rule, if any, should connect
+    the author's proposed session seed to a policy?
+    \item Which initial positions may a verifier choose, and how should their
+    pre-existing minimax values alter the claim?
+    \item Which separately versioned \(\mathsf{Bind}\) circuit should connect
+    the complete canonical policy to an external commitment and context, under
+    which commitment assumptions, and at what measured cost?
+    \item Which concrete MPC-in-the-head transformation can prove knowledge of
+    the complete committed witness while meeting a malicious-verifier
+    zero-knowledge definition; under which commitment, setup, and composition
+    assumptions; and with what rounds, transcript, and proof size?
+    \item Should per-state evaluation reveal the query, the move, both, or only
+    a derived game action?
+    \item What query budget and leakage metric would make a meaningful
+    anti-cloning claim?
+    \item Does the author's matrix intuition correspond to a useful linear or
+    algebraic representation, or should it remain a metaphor?
+    \item Can a role-specific compact internal witness be expanded
+    canonically to the complete Version~1 policy without changing the message
+    bound by the commitment?
+\end{enumerate}
+
+These are research questions. The recursive checker, fixed-DAG evaluator, and
+Boolean Core remain public-disclosure baselines against which later answers
+must be compared.
+
+\section{Exercises}
+
+\begin{enumerate}
+    \item Independently enumerate the legal reachable states and reproduce the
+    four state counts in this chapter.
+    \item Construct a canonical policy containing exactly one reachable losing
+    branch, and explain why random play may miss it.
+    \item Give an example showing why non-loss from $s_0$ does not imply
+    locally optimal moves at every off-path state.
+    \item Define a public policy-generation algorithm and extend $R$ so that
+    a private seed, rather than a policy table, is the witness. List the new
+    assumptions this introduces.
+    \item Prove the finite-oracle reconstruction proposition for the role you
+    choose, and state why it does not automatically reconstruct unqueried
+    off-path states when access is restricted to actual games.
+    \item Choose a legal state that is already losing for the player to move.
+    Explain why unrestricted verifier-selected initial conditions make the
+    original non-loss claim impossible.
+    \item Describe the difference between a zero-knowledge proof for $R$ and
+    a zero-knowledge proof of knowledge for $R$. Identify what an extractor
+    must output in the latter case.
+    \item Prove directly from the base-three board encoding that every legal
+    child index exceeds its parent index. Reimplement the bottom-up recurrence
+    without calling either C evaluator and compare all three verdicts on a
+    precisely described finite corpus.
+    \item Independently parse, recount, and evaluate both serialized Core
+    circuits. Explain why agreement on a bounded corpus proves neither policy
+    privacy nor circuit equivalence for every possible policy.
+\end{enumerate}

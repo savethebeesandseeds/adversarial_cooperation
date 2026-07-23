@@ -2,27 +2,39 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-OUT_DIR="${ROOT_DIR}/demostrations/.build/pdf"
-TMP_DIR="${ROOT_DIR}/.temp/book_sources"
+OUT_DIR="${BOOK_OUT_DIR:-${ROOT_DIR}/demostrations/.build/pdf}"
+TMP_DIR="${BOOK_TMP_DIR:-${ROOT_DIR}/.temp/book_sources}"
 
 usage() {
   cat <<'EOF'
 Usage:
-  book -pdf <target>
-  book -list
-  book -h | --help
+  bash book -pdf <target>
+  bash book -list
+  bash book -h | --help
 
 Targets:
   section_poker   Build poker demonstration section PDF
+  section_rps     Build the canonical Two Oracles RPS chapter PDF
+  section_hash    Build the canonical Hash Functions appendix PDF
+  section_trust   Build the canonical Trust Establishment chapter PDF
+  section_ttt     Build the canonical Tic-Tac-Toe public-checker chapter PDF
 
 Examples:
-  ./book -pdf section_poker
+  bash book -pdf section_poker
+  bash book -pdf section_rps
+  bash book -pdf section_hash
+  bash book -pdf section_trust
+  bash book -pdf section_ttt
 EOF
 }
 
 list_targets() {
   cat <<'EOF'
 section_poker -> demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex
+section_rps -> document/content/two_oracles_play_rock–paper–scissors/two_oracles_play_rock–paper–scissors.tex
+section_hash -> document/content/aprendix/hash_functions/hash_functions.tex
+section_trust -> document/content/trust_establishment/trust_establishment.tex
+section_ttt -> document/content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy.tex
 EOF
 }
 
@@ -31,6 +43,18 @@ target_to_tex() {
   case "$target" in
     section_poker)
       printf '%s\n' "demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex"
+      ;;
+    section_rps)
+      printf '%s\n' "document/content/two_oracles_play_rock–paper–scissors/two_oracles_play_rock–paper–scissors.tex"
+      ;;
+    section_hash)
+      printf '%s\n' "document/content/aprendix/hash_functions/hash_functions.tex"
+      ;;
+    section_trust)
+      printf '%s\n' "document/content/trust_establishment/trust_establishment.tex"
+      ;;
+    section_ttt)
+      printf '%s\n' "document/content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy.tex"
       ;;
     *)
       return 1
@@ -44,7 +68,7 @@ compile_pdf_target() {
 
   section_tex_rel="$(target_to_tex "$target")" || {
     echo "Unknown target: $target" >&2
-    echo "Run './book -list' to see available targets." >&2
+    echo "Run 'bash book -list' to see available targets." >&2
     exit 1
   }
 
@@ -64,16 +88,34 @@ compile_pdf_target() {
   wrapper_tex="${TMP_DIR}/${target}.tex"
 
   cat >"$wrapper_tex" <<EOF
-\\documentclass[12pt]{book}
+\\documentclass[12pt,openany]{book}
 \\input{${ROOT_DIR}/document/utils/text_utils.tex}
 \\input{${ROOT_DIR}/document/utils/math_utils.tex}
+\\hypersetup{hidelinks}
 \\begin{document}
 \\input{${section_tex_abs}}
-\\end{document}
+EOF
+
+  if [[ "$target" == "section_rps" || "$target" == "section_hash" || "$target" == "section_trust" || "$target" == "section_ttt" ]]; then
+    cat >>"$wrapper_tex" <<'EOF'
+\bibliographystyle{plain}
+\bibliography{references}
+EOF
+  fi
+
+  cat >>"$wrapper_tex" <<'EOF'
+\end{document}
 EOF
 
   echo "Compiling target '${target}'..."
-  latexmk -pdf -interaction=nonstopmode -outdir="$OUT_DIR" "$wrapper_tex"
+  if [[ "$target" == "section_rps" || "$target" == "section_hash" || "$target" == "section_trust" || "$target" == "section_ttt" ]]; then
+    BIBINPUTS="${ROOT_DIR}/document:${BIBINPUTS:-}:" \
+      latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error \
+        -outdir="$OUT_DIR" "$wrapper_tex"
+  else
+    latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error \
+      -outdir="$OUT_DIR" "$wrapper_tex"
+  fi
 
   echo "PDF generated: ${OUT_DIR}/${target}.pdf"
 }

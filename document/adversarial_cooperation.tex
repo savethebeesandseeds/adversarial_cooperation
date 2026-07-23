@@ -1,8 +1,9 @@
-\documentclass[draft,12pt]{book}
+\documentclass[12pt]{book}
 
 % Load packages
 \input{utils/text_utils.tex} % Include the auxiliary text file
 \input{utils/math_utils.tex} % Include the auxiliary math file
+\hypersetup{hidelinks}
 
 % Document information
 \title{Adversarial Cooperation}
@@ -18,6 +19,9 @@
 \mainmatter
 % \include{content/introduction}
 \include{content/trust_establishment/trust_establishment}
+
+\bibliographystyle{plain}
+\bibliography{references}
 
 \backmatter
 

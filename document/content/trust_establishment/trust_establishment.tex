@@ -1,98 +1,434 @@
 \chapter{Trust Establishment}
-
 \label{chap:trust-establishment}
 
 \begin{abstract}
-In cooperative systems the parties make no assumptions about channel security; this stage is therefore called \emph{trust establishment}.  
-Classical \emph{unauthenticated} key-exchange schemes provide confidentiality against passive eavesdroppers, yet they fall to active man-in-the-middle attacks.  
-Cooperation cannot rely on unverified assumptions.  
-Our sole assumption is access to a local true-random generator; parties remain vulnerable only to signal-loss. 
-
-We propose that each participant first isolates and safeguards an experiment to measure a truly random source, then models the resulting noise according to their individual preferences.  
-No harm arises if other parties learn one another’s secret keys, secrets are tactical disadvantages. 
+Parties cannot remove trust by naming a cryptographic primitive.  They can
+instead make each trust assumption visible and ask which property depends on
+it.  This chapter separates local entropy generation, public coordination,
+unauthenticated key exchange, identity binding, authenticated key
+establishment, and secret-key agreement from correlated observations.  Its
+central boundary is simple: local randomness may create a private secret, but
+it does not identify a remote participant.  The chapter presents a taxonomy
+and research agenda, not a new key-establishment protocol or security theorem.
 \end{abstract}
 
+\section{Scope and Contribution Status}
 
-\section{Topic}
-Let $\Lambda$ model $n$ raw entropy sources $\Pi^{}_{n}$, where $\lambda^{i}$ are the \emph{eigenvalues} of the covariance.  
+Within this book, \emph{trust establishment} means making explicit which setup
+resource binds a session, credential, or key to an intended peer, and which
+properties that binding supplies.  It does not mean creating moral trust.  It
+does not prove that a participant is honest, that an institution assigned the
+right identity, or that messages will be delivered.
 
-\begin{protocol}
-\caption{Private-key derivation from a random signal.}
-\label{prot:eczkmh}
+This chapter is a literature-backed foundation.  It makes no novelty claim,
+selects no universal identity system, and implements no protocol.  Its task is
+to prevent later chapters from confusing distinct resources merely because
+they all appear near the beginning of a cryptographic conversation.
+
+\section{Author's Intuition}
+
+The original draft begins with an important instinct:
+
+\begin{quote}
+Each participant should isolate and safeguard an experiment from which local
+uncertainty is measured.  The participant should not have to surrender every
+private advantage merely to cooperate.
+\end{quote}
+
+That instinct survives here as a principle of participant autonomy.  A party
+should be able to control its local source, understand its failure modes, and
+retain only the secrets the joint purpose actually needs.  The draft's phrase
+``secrets are tactical disadvantages'' is therefore preserved as a
+secret-minimization principle: long-lived secrets are capabilities, but they
+are also liabilities that can be stolen, coerced, copied, or misused.
+
+The earlier text also distinguishes an adversary, who may protect its own
+interests while sharing the joint purpose, from an enemy whose objective
+includes defeating that purpose.  This chapter preserves the distinction as an
+author's modeling question, not as a cryptographic property.  A later protocol
+must express it through explicit behavior or preference assumptions.
+
+It must not be read as the technical claim that secret-key disclosure causes
+no harm.  Disclosure can enable impersonation, forgery, decryption, or
+retrospective compromise, depending on the protocol.
+
+An earlier version of this chapter also asks whether extensive challenge steps
+can defeat an active interposer, calls the problem ``a grail in cryptography,''
+and separates active interception from denial of service.  Those questions
+remain valuable.  A challenge, however, can demonstrate possession only
+relative to a credential, secret, or statement that was already bound to the
+intended peer.  Challenges do not create that binding from nothing.
+
+\section{The Cooperation Problem}
+
+Let Alice and Bob intend to communicate.  Let Mallory control the network, and
+let $\Sigma$ denote whatever setup resource the parties already possess.  The
+resource $\Sigma$ might be empty, a pre-shared secret, an authenticated public
+key, a certificate policy, a remembered first key, a password, or evidence
+obtained in a physical meeting.  Let $T$ be the public transcript.  Depending
+on the task, Alice and Bob may output local keys $K_A$ and $K_B$, a public
+action, or an explicit abort.
+
+The phrase ``channel security'' hides several different questions:
+
+\begin{itemize}
+    \item \textbf{Confidentiality:} who can read the messages?
+    \item \textbf{Origin authentication:} what justifies attributing a message
+    to a particular peer or credential?
+    \item \textbf{Integrity:} can modification be detected?
+    \item \textbf{Freshness:} can an old valid message be replayed as new?
+    \item \textbf{Ordering and agreement:} do the parties accept the same
+    session context and transcript?
+    \item \textbf{Delivery:} can an adversary delay or suppress every message?
+\end{itemize}
+
+A chapter may assume some of these properties and construct others.  It may
+not silently treat them as one indivisible guarantee.
+
+\section{Six Different Tasks}
+
+The comparison below separates six tasks that the earlier draft placed too
+close together.
+
 \begin{center}
-\[
-\mcaln{} \coloneqq (-1,1) \subset \mathbb{R}, 
-\qquad 
-\mcalnp{} =\mcaln{} \: \bmod{} p,
-\]
-\[
-\wkmodel{},
-\]
-\[
-\mcalk{}.
-\]
-\[
-\mathcal N := (-1,1)\subset\mathbb R,
-\qquad
-\mathcal N_p := Q_p\!\bigl[\mathcal N\bigr]\subset\mathbb Z_p,
-\;\;
-Q_p(x)=\bigl\lfloor(x+1)\tfrac{p-1}{2}\bigr\rfloor \pmod{p}.
-\]
+\centering
+\small
+\textbf{Six tasks and their resources}\par\medskip
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}
+                >{\raggedright\arraybackslash}p{0.24\textwidth}
+                >{\raggedright\arraybackslash}p{0.22\textwidth}
+                >{\raggedright\arraybackslash}p{0.22\textwidth}}
+\textbf{Task} & \textbf{Initial resource} & \textbf{Output or goal} &
+\textbf{What is still missing} \\
+\hline
+Local secret generation & Characterized local source and protected endpoint &
+Unpredictable local bits & No remote peer or shared value \\
+\hline
+Public coordination & Common public state, algorithm, or beacon & Same public
+action or random value & No secrecy and no identity by itself \\
+\hline
+Unauthenticated key exchange & Computational assumptions and fresh local
+randomness & Matching key against a passive observer & No protection from
+active key substitution \\
+\hline
+Identity or credential binding & A setup rule in $\Sigma$ & Association between
+a name or role and a credential & No session key or delivery by itself \\
+\hline
+Authenticated key establishment & A binding resource plus a key-establishment
+protocol & A fresh, peer-bound shared key or abort & Availability and endpoint
+integrity remain external \\
+\hline
+Correlated-source agreement & Jointly distributed observations $X,Y,Z$ and
+authenticated public discussion & Information-theoretic shared key under an
+exact source model & No conclusion from Alice--Bob correlation alone \\
+\end{tabular}
 \end{center}
-\end{protocol}
 
-\begin{algorithm}[H]
-\caption{Entropy-Maximised Private-Key Derivation (\( \mathsf{Alt}\,1 \))}
-\label{alg:emp-max}
-\KwIn{Raw entropy batch $\Pi_n$, participant index $i$, target prime $p$}
-\KwOut{Private key $k_n^{\,i}$}
+The table is not a menu of interchangeable implementations.  It is a guard
+against circular reasoning.  For example, assuming an authenticated public
+channel in order to study correlated-source agreement is legitimate, but that
+study does not then explain where the authentication came from.
 
-\textbf{Isolate} local entropy experiment\tcc*[r]{Physical shielding}
-\nl $\pi \gets \textsc{MeasureRandomSource}(\Pi_n)$\;
-\nl $\Lambda^{i} \gets \textsc{SolveMaxEntropyModel}\bigl(\pi,\mathrm{constraints}_i\bigr)$\;
-\nl $\mathcal{N}_p \gets \textsc{OptimiseQuantiser}\bigl(\Lambda^{i},p\bigr)$\;
-\nl $u \gets \Lambda^{i}(\pi)$\tcp*{continuous $(0,1)$ value}
-\nl $k_n^{\,i} \gets \bigl\lfloor u\cdot p \bigr\rfloor \bmod p$\;
-\nl $k_n^{\,i} \gets \textsc{ExtractUniformBits}\!\bigl(k_n^{\,i}\bigr)$\tcp*{e.g.\ HKDF}
-\KwRet{$k_n^{\,i}$}
-\end{algorithm}
+\section{Local Entropy Is Not Remote Identity}
 
+A defensible local randomness pipeline contains several separately reviewable
+stages:
 
-Step~\ref{step:model} of Algorithm~\ref{alg:pkd}
-embeds user preferences into~$\Lambda^{i}$.
+\begin{enumerate}
+    \item describe the physical or non-physical noise source and how it may be
+    observed or influenced;
+    \item digitize raw observations without hiding finite-precision or sampling
+    effects;
+    \item estimate a conservative lower bound on min-entropy under a stated
+    model;
+    \item condition or extract only under the preconditions of a named
+    construction;
+    \item derive purpose-specific keys with explicit context and separation;
+    \item health-test the source, protect the resulting state, rotate secrets,
+    and define failure behavior.
+\end{enumerate}
 
+NIST SP 800-90B treats a noise source, optional deterministic conditioning,
+and health testing as distinct components.  It requires documentation and
+entropy assessment and states that deterministic conditioning has at most the
+entropy of its input\cite{nist80090b}.  Conditioning may reduce bias or
+concentrate available entropy; it cannot manufacture entropy absent from the
+source.  A later key-derivation step likewise does not repair an
+uncharacterized input merely by giving it a cryptographic name.
 
+Covariance, variance, visible noise, and an attractive histogram can help
+diagnose a source, but none is automatically a min-entropy bound.  Physical
+shielding may reduce some forms of observation or influence, yet it proves
+neither source quality nor endpoint integrity.  If Mallory can predict the
+source, bias the measurement, or read the conditioned key from memory, the
+local pipeline has failed even if every deterministic transformation executes
+correctly.
 
+Most importantly, Alice can execute a flawless local pipeline and still have
+no evidence that a received message came from Bob.  Local unpredictability and
+remote identity answer different questions.
 
+\subsection{Open Research Note: The Original Entropy Model}
 
-This is not finish, algorithm is just a sketch. 
+The original sketch proposed raw observations $\Pi_n$, a participant-specific
+model $\Lambda$, covariance eigenvalues, a quantizer into $\mathbb{Z}_p$, and a
+final conditioning step.  It also wanted participants to model local noise
+according to their own preferences.  The sketch was explicitly unfinished.
 
+It is preserved as a research question rather than an active protocol.  Before
+it could derive cryptographic key material, it would need at least:
 
+\begin{itemize}
+    \item a defined stochastic and adversarial source model;
+    \item an explanation of what $\Lambda$ maps and what its eigenvalues mean;
+    \item a conservative min-entropy estimate with confidence and restart
+    behavior;
+    \item a finite-precision quantizer and an analysis of bias after mapping
+    into $\mathbb{Z}_p$;
+    \item exact preconditions for the conditioner or extractor; and
+    \item health tests and explicit behavior when the model is falsified.
+\end{itemize}
 
-\section{Coordination vs Secrecy}
+Two questions are especially promising.  Can covariance structure assist
+source diagnostics without being mistaken for an entropy proof?  Can parties
+choose autonomous local sources and models while still reporting an objective,
+comparable lower bound required by a shared protocol?  Until those questions
+are answered, the construction remains an open research note.
 
-Independent, perfectly random seeds do not let isolated parties land on the same secret value; information-theoretic results forbid it.
+\section{From Key Exchange to an Intended Peer}
 
+An unauthenticated computational key exchange can be analyzed against a
+passive observer under the assumptions of its selected construction.  That
+statement does not extend to an active network adversary who may replace
+messages.
 
-In this sense we can either have, secrecy or coordination. 
+The elementary interposition trace is:
 
-| Setting                                                                                         | Mutual information $I(X;Y)$ between Alice’s and Bob’s raw bits | Can a shared secret key be distilled?                                                                                                              |
-| ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Truly independent RNGs**                                                                      | $I=0$                                                          | **No.** Shannon (1949) already implies the eavesdropper can simulate either party as well as the other.                                            |
-| **Correlated observations of the same phenomenon** (noise on a wire, channel reciprocity, etc.) | $I>0$ but $<H$                                                 | **Yes** – Maurer/Wolf key-agreement theorems (1993-2003) show you can squeeze a key of length $\le I$ by error-correction + privacy-amplification. |
-| **Pre-shared seed / entanglement / trusted beacon**                                             | Explicit common randomness                                     | **Trivial** – seed → PRF → key stream.                                                                                                             |
+\begin{enumerate}
+    \item Alice sends unauthenticated key-exchange material intended for Bob.
+    \item Mallory replaces it and sends Mallory's material to Bob.
+    \item Bob responds; Mallory replaces Bob's material before Alice sees it.
+    \item Alice establishes one key with Mallory, while Bob establishes a
+    different key with Mallory.
+    \item Mallory may relay, modify, or suppress subsequent traffic.
+\end{enumerate}
 
+Mallory, as an endpoint of both substituted exchanges, knows both resulting
+keys.  A separate passive observer may still find the keys unpredictable, but
+that passive-observer property binds neither key to the intended peer.  This is
+why local randomness is necessary for many protocols but insufficient for peer
+authentication.
 
+TLS 1.3 provides one current standards example of the separation: its
+handshake has distinct key-exchange and authentication work, can use
+certificate-based credentials or a pre-shared key, and provides key
+confirmation and handshake integrity.  Its unauthenticated modes still require
+an external binding such as out-of-band validation or trust on first use to
+resist active interposition\cite{rfc9846tls13}.  TLS is an example here, not a
+protocol proposed or implemented by this book.
 
-When I(X;Y)=0, the lemma’s bound collapses to “no extractor can give both parties matching uniform bits except with guessing probability.”
+\subsection{What a Challenge Can Establish}
 
-Note: Market is a shared channel where I(X;Y)>0 
+A challenge/response exchange can demonstrate that the responder possesses a
+secret key, password-derived capability, witness, or hardware credential.  It
+does not answer why that capability should be called ``Bob.''  That answer
+comes from $\Sigma$: a prior ceremony, credential issuer, pin, remembered key,
+or other binding rule.
 
-Unique-optimal-strategy coordination
-If a publicly-known optimisation problem has a single global optimum, then any rational agent will converge to the same action deterministically.
-Example: both routers run Dijkstra on the same published topology file; they pick the same shortest path and forward packets identically.
-Limit: an eavesdropper can run the same algorithm, so secrecy ≈ 0.
+A complete session also needs context.  The proof or authenticator should bind
+the protocol and version, parties or roles, session identifier, transcript,
+and freshness material.  Otherwise a valid response may be replayed or moved
+into a different conversation.  Key confirmation then establishes that a peer
+possessing the relevant secret derived the same session key; it still does not
+guarantee that messages will arrive or that the endpoint is uncompromised.
 
-%%%% ------------------------------
-\bibliographystyle{plain}
-\bibliography{references}
+\section{Setup Choices Are Different Resources}
+
+No single setup choice is universally correct.  The comparison below records
+the most important tradeoffs without choosing an implementation.
+
+\noindent\textbf{Pre-shared high-entropy secret.}
+May bind peers that received the same secret.  Principal risks are secure
+distribution, copying, group ambiguity, and compromise.
+
+\medskip
+\noindent\textbf{Authenticated public key, certificate, or pin.}
+May bind a name or role under a verification policy.  Principal risks are
+issuer or policy error, revocation failure, key theft, and pinning mistakes.
+
+\medskip
+\noindent\textbf{Trust on first use (TOFU).}
+May bind later sessions to the first observed key.  The first contact can be
+captured, and legitimate key change is difficult.
+
+\medskip
+\noindent\textbf{Password-authenticated exchange.}
+May bind a peer that knows the agreed password under the chosen protocol.
+Principal risks include weak passwords, enrollment, recovery, coercion, and
+protocol-specific assumptions.
+
+\medskip
+\noindent\textbf{Human comparison or ceremony.}
+A fingerprint comparison or physical ceremony may bind a short value or
+credential to people present.  Principal risks are human error, accessibility,
+coercion, and ceremony substitution.
+
+A credential therefore authenticates only relative to its issuance, storage,
+verification, and revocation policy.  A valid certificate can show that a
+configured authority made a statement.  It cannot show that the authority's
+statement is just, that a human remains uncoerced, or that the credential's
+private key was never copied.
+
+\section{Correlated Observations and Public Discussion}
+
+Information-theoretic secret-key agreement from observations requires a model
+that includes the eavesdropper.  For the cited rate statement, fix a
+finite-alphabet joint distribution $P_{XYZ}$ and give the parties $N$
+independent repetitions $X^N$, $Y^N$, and $Z^N$.  Let $T_N$ contain every
+message exchanged during the public-discussion protocol.  The asymptotic rate
+counts secret-key bits per repetition as $N$ tends to infinity, under vanishing
+disagreement probability and vanishing normalized information leakage to Eve
+given $(Z^N,T_N)$.  Secrecy therefore cannot be inferred merely from the
+correlation between $X$ and $Y$.
+
+Maurer's repeated-source model assumes that active modification or message
+injection on the public discussion channel is detected.  In that model, the
+secret-key rate satisfies\cite{maurer1993secretkey}
+
+\[
+    S(X;Y\mathbin\Vert Z)
+    \leq \min\!\left\{I(X;Y),\,I(X;Y\mid Z)\right\}.
+\]
+
+Thus, if $X$ and $Y$ are independent, the information-theoretic secret-key
+rate is zero in this model.  This is a conditional result, not a general claim
+that computational key agreement is impossible.  Public-key assumptions can
+change what computationally bounded parties can achieve.
+
+Positive mutual information between Alice and Bob is also insufficient.  Let
+$H(X)>0$ and $X=Y=Z$.  Then $I(X;Y)=H(X)>0$, but Eve already knows the entire
+common observation.  Likewise, error-correction or reconciliation messages in
+$T_N$ may reveal
+information that must be accounted for before privacy amplification.  A rate
+slogan that omits $Z$, $T_N$, agreement error, and the exact source distribution
+does not establish a secret key.
+
+This distinction repairs the earlier statement that any correlated common
+phenomenon can be ``squeezed'' into secrecy.  Correlation may be useful, but its
+value is always relative to Eve's observation and the public leakage required
+to reconcile Alice's and Bob's views.
+
+\section{Public Coordination Without Secrecy}
+
+Public common randomness is valuable precisely because many observers can
+verify and reuse it.  NIST describes randomness beacons as a public utility for
+auditable randomized procedures and explicitly warns that beacon values must
+not be used as secret cryptographic keys\cite{nist-randomness-beacons}.  Alice,
+Bob, and Eve can all agree on the same beacon value; agreement is not secrecy.
+
+The same distinction applies to deterministic optimization.  If Alice and Bob
+have identical public input, the same specified algorithm and version, and
+deterministic tie-breaking, they obtain the same public output.  For example,
+two routers using the same topology snapshot, weights, Dijkstra implementation,
+and tie-breaking rule can select the same route.  An observer with the same
+information can compute it too.
+
+The original note that ``a market is a shared channel'' is preserved as an
+open empirical hypothesis, not as a secret-key claim.  A serious formulation
+must define what Alice observes as $X$, what Bob observes as $Y$, what Eve sees
+as $Z$, what public interaction becomes $T$, and which observations are not
+already public.  Market correlation alone does not answer those questions.
+
+\section{Attacks and Counterexamples}
+
+The following cases should be tested against any future construction:
+
+\begin{description}
+    \item[Active interposition.] Mallory establishes separate sessions with
+    Alice and Bob when exchanged keys lack an authentic binding.
+    \item[Credential substitution.] Mallory supplies Mallory's public key under
+    Bob's name when no trusted association exists.
+    \item[First-contact capture.] A TOFU system faithfully remembers the
+    attacker's key because the first session was already intercepted.
+    \item[Replay.] A valid old proof is accepted in a new session because the
+    authenticator omitted freshness or context.
+    \item[Source manipulation.] Mallory biases or predicts the local source;
+    deterministic conditioning cannot reconstruct missing entropy.
+    \item[Quantizer bias.] A nonuniform or finite-precision source maps
+    disproportionately into some residues.
+    \item[Endpoint compromise.] Mallory reads the final key directly from
+    memory, bypassing the mathematical pipeline.
+    \item[Key exposure.] A stolen pre-shared or signing key enables
+    impersonation and may compromise protected traffic according to the
+    protocol.
+    \item[Public correlation.] Let $H(X)>0$ and $X=Y=Z$.  Alice and Bob have
+    positive mutual information and perfect agreement, while Eve has the same
+    information.
+    \item[Reconciliation leakage.] Public correction data removes conditional
+    entropy that an informal calculation counted as private.
+    \item[Public beacon.] All parties agree, including Eve; no shared secret is
+    created.
+    \item[State divergence.] Different router state or tie-breaking produces
+    different actions.
+    \item[Denial of service.] Mallory drops every message.  Without an explicit
+    timing or failure-detector assumption, suppression may be indistinguishable
+    from delay.  Alice may observe only local non-completion or a timeout;
+    cryptography neither identifies the cause nor forces delivery.
+\end{description}
+
+\section{What Cryptography Does Not Solve}
+
+Cryptography can bind statements to keys, keys to transcripts, and transcripts
+to an explicitly configured setup.  It cannot decide whether the configured
+identity policy is fair, whether a certificate issuer spoke truthfully,
+whether a participant is coerced, or whether cooperation is wise.  It cannot
+make a failed entropy source unpredictable, protect a key already read from a
+compromised endpoint, or compel an adversary to deliver a message.
+
+This chapter therefore establishes no interpersonal or moral trust, truthful
+input, availability, fairness, non-repudiation, coercion resistance,
+composability, post-quantum guarantee, or general information-theoretic
+guarantee.  It establishes no secret key at all.  Its contribution is the
+boundary map that later protocol chapters must fill with an explicit setup,
+adversary, construction, and evidence.
+
+\section{Limitations and Open Problems}
+
+The taxonomy is deliberately prior to construction.  Important open problems
+remain:
+
+\begin{enumerate}
+    \item Choose one target setting for this book and state how human or
+    institutional identity is bound to protocol credentials.
+    \item Determine whether the original covariance model can support source
+    diagnostics and a defensible min-entropy bound.
+    \item Specify one physical or non-physical source, its adversarial influence
+    model, its quantizer, health tests, and its failure behavior.
+    \item Decide when TOFU, a pre-shared secret, a password ceremony, a
+    certificate policy, or a physical meeting is an acceptable setup.
+    \item Define a market-observation experiment with explicit $X,Y,Z,T$ and
+    measure whether any conditional secrecy remains after public discussion.
+    \item Separate detection and accountability from recovery when an active
+    adversary blocks the channel.
+\end{enumerate}
+
+\section{Exercises}
+
+\begin{enumerate}
+    \item For a proposed messaging protocol, list separately its assumptions
+    about confidentiality, authentication, integrity, freshness, ordering, and
+    delivery.
+    \item Draw the two-session man-in-the-middle trace and identify the first
+    message that would need an authentic binding to prevent substitution.
+    \item Explain why a challenge signed by an unknown key proves possession
+    of that key but not the signer's intended human identity.
+    \item Give a concrete nonconstant example with $H(X)>0$ and $X=Y=Z$,
+    then compute why Alice--Bob correlation alone cannot imply secrecy from
+    Eve.
+    \item Compare a pre-shared secret, TOFU, and a physical fingerprint
+    ceremony.  State one failure unique to each.
+    \item Construct two public shortest-path inputs that differ by one edge or
+    one tie-breaking rule and cause two deterministic routers to disagree.
+    \item Propose a measurable hypothesis for the market-observation idea,
+    including Eve's view and every public reconciliation message.
+\end{enumerate}
