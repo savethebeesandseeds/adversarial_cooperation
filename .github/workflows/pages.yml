@@ -1,0 +1,64 @@
+name: Build and deploy the book reader
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  AC_RUN_ID: pages-${{ github.run_id }}-${{ github.run_attempt }}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the canonical sources
+        uses: actions/checkout@v6
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare the dedicated artifact directory
+        run: |
+          mkdir -p .container-output
+          echo "AC_UID=$(id -u)" >> "$GITHUB_ENV"
+          echo "AC_GID=$(id -g)" >> "$GITHUB_ENV"
+
+      - name: Build and verify in the dedicated project toolchain
+        run: docker compose run --rm toolchain web
+
+      - name: Confirm the complete static edition
+        run: |
+          site=".container-output/${AC_RUN_ID}/web-dist"
+          test -s "$site/index.html"
+          test -s "$site/book/Adversarial-Cooperation.pdf"
+          test "$(head -c 5 "$site/book/Adversarial-Cooperation.pdf")" = '%PDF-'
+          test -s "$site/assets/ttt-module.mjs"
+          test -s "$site/assets/ttt-module.wasm"
+          test -z "$(find "$site" -type f -name book.json -print -quit)"
+
+      - name: Upload only the generated static site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .container-output/${{ env.AC_RUN_ID }}/web-dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

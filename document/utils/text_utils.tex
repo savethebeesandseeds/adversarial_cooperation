@@ -4,10 +4,10 @@
 \usepackage[T1]{fontenc}    % Output font encoding for international characters
 \usepackage{geometry}       % Easy management of document margins
 \usepackage{graphicx}       % Enhanced support for graphics
-\usepackage{hyperref}       % Interactive, clickable links
 \usepackage{xcolor} % For colored text
 \usepackage{float}
 \usepackage{array}         % Ragged fixed-width table columns
+\usepackage{hyperref}       % Interactive, clickable links; load after float
 
 % Define a new command for bold text with custom color
 \newcommand{\highlight}[1]{\textbf{\color{red}#1}}
@@ -16,6 +16,14 @@
 \newenvironment{abstract}
   {\begin{quote}\small\noindent\textbf{Abstract.}~}
   {\end{quote}}
+
+% Visible evidence status for unfinished and mixed-maturity chapters.
+% Inclusion in the book preserves an idea; it does not promote its claims.
+\newcommand{\researchstatus}[2]{%
+  \begin{quote}\small\noindent
+  \textbf{Status: #1.} #2
+  \end{quote}%
+}
 
 \floatstyle{plain}
 \newfloat{protocol}{htbp}{lop}

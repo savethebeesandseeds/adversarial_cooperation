@@ -49,6 +49,24 @@ fi
 # ─────────────────────────  Compile (colourised)  ───────────────
 outdir=${LATEX_OUTDIR:-.temp}
 
+# LaTeX writes one auxiliary file beside each \include path under the output
+# directory. latexmk can create the top-level output directory, but not these
+# nested parents reliably on a clean tree, so create only the declared include
+# directories before compilation.
+resolved_outdir=$outdir
+if [[ "$outdir" != /* ]]; then
+  resolved_outdir="$baseDir/$outdir"
+fi
+mkdir -p "$resolved_outdir"
+while IFS= read -r include_path; do
+  include_dir=$(dirname "$include_path")
+  if [[ "$include_dir" != "." ]]; then
+    mkdir -p "$resolved_outdir/$include_dir"
+  fi
+done < <(
+  sed -n 's/^[[:space:]]*\\include{\([^}]*\)}.*/\1/p' "$tex_file"
+)
+
 echo "Compiling $tex_file (outdir: $outdir)..."
 compile_cmd=(latexmk -cd -pdf -interaction=nonstopmode -outdir="$outdir" "$tex_file")
 

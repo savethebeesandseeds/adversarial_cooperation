@@ -1,4 +1,4 @@
-\documentclass[12pt]{book}
+\documentclass[12pt,openany]{book}
 
 % Load packages
 \input{utils/text_utils.tex} % Include the auxiliary text file
@@ -6,28 +6,65 @@
 \hypersetup{hidelinks}
 
 % Document information
-\title{Adversarial Cooperation}
+\title{Adversarial Cooperation\\[0.5em]\large Complete Research Draft}
 \author{Waajacu}
 \date{\today}
 
 \begin{document}
+\raggedbottom
 
 \frontmatter
 \maketitle
+\include{content/research_draft_status}
 \tableofcontents
 
 \mainmatter
-% \include{content/introduction}
-\include{content/trust_establishment/trust_establishment}
 
-\bibliographystyle{plain}
-\bibliography{references}
+\part{Foundations}
+
+\include{content/introduction}
+\include{content/defining_victory/defining_victory}
+\include{content/primitives/primitives}
+\include{content/trust_establishment/trust_establishment}
+\include{content/byzantine_generals_problem/byzantine_generals_problem}
+
+\part{Finite Games and Verifiable Commitment}
+
+\include{content/two_oracles_play_rock–paper–scissors/two_oracles_play_rock–paper–scissors}
+\include{content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy}
+\include{content/poker_without_revealing_the_cards/poker_without_revealing_the_cards}
+
+\part{Private Joint Action}
+
+\include{content/adversario_sibi_perfidiam_revelare/adversario_sibi_perfidiam_revelare}
+\include{content/interactive_secure_stag_hunt/interactive_secure_stag_hunt}
+\include{content/joint_secure_obstacle_avoidance/joint_secure_obstacle_avoidance}
+\include{content/secure_multiparty_optimization/secure_multiparty_optimization}
+\include{content/law_without_referencering_the_law/law_without_referencering_the_law}
+\include{content/cryptographic_meta_mathematics/cryptographic_meta_mathematics}
+
+\part{Institutions, Dynamics, and Repair}
+
+\include{content/conflict_arbitrage/conflict_arbitrage}
+\include{content/aggregation_disadvantage/aggregation_disadvantage}
+\include{content/momentum_zero_trap/momentum_zero_trap}
+\include{content/friendly_fire/friendly_fire}
+\include{content/figthing_dicipates_strength/figthing_dicipates_strength}
+\include{content/helmsmans_game/helmsmans_game}
+\include{content/addressing_goodharts_law/addressing_goodharts_law}
+\include{content/adversarial_aftermatch/adversarial_aftermatch}
+
+\appendix
+\part{Appendices}
+
+\include{content/aprendix/hash_functions/hash_functions}
+\include{content/aprendix/non_repudiation/non_repudiation}
+\include{content/aprendix/cryptographic_forgivness/cryptographic_forgivness}
+\include{content/aprendix/ISO-IEC/iso_iec}
+\include{content/aprendix/abstract_syntax_tree_high_level_synthesis/abs_hls}
 
 \backmatter
-
-% If you have appendices, they start here
-\appendix
-\chapter{Appendix Title}
-Details relevant to the appendix.
+\bibliographystyle{plain}
+\bibliography{references}
 
 \end{document}

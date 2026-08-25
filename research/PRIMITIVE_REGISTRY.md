@@ -89,7 +89,9 @@ runtime dependencies.
 
 Bind one participant to a byte string before disclosure while making recovery
 of a low-entropy payload depend on a fresh, secret, high-entropy nonce. The
-first user is the Two Oracles Play Rock--Paper--Scissors chapter.
+first user is the Two Oracles Play Rock--Paper--Scissors chapter. The
+Tic-Tac-Toe chapter now reuses the primitive under a separate, fixed external
+policy-commitment profile.
 
 ### Definition
 
@@ -140,7 +142,7 @@ post-quantum secure, composable, or production-ready.
 
 - classical computationally bounded adversary for the stated arguments;
 - fresh, secret, unpredictable 32-byte nonce;
-- protected local move and nonce until reveal;
+- protected local payload and nonce until reveal;
 - correct BLAKE2b implementation and successful library initialization;
 - collision/second-preimage behavior and the explicitly labeled
   random-oracle-style hiding model;
@@ -172,6 +174,8 @@ hash or commitment construction.
 ### Approved Uses
 
 - educational RPS commit--reveal;
+- educational external Tic-Tac-Toe policy commitment, with disclosed opening
+  verification and no private-proof claim;
 - deterministic protocol vectors and mutation tests; and
 - later educational protocols only after their contexts and leakage are
   independently reviewed.
@@ -188,6 +192,49 @@ replacement for a commitment scheme whose formal proof is required.
 - Tests: `tests/test_commitment.c`.
 - Future explanatory appendix: Commitments, after the Hash Functions appendix
   has been repaired.
+
+Additional Tic-Tac-Toe artifacts:
+
+- Chapter:
+  `document/content/tic_tac_toe_without_revealing_the_strategy/`.
+- Profile interface: `include/ac/ttt_bind.h`.
+- Profile wrapper and symbolic cost model: `src/protocols/ttt_bind.c`.
+- Warning-bearing profile demo:
+  `src/tic_tac_toe_without_revealing_the_strategy/ttt_bind_demo.c`.
+- Deterministic vector: `test-vectors/tic-tac-toe-bind-v1.txt`.
+- Tests: `tests/test_ttt_bind.c`.
+
+### Tic-Tac-Toe External Policy Profile
+
+The profile and protocol versions are 1, and the exact protocol identifier is
+`AC-TTT-POLICY-V1`. The context uses fixed protocol-role octets `PROVER=1`
+and `VERIFIER=2`, a nonzero public 32-byte session identifier, a public 32-bit
+statement round, and payload type 1. The payload is the four-byte Core instance
+followed by all 19,683 canonical-policy bytes. The claimant's X/O game role is
+in those four payload bytes; it is not reused as a protocol role.
+
+The payload is 19,687 bytes, the complete framed BLAKE2b-256 message is 19,809
+bytes, and its fixed length executes 155 compression calls. The frozen direct
+symbolic Bind shape reports 5,625,151 AND plus 26,378,049 XOR gates,
+32,003,200 total gates, 32,161,498 wires, and depth 1,558,999. No netlist is
+emitted, evaluated, or serialized. These are not lower bounds, optimized
+backend estimates, or proof costs.
+
+The profile's disclosed-opening wrapper establishes only deterministic
+encoding and recomputation behavior for tested builds. It does not check
+policy semantics; `Core` does that separately. Session and round fields do not
+prevent replay unless an application enforces uniqueness and ordering. The
+profile is not approved for proof-internal simulated-view commitments, whose
+primitive, domain, encoding, assumptions, and cost remain unselected.
+
+Version 1 is also the frozen direct-cost baseline rather than an inevitable
+private-proof profile. Its measured 32,003,200-gate Bind will not be emitted as
+the next artifact, and no Version 2 primitive is registered. “Proof-friendly”
+is treated as a backend-relative measurement requirement, not a primitive or
+security property. Any later replacement must have a distinct version, exact
+encoding and opening relation, source-backed assumptions, migration rule,
+shared-policy-witness enforcement, deterministic vectors, and a total
+proof-system cost comparison. This decision adds no library.
 
 ### Required Test Evidence
 

@@ -6,6 +6,27 @@ These records explain choices already made for a bounded slice. They do not
 authorize unrelated refactors, renames, cleanup, or stronger research claims.
 Material deviations require a new entry with rationale and evidence.
 
+## Whole-Book Assembly
+
+### D-BOOK-001 - Keep every live content source visible in one status-labeled draft
+
+- **Status:** Accepted editorial and preservation decision.
+- **Decision:** The main manuscript is the inclusive Complete Research Draft.
+  Its include graph exposes all 27 live content sources: 22 chapters and
+  research notes in four main parts, followed by five appendices. A front-
+  matter reading guide and local research-status notices distinguish developed
+  chapters from intuitions, open problems, incomplete fragments, and
+  placeholders.
+- **Rationale:** Excluding unfinished work made the PDF look like a book about
+  only the few technically mature slices and hid the wider research program.
+  Visibility lets the author and reader see the actual scope without forcing
+  every idea into theorem or protocol form.
+- **Consequence:** Presence in the main PDF is not evidence of maturity,
+  correctness, security, novelty, citation completeness, or implementation.
+  Existing claim, assumption, and verification boundaries remain in force.
+  Later work deepens the visible chapter in place; it should not express
+  scientific uncertainty by silently removing the chapter from the book.
+
 ## RPS Vertical Slice
 
 ### D-RPS-001 — Provisional interpretation of the oracle sentence
@@ -288,13 +309,15 @@ Material deviations require a new entry with rationale and evidence.
 
 - **Status:** Accepted; reflects the author's preference for a minimal and
   inspectable implementation.
-- **Decision:** Implement the model, reference generator, checker, demo, and
-  tests using only C11 fixed-size caller-owned storage. The TTT link commands
-  omit `$(LDLIBS)` and add no cryptographic primitive or library.
+- **Decision:** Implement the model, reference generator, checker, Core demo,
+  and Core tests using only C11 fixed-size caller-owned storage. Preserve that
+  dependency-free target. The separately named `ttt_bind` target reuses the
+  repository's existing libsodium commitment backend and adds no library.
 - **Rationale:** The public finite predicate requires no randomness, hashing,
   commitment, network, clock, file I/O, or external proof backend.
-- **Consequence:** Repository-wide libsodium configuration and all existing
-  cryptographic code remain unchanged.
+- **Consequence:** The original `ttt`/Core link remains free of `$(LDLIBS)`;
+  `ttt_bind` links only the already configured libsodium backend. The generic
+  commitment implementation remains byte-identical.
 
 ### D-TTT-004 — Five claims remain separate
 
@@ -306,8 +329,9 @@ Material deviations require a new entry with rationale and evidence.
 - **Rationale:** A commitment-shaped value cannot be scanned for policy
   quality, zero knowledge does not automatically provide extraction, and a
   revealed oracle answer remains revealed.
-- **Consequence:** The existing educational hash commitment is not reused or
-  promoted into a proof system in this slice.
+- **Consequence:** The external profile reuses the educational hash commitment
+  for byte binding, but it is never promoted into a proof system or treated as
+  proof-internal commitment machinery.
 
 ### D-TTT-005 — Unrestricted exact-oracle anti-cloning is impossible here
 
@@ -347,9 +371,10 @@ Material deviations require a new entry with rationale and evidence.
 - **Consequence:** Sources remain bibliography only and add no dependency.
   Any stronger contribution classification requires a separate review.
 
-### D-TTT-008 — Standalone target without main-book promotion
+### D-TTT-008 — Standalone target before main-book promotion
 
-- **Status:** Accepted for this slice.
+- **Status:** Superseded for current inclusion by D-TTT-022; retained as the
+  correct boundary of the earlier public-checker slice.
 - **Decision:** Add `section_ttt` with wrapper-owned bibliography emission, but
   leave `document/adversarial_cooperation.tex`, its include graph, the chapter
   backup, the tracked demonstration placeholder, and the primitive registry
@@ -390,8 +415,9 @@ Material deviations require a new entry with rationale and evidence.
 
 ### D-TTT-011 — Build a fixed DAG evaluator before a proof circuit
 
-- **Status:** Accepted sequence; fixed-DAG evaluator, equivalence argument, and
-  role-specialized Core circuits complete. `Bind` and a proof protocol remain
+- **Status:** Accepted sequence; fixed-DAG evaluator, equivalence argument,
+  role-specialized Core circuits, external commitment profile, and symbolic
+  direct-Bind measurement complete. An emitted Bind and proof protocol remain
   open.
 - **Decision:** Make the next executable artifact a dependency-free bottom-up
   evaluator over the fixed reachable-state DAG. Establish equivalence with the
@@ -400,9 +426,10 @@ Material deviations require a new entry with rationale and evidence.
 - **Rationale:** The current DFS is a good public diagnostic checker but its
   recursion, secret-dependent early exits, table lookup, and counterexample
   reporting should not be mechanically mistaken for a proof circuit.
-- **Consequence:** No proof library is selected until `Bind`, both commitment
-  layers, and complete proof costs are specified and measured. Core counts
-  alone do not estimate a proof.
+- **Consequence:** No proof library is selected until a proof representation
+  and its external and proof-internal commitment layers are compared together
+  under a complete cost and security model. Neither Core nor composed gate
+  counts estimate a proof.
 
 ### D-TTT-012 — Retain MPC-in-the-head only as a conditional candidate
 
@@ -418,8 +445,8 @@ Material deviations require a new entry with rationale and evidence.
 - **Consequence:** No Fiat-Shamir transform, random-oracle claim, pairing stack,
   R1CS framework, proof dependency, or production-security claim is added. The
   proof-internal commitments to simulated views remain distinct from the
-  external policy commitment checked by `Bind`; both require a separately
-  recorded construction, encoding, assumptions, and cost.
+  selected external policy profile. The proof-internal primitive, domain,
+  encoding, assumptions, and cost remain unselected.
 
 ### D-TTT-013 — Use the board encoding as the public topological schedule
 
@@ -486,8 +513,10 @@ Material deviations require a new entry with rationale and evidence.
   plaintext and that circuit serialization binds no policy opening.
 - **Rationale:** A circuit is a computation description, not a commitment,
   zero-knowledge protocol, or proof of knowledge.
-- **Consequence:** `Bind`, the external commitment, proof-internal
-  commitments, soundness, extraction, zero knowledge, and privacy stay open.
+- **Consequence:** A separate external profile and disclosed-opening wrapper
+  may bind bytes, but the Core serialization itself still provides no
+  commitment. Proof-internal commitments, soundness, extraction, zero
+  knowledge, and privacy stay open.
 
 ### D-TTT-018 — Preserve independent baselines and bound circuit evidence
 
@@ -501,3 +530,249 @@ Material deviations require a new entry with rationale and evidence.
   comparison practical without changing the API.
 - **Consequence:** Agreement remains bounded implementation evidence, not
   exhaustive policy-space coverage or formal C/circuit equivalence.
+
+### D-TTT-019 — Reuse one minimal external commitment under a fixed profile
+
+- **Status:** Accepted and implemented as an educational disclosed-opening
+  baseline.
+- **Decision:** Reuse AC Commitment Version 1 under protocol identifier
+  `AC-TTT-POLICY-V1`. Bind the four Core bytes and all 19,683 policy bytes to a
+  nonzero public session and public statement round. Use fixed protocol-role
+  labels `PROVER` and `VERIFIER`; keep the claimant's X/O role in the payload.
+- **Rationale:** This fixes the exact statement with no new library or custom
+  production cryptography, while preventing game-role and sender-role concepts
+  from being conflated.
+- **Consequence:** The profile inherits only the generic commitment's limited
+  collision/alternate-opening and random-oracle-style arguments. It provides
+  no knowledge, authentication, replay database, privacy during verification,
+  or production guarantee.
+
+### D-TTT-020 — Measure direct Bind symbolically before emitting it
+
+- **Status:** Accepted and implemented as a cost model, not a circuit.
+- **Decision:** Walk one frozen BLAKE2b XOR/AND operation shape, using the
+  explicit bit-zero half-adder and discarding the final carry, count depth and
+  gates exactly, combine its counts arithmetically with each Core, and do not
+  allocate or serialize its 5,625,151 AND plus
+  26,378,049 XOR gates: 32,003,200 total gates, 32,161,498 wires, and depth
+  1,558,999.
+- **Rationale:** The direct result is already sufficient to show that the
+  external hash dominates this Boolean route. Emitting hundreds of megabytes
+  before selecting a proof transformation would add machinery without adding
+  privacy or a proof.
+- **Consequence:** Every reported size is labeled modeled or “if emitted.”
+  No circuit-equivalence, proof-size, transcript, runtime, lower-bound, or
+  optimized-backend claim follows. No proof-internal view commitment is
+  selected; its 35,040-byte illustrative value is only a conditional
+  digest-and-nonce floor recorded in the plan and manuscript, not a C API.
+
+### D-TTT-021 — Preserve Version 1 and co-design the proof binding
+
+- **Status:** Accepted paper-first route decision; no code or dependency.
+- **Decision:** Keep `AC-TTT-POLICY-V1`, its implementation, vector, and direct
+  symbolic counts as the disclosed-opening and comparison baseline. Do not
+  emit its 32,003,200-gate Bind circuit as the next artifact. Select neither an
+  unspecified replacement nor a proof representation outside an end-to-end
+  comparison of candidate pairs. Any replacement must receive a new profile
+  and relation version.
+- **Rationale:** Emitting the frozen direct netlist would add hundreds of
+  megabytes of representation evidence but no privacy or proof. Conversely,
+  “proof-friendly” is backend-relative: selecting a commitment independently
+  of its field, constraint language, setup, transcript, and adversary model
+  would add assumptions and machinery without a comparable total cost.
+- **Consequence:** The next gate is a source-backed, end-to-end comparison that
+  enforces one shared policy witness across Core and the opening relation. It
+  must distinguish an externally published and recorded policy commitment,
+  under an explicit lifecycle, from proof-internal commitments; define
+  migration and exact bytes for any new profile; and include total relation,
+  transcript, prover, and verifier costs.
+  No alternative is claimed cheaper, safer, selected, or implemented; no new
+  library is authorized.
+
+### D-TTT-022 — Adopt Tic-Tac-Toe as the canonical Core-Bind reference
+
+- **Status:** Accepted after standalone and main-book build verification.
+- **Decision:** Promote the chapter into the main include graph and make its
+  concept ladder, statement modes, shared-witness proposition, and publication
+  lifecycle the book's reusable reference contract. Later chapters may cite
+  these distinctions only after replacing their problem-specific model,
+  witness, relation, leakage, setup, adversary, and lifecycle.
+- **Rationale:** Tic-Tac-Toe is finite enough for exhaustive public checking
+  while still exposing the exact conceptual mistakes that recur in larger
+  applications: confusing a commitment with a semantic predicate, proving two
+  facts about different witnesses, mistaking witness-typed wires for secrecy,
+  and treating context bytes as an authenticated chronological record.
+- **Consequence:** Stable labels and a parameterized future security target are
+  part of the chapter. Promotion creates no proof, privacy, commitment-security,
+  transfer, or novelty claim. The include is retained only if both PDFs build
+  and pass visual inspection.
+
+### D-TTT-023 — Publish one deterministic positive cross-layer fixture
+
+- **Status:** Accepted as test and teaching material only.
+- **Decision:** Keep fresh randomness as the Bind demo default and add an
+  explicit `--reference-vector` mode using fixed public constants and the valid
+  X reference policy. Require those exact policy bytes to pass the recursive
+  evaluator, fixed DAG, actual Core-X Boolean evaluation, and Bind opening in a
+  single test group. Preserve the older invalid-policy vector because it
+  demonstrates that Bind does not imply Core.
+- **Rationale:** A canonical example needs one replayable positive story across
+  all existing layers. A fixed fixture improves conformance evidence without
+  pretending that public test randomness supplies hiding.
+- **Consequence:** No public API, primitive, proof backend, or cryptographic
+  library is added. The fixture establishes deterministic implementation
+  agreement only; it does not prove commitment security, circuit equivalence,
+  or policy privacy.
+
+### D-WEB-001 --- Keep the browser edition derived and source-addressable
+
+- **Status:** Superseded for the public reader by D-WEB-003; retained as the
+  record of the first static-browser attempt.
+- **Decision:** Keep LaTeX and C as the only authored book and protocol
+  sources. Generate the browser payload from the main include graph, attach
+  exact source ranges and hashes to rendered blocks, and compile the existing
+  disclosed-policy Tic-Tac-Toe checker to WebAssembly through a thin ABI.
+  Browser editing operates on the corresponding raw LaTeX block after an
+  explicit local-directory grant; it never converts arbitrary rendered HTML
+  back into LaTeX.
+- **Rationale:** The browser should make the book inspectable and executable
+  without becoming a competing manuscript or a JavaScript reimplementation of
+  the research code.
+- **Consequence:** Generated HTML, JSON, JavaScript glue, and WebAssembly are
+  disposable artifacts. Static hosting can enforce revision and source-range
+  checks but cannot establish that an edited manuscript compiles; the ordinary
+  LaTeX build remains authoritative. The browser checker remains fully
+  disclosed and educational. It supplies no zero knowledge, policy privacy,
+  authorship, cryptographic proof, or stronger security guarantee.
+
+### D-WEB-002 --- Keep browser feedback read-only and standardize chapter views
+
+- **Status:** Superseded by D-WEB-003; retained as the record of the second
+  browser-review attempt.
+- **Decision:** Give every chapter Standard, Demo, and Document views. Register
+  demonstrations by exact canonical source path and show an explicit
+  unavailable state when none is ready. Remove browser directory grants and
+  manuscript writes. A text selection may instead produce a copyable change
+  indication containing complete enclosing source-block provenance, exact raw
+  LaTeX, and a reader-authored note.
+- **Rationale:** The browser is a useful place to point at wording and explore
+  executable companions, but a hosted reading surface should not silently
+  acquire authority over the research record. A rendered selection also
+  cannot be reverse-mapped character-for-character after LaTeX commands and
+  whitespace have been transformed.
+- **Consequence:** Change indications are editorial requests, not accepted
+  edits. They write no file, upload no content, run no compiler, and claim only
+  complete-block provenance. The compiled PDF remains the typographic
+  authority. The dependency-free Standard renderer handles common constructs
+  and must visibly label unsupported ones; exact LaTeX remains available in
+  Document view. The Tic-Tac-Toe browser lab remains a fully disclosed
+  educational checker with no additional cryptographic claim.
+
+### D-WEB-003 --- Make the compiled PDF the reader and standardize demos
+
+- **Status:** Accepted replacement for the public browser interface.
+- **Decision:** Expose only Read, Demos, and About. Read embeds the PDF newly
+  compiled from the canonical LaTeX manuscript. Demos lists only registered,
+  working WebAssembly companions. Remove the custom LaTeX renderer,
+  serialized manuscript, raw-document view, source map, change indications,
+  comments, and every browser manuscript-write path. Standardize a validated,
+  immutable demo definition with named examples and a runner that returns one
+  presentation-neutral result shape.
+- **Rationale:** A second partial renderer obscured the manuscript, duplicated
+  source at runtime, and made an ordinary reading surface look like an editor.
+  The PDF already gives complete LaTeX rendering. A small demo contract lets
+  later chapters reuse navigation and presentation without copying protocol
+  code or inventing a new page structure.
+- **Consequence:** LaTeX remains the sole manuscript source, C remains the
+  computational source of demonstrations, and JavaScript is adapter and
+  presentation code only. The first registry entry is the disclosed-policy
+  Tic-Tac-Toe checker with three fixed examples. A successful run is an
+  implementation observation under that fixed model; it adds no privacy,
+  zero-knowledge, commitment-security, authorship, or novelty claim.
+
+## Dedicated Container Toolchain
+
+### D-CONTAINER-001 --- Make provisioning visible and project-owned
+
+- **Status:** Accepted operational boundary; not a security theorem.
+- **Decision:** Use the Docker Official Debian stable-slim image pinned by
+  digest in `compose.yaml`, and provision each fresh disposable container by
+  running the checked-in `setup.sh`. Do not add a Dockerfile or reuse an
+  ambient container belonging to this or another project.
+- **Rationale:** The package request, APT policy, privilege transition, build
+  commands, and version record remain visible in ordinary repository files.
+  A hidden prebuilt layer is not required to understand what the environment
+  requests from Debian.
+- **Consequence:** Provisioning is slower and is not bit-for-bit frozen. The
+  base image is fixed by digest, but Debian stable packages can advance through
+  signed security and update repositories. Every run records the platform,
+  architecture, packages, and tools actually used. The record supplies
+  provenance; it does not prove that those packages are harmless or
+  vulnerability-free, nor that different architectures produce identical
+  bytes.
+
+### D-CONTAINER-002 --- Minimize the package and host-access surfaces
+
+- **Status:** Accepted implementation boundary.
+- **Decision:** Install explicit, mode-specific top-level Debian package
+  profiles with recommended and suggested packages disabled, require
+  authenticated APT repository metadata, and reject insecure or
+  unauthenticated APT modes. Mount only the enumerated
+  repository inputs read-only, omit `.git`, Docker sockets, explicitly mapped
+  host devices, deliberately passed secrets, and unrelated host paths, and
+  make `.container-output/` the only writable project bind mount.
+- **Rationale:** Fewer packages and narrower mounts reduce accidental authority
+  and the amount of third-party code in the build environment.
+- **Consequence:** `--no-install-recommends` and related controls reduce the
+  dependency surface; they do not make a selected package intrinsically safe.
+  APT authenticates repository metadata and package hashes but does not audit
+  package behavior for this project.
+
+### D-CONTAINER-003 --- Separate privileged setup from unprivileged builds
+
+- **Status:** Accepted implementation boundary.
+- **Decision:** Restrict root authority to provisioning the disposable
+  container with APT. Run compilation, tests, manuscript assembly, WebAssembly
+  generation, and preview serving as a numeric non-root user under
+  no-new-privileges with an empty Linux capability set. Ordinary network access
+  remains throughout this one-container run. Publish the preview only on host
+  loopback and deliberately pass no host credentials into the container.
+- **Rationale:** Package installation requires modifying the container root
+  filesystem, while ordinary project builds do not require root authority.
+- **Consequence:** The later build phase still has ordinary outbound network
+  reachability; the one-container, no-Dockerfile design cannot remove its
+  network after provisioning. Docker also shares the host kernel and trusts
+  the Docker daemon. This environment is not a sandbox for hostile source,
+  kernel exploits, daemon compromise, or a malicious dependency.
+
+### D-CONTAINER-004 --- Use the same path for local verification and Pages
+
+- **Status:** Accepted deployment boundary.
+- **Decision:** Local hosts and GitHub Actions invoke the same Compose service.
+  The Pages workflow runs `docker compose run --rm toolchain web` and uploads
+  only `.container-output/pages-<run-id>-<attempt>/web-dist` as a static
+  artifact.
+- **Rationale:** A single platform-neutral command avoids a special Windows
+  hosting path and reduces differences between local and continuous builds.
+- **Consequence:** GitHub Pages receives static HTML, CSS, JavaScript,
+  WebAssembly, and the compiled manuscript PDF. It receives no serialized
+  LaTeX manuscript, running container, build-time privilege, Docker socket,
+  server-side editor, or host filesystem authority. The published reader
+  requests no local-checkout directory grant and exposes no client-side
+  manuscript write path.
+
+### D-CONTAINER-005 --- Keep preview ephemeral and artifact publication write-once
+
+- **Status:** Accepted lifecycle boundary.
+- **Decision:** Build and serve preview entirely in disposable container
+  storage. Do not publish a preview run directory. Continue to publish `web`
+  and `verify` results only to explicit, write-once artifact destinations that
+  are assembled under a hidden sibling and atomically renamed into place. An
+  existing run ID is rejected.
+- **Rationale:** Preview is transient inspection, whereas a published artifact
+  is evidence to preserve. A fixed preview artifact name prevented ordinary
+  restart after the first run and conflated those lifecycles.
+- **Consequence:** `docker compose up preview` may be stopped and started
+  without deleting or renaming host evidence. The preview remains reachable
+  only through host loopback port 4173. This separation changes no package,
+  source-mount, non-root, capability, network, or scientific claim boundary.

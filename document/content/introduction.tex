@@ -1,55 +1,63 @@
 \chapter{Introduction}
-Assume your adversary is smarter than us... Trust a failure, smartness yields kindness. 
+\label{chap:introduction}
 
+\researchstatus{Early authorial draft}{This chapter preserves the moral
+purpose and opening intuitions of the project. Its claims are invitations to
+research, not universal cryptographic guarantees.}
 
-Here an Adversary is willing to cooperate, and Enemy wont and will try against both parties. 
+\section{Author's Intuition}
 
-\section{Section Title}
-Prophetical perpetual war needs to be teached the following delusion. 
+Assume that an adversary may be smarter than us. The original intuition hoped
+that greater understanding might also yield kindness. That hope motivates the
+book, but no protocol may assume that intelligence implies benevolence.
 
-The following secure formulations cant even be broken under Quantum computing, they are Informational secure. 
+Here an \emph{adversary} is a party willing to pursue a shared purpose while
+protecting its own interests. An \emph{enemy} is provisionally distinguished
+as a party that acts against the shared purpose itself. Later chapters must
+replace this moral vocabulary with explicit roles, actions, and adversarial
+capabilities whenever a technical claim depends on it.
 
-These are highlighted examples of knowing how to deal with procedural circuntances in adversary cooperation, 
+\section{The Project's Promise}
 
-It's been said under my generation that war will last for ever. 
+One generation has often been told that war will last forever. Differences and
+resistance can nevertheless preserve hope under oppression. This project asks
+whether some conflicts contain procedural weaknesses: places where parties
+could commit, prove, compute, or coordinate without surrendering every secret
+or trusting a single intermediary.
 
-Differences and resistance yields hope under regime and oppression, 
-here are a way to resist without disturbing the shared porpoise. 
+The book does not claim that every unnecessary war has already been solved.
+It studies smaller questions that can be falsified. For each proposed protocol
+we ask what parties know, what they keep private, what they can verify, how
+they may deviate, and how the protocol ends.
 
-All unnecessary WAR has a weakness, secure adversary cooperation. It's easy, thank you for hearing what I have to say. 
+\section{Humility Before Security Claims}
 
+The early draft imagined formulations that no quantum computer could break and
+described them broadly as information-theoretically secure. That statement is
+not a property of the book as a whole. Some constructions may seek
+information-theoretic guarantees; others rely on classical computational
+assumptions; many current chapters are only educational demonstrations or open
+problems. Each chapter must state its own model and evidence.
 
-\section{Section Title}
-So long your adversary is not able to break the fundamental law of information, 
-it won't, however smart, be able to cheat ---not even with an array of quantum computers. 
+An adversary may be more capable than the designer. Humility therefore comes
+before every construction. If a reader sees a missing assumption, a stronger
+attack, or a better path, the project asks to be corrected.
 
-Again, be aware they might be smarter than us. And if you are smarter than me, 
-please show me the way, as i am with the mission to win wars. 
+\section{The Obvious Lying Adversary}
 
-and if they are, they will be good. The humility bias comes first before all of these what follows. 
-The next was to think about how to explain this, and there is so much to cover that I've made the 
-appendix long and retained the ideas on the short following N\(FIXME_at_the_end\) chapters. 
+Zero-knowledge proofs, commitments, authentication, and transcript mechanisms
+can constrain particular false statements or inconsistent actions under named
+assumptions. They do not prevent people from lying in general, establish just
+objectives, or make an institution trustworthy by themselves.
 
-\section{The obvious lying adversary}
-Zero knowledge proofs and non repudiation are used to avoid you and your adversary to lie. 
+\section{The Book Ahead}
 
-\section{Section Title}
-Life is becoming beautiful, and we can sense it ---for now, let's us make war be optional. 
+The foundations distinguish randomness, identity, commitment, and proof. The
+finite-game chapters then place small protocols under a bright light. Later
+research notes ask about private joint action, institutions, failed metrics,
+aftermath, and repair. The appendices collect the primitive background needed
+to assess those ideas.
 
-\section{Section Title}
-This is an example of highlighted text using a custom command: \highlight{important}.
-
-\section{Mathematics}
-Text about vectors and sets:
-\dtorch{a}{b}{C}{d}{e}
-\begin{itemize}
-    \item A vector: $\vect{v}$ and a set: $\set{S}$.
-\end{itemize}
-
-\begin{theorem}
-If \( a > b \), then \( b < a \).
-\end{theorem}
-
-
-
-
+Life can become more beautiful. For now, let us investigate how to make war
+optional. This is the ethical aspiration of the project, not a theorem proved
+by the pages that follow.

@@ -7,6 +7,27 @@ state machine, transcript, tests, attacks, limitations, and citations agree.
 Do not polish every fragment in parallel and do not use a green demo as a
 substitute for a security argument.
 
+## Complete Research Draft Assembly - 2026-08-01
+
+The main manuscript now exposes every one of the repository's **27 live
+content sources**. The inclusive assembly contains 22 chapters and research
+notes across Foundations, Finite Games and Verifiable Commitment, Private
+Joint Action, and Institutions, Dynamics, and Repair, followed by five
+appendices.
+
+This is an editorial and preservation milestone, not completion of the later
+research phases. A front-matter reading guide and chapter-local status notices
+distinguish developed material, author's intuition, design notes, open
+problems, incomplete fragments, and placeholders. Inclusion establishes only
+that the source is visible in the book's main include graph. It does not
+validate a claim, establish protocol security or novelty, supply missing
+threat models, or promote a fragment into a mature chapter.
+
+The roadmap therefore continues to prioritize evidence-bounded vertical
+slices. Future chapter work should deepen the visible source in place while
+preserving its status boundary, rather than disconnecting unfinished material
+from the book.
+
 ## Phase 0 — Preservation and Audit
 
 **Objective:** establish live repository evidence without rewriting source.
@@ -158,23 +179,32 @@ the complete book skeleton compiles without turning open problems into claims.
   repeated-query extraction;
 - only then evaluate a zero-knowledge construction.
 
-**Public checker, fixed-DAG equivalence, and role-specialized Boolean Core gates
-complete; `Bind` and the private protocol remain open.** The recursive checker
-retains replayable diagnostics, the fixed DAG supplies the public topological
-recurrence and induction argument, and `Core-X`/`Core-O` now have fixed typed
-inputs, deterministic XOR/AND netlists, canonical serialization, and exact
-construction counts independently derived and recounted from the emitted
-gates. Circuit acceptance is checked against both preserved C evaluators on a
-bounded corpus. All three paths still receive the policy in plaintext. The immediate
-next gate is to select and measure `Bind` and both commitment layers before
-choosing a proof transformation or importing proof machinery. MPC-in-the-head
-remains only the leading conditional educational family. No proof library,
-cryptographic implementation, private-proof claim, or novelty claim has been
-added.
+**Canonical running example established; the private protocol remains open.**
+The chapter now supplies the book's reusable concept ladder, separates
+existential and committed statement modes, names a parameterized future
+security target, proves the shared-witness requirement, and records the
+external publication lifecycle needed for temporal claims. The recursive
+checker retains replayable diagnostics, the fixed DAG supplies the public
+recurrence and induction argument, and `Core-X`/`Core-O` have emitted
+deterministic XOR/AND netlists with exact counts. A deterministic positive
+fixture carries the same valid policy bytes through the recursive, DAG, Core,
+and Bind layers; the older invalid-policy vector remains the counterexample
+showing that Bind does not imply Core. The external profile reuses the sole
+existing libsodium commitment backend under a separate context, adds no
+library, and verifies only disclosed openings. The frozen direct-BLAKE2b Bind
+shape measures 32,003,200 gates without emitting its roughly 288 MB
+serialization. Every current path still receives the policy in plaintext.
+The next research gate is to compare source-backed
+proof-representation/commitment pairs against the frozen Version 1 baseline
+under one total security and cost model, then select the two layers together.
+The distinct proof-internal commitment and complete transformation must still
+be selected before importing proof machinery. MPC-in-the-head remains only the
+leading conditional educational family. No proof library, private-proof claim,
+production-security claim, or novelty claim has been added.
 
 ### Poker
 
-- preserve current four-stage decomposition as the strongest technical anchor;
+- preserve the four-stage decomposition as an inspectable educational sketch;
 - label the current C program as a centralized educational animation;
 - replace trace checksums with explicit semantics;
 - define participant-local state and messages;

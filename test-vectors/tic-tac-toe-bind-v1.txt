@@ -1,0 +1,77 @@
+Adversarial Cooperation: Tic-Tac-Toe Bind Profile Version 1
+================================================================
+
+Purpose
+-------
+
+This vector fixes the external policy-commitment byte contract. It is evidence
+that two independent implementations produced the same deterministic digest.
+It is not evidence of hiding, binding, zero knowledge, extractability,
+authorship, or production security.
+
+Primitive
+---------
+
+BLAKE2b, unkeyed, 32-byte output.
+
+Fixed commitment context
+------------------------
+
+generic domain:       ASCII "AC-COMMITMENT-V1"
+scheme version:       1, u16 big-endian
+protocol-id length:   16, u16 big-endian
+protocol identifier: ASCII "AC-TTT-POLICY-V1"
+protocol version:     1, u16 big-endian
+session-id length:    32, u16 big-endian
+session identifier:   40 41 42 43 44 45 46 47
+                      48 49 4a 4b 4c 4d 4e 4f
+                      50 51 52 53 54 55 56 57
+                      58 59 5a 5b 5c 5d 5e 5f
+statement round:      16909060 (0x01020304), u32 big-endian
+committer role:       1 (fixed PROVER label), one byte
+recipient role:       2 (fixed VERIFIER label), one byte
+payload type:         1, u16 big-endian
+nonce length:         32, u16 big-endian
+nonce:                a0 a1 a2 a3 a4 a5 a6 a7
+                      a8 a9 aa ab ac ad ae af
+                      b0 b1 b2 b3 b4 b5 b6 b7
+                      b8 b9 ba bb bc bd be bf
+
+Payload
+-------
+
+payload length: 19,687, u64 big-endian
+
+The first four payload bytes are:
+
+    01 01 00 00
+
+They mean game version 1, claimant X, and empty-board index zero.
+
+For policy byte index i in [0, 19682]:
+
+    policy[i] = (17 * i + 3) mod 256
+
+This deliberately synthetic table need not be a legal policy. The vector tests
+commitment framing; the separate Core relation tests policy legality/non-loss.
+
+Result
+------
+
+Complete framed message length: 19,809 bytes
+BLAKE2b compression blocks:     155
+
+Digest:
+
+    b53130b6c3c2ebf8ca9ffb05358a61de
+    820ee465587dafac7720060e06b51a00
+
+Independent reproduction
+------------------------
+
+Python 3 standard-library `hashlib.blake2b(..., digest_size=32)` produced the
+digest above from the exact byte sequence described here. Python is a
+verification tool for this vector, not a project runtime dependency.
+
+The application must enforce session uniqueness and meaningful round
+allocation. Merely hashing these fields does not itself prevent replay.

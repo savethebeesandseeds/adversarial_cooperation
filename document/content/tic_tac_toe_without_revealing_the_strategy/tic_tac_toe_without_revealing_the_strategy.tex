@@ -12,6 +12,13 @@ conditions; inspect all the Monte Carlo scenarios; investigate whether one can
 invert the matrix; and always include code for demonstration.}
 \end{quote}
 
+The original intuition uses \emph{strategy} broadly and uses \emph{perfect} to
+mean undefeated. The formal object below is a deterministic positional
+\emph{policy}. The property checked is \emph{non-loss from one fixed initial
+state}, not local minimax optimality at every state. This translation preserves
+the question while preventing the words from carrying a stronger theorem than
+the construction.
+
 These notes contain several distinct research questions. This chapter
 preserves them, but it does not present them as one completed mechanism. A
 session identifier, commitment randomness, and a policy-generation seed are
@@ -21,18 +28,16 @@ open directions, not hidden steps in the construction below.
 
 \begin{center}
 \fbox{\begin{minipage}{0.91\textwidth}
-\textbf{Current Result: Public Verification by Full Disclosure.}
+\textbf{Current Result, in Plain Words.}
 
-The current C companion checks a complete, disclosed deterministic policy
-through three public representations: a recursive diagnostic checker, a fixed
-bottom-up game-DAG evaluator, and deterministic role-specialized Boolean
-circuits called \(\mathsf{Core\mbox{-}X}\) and
-\(\mathsf{Core\mbox{-}O}\). The circuits check the public game version,
-claimant role, empty initial board, complete canonical policy, and fixed-DAG
-root value. The policy remains plaintext. ``Witness'' names an input-wire
-range; it does not confer secrecy. The circuits contain no
-\(\mathsf{Bind}\), commitment, proof system, zero-knowledge mechanism,
-authentication, or anti-cloning mechanism.
+\begin{enumerate}
+    \item We can disclose one complete policy and exhaustively check that it
+    never loses under the fixed game model.
+    \item We can commit to the exact policy bytes and later verify a disclosed
+    opening under a fixed educational profile.
+    \item We cannot yet prove non-loss while keeping that policy secret. No
+    current circuit, commitment, or test is a zero-knowledge proof.
+\end{enumerate}
 \end{minipage}}
 \end{center}
 
@@ -47,19 +52,32 @@ board. A second C11 evaluator expresses the same verdict as a fixed bottom-up
 recurrence over the reachable game DAG, without recursion or a
 policy-selected successor address. A third dependency-free C11 component emits
 and evaluates fixed XOR/AND circuits for the game predicate
-\(\mathsf{Core}\). All three remain disclosure baselines, not a solution to
+\(\mathsf{Core}\). A fourth component composes the existing educational
+BLAKE2b-256 commitment with an exact Tic-Tac-Toe context, checks disclosed
+openings, and counts one frozen XOR/AND representation of
+\(\mathsf{Bind}\) without materializing it. All current paths remain
+disclosure baselines, not a solution to
 the chapter title. We distinguish
 knowledge of a committed policy, policy legality, global non-loss, private
 per-state evaluation, and resistance to extraction through repeated queries.
 We then state a candidate committed-policy relation for future zero-knowledge
 argument-of-knowledge research, compare bounded implementation routes, and
 complete the backend-neutral Boolean-circuit step for
-\(\mathsf{Core}\). The separate \(\mathsf{Bind}\) predicate, both
-commitment layers, and every proof transformation remain open. We identify the
-leakage, abort, composition, and setup questions that remain open.
+\(\mathsf{Core}\), freeze an external policy-commitment profile, and measure
+the direct Boolean cost of \(\mathsf{Bind}\). We prove why the same policy
+witness must satisfy both predicates and preserve the measured direct profile
+as a comparison baseline. We do not emit that large circuit or select an
+unspecified ``proof-friendly'' replacement before choosing the proof
+representation that would consume it. Every proof-internal commitment and
+every proof transformation remain open. We identify the leakage, abort,
+composition, and setup questions that remain open. The resulting
+Core--Bind--proof separation is the book's canonical running example; its
+assumptions and conclusions do not transfer to another problem merely because
+that problem cites it.
 \end{abstract}
 
 \section{Cooperation Problem}
+\label{sec:ttt-cooperation-problem}
 
 A player may wish to demonstrate that it possesses a strategy that cannot be
 defeated while retaining the particular strategy as private information. The
@@ -79,12 +97,16 @@ truth of the claim?
 
 The first public slice answered a prerequisite question instead: what exact
 predicate should be checked if the policy is disclosed? The second fixed its
-game-DAG recurrence, and the present slice freezes that recurrence as public
-Boolean netlists. None of these steps hides the policy. Defining the predicate
-first prevents a future proof system from hiding an ambiguous or incorrect
-computation.
+game-DAG recurrence; later slices froze that recurrence as public Boolean
+netlists, fixed the external commitment bytes, and measured the direct cost of
+recomputing that commitment inside the relation. The present decision keeps
+that direct profile as a baseline but declines to materialize it before a
+proof representation is selected. None of these steps hides the policy.
+Defining the predicate and binding contract first prevents a future proof
+system from hiding an ambiguous or incorrect computation.
 
 \section{Disclosure and Trusted-Evaluator Baselines}
+\label{sec:ttt-baselines}
 
 Under full disclosure, the claimant sends the complete strategy to the
 verifier. The verifier can check every entry and simulate every opponent
@@ -100,7 +122,55 @@ cryptographic construction would seek some of the evaluator's confidentiality
 without inheriting its discretionary power. Cryptography is relevant only
 after the statement, witness, verifier, and leakage have been fixed.
 
+\section{Why This Is the Book's Running Example}
+\label{sec:ttt-running-example}
+
+Tic-Tac-Toe is useful here precisely because it is not mysterious. Its rules
+are public, its state space is finite, a losing branch can be replayed, and a
+reader can reproduce the complete semantic check. The strategy is not a scarce
+real-world secret: anyone can construct a non-losing policy. The example is a
+laboratory for protocol anatomy, not a claim that Tic-Tac-Toe knowledge has
+economic value.
+
+Table~\ref{tab:ttt-concept-ladder} is the reference map used throughout this
+chapter and intended for later chapters. Each layer answers a different
+question. Skipping a layer does not cause the next layer to supply it.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\begin{tabular}{@{}
+>{\raggedright\arraybackslash}p{0.16\textwidth}
+>{\raggedright\arraybackslash}p{0.19\textwidth}
+>{\raggedright\arraybackslash}p{0.27\textwidth}
+>{\raggedright\arraybackslash}p{0.27\textwidth}@{}}
+\hline
+Layer & Meaning here & What it establishes & What it does not establish \\
+\hline
+Game model & Rules and reachable states & Meaning of legal play & A policy \\
+Policy $\pi$ & Complete deterministic response table & Which move is selected & Legality, non-loss, or privacy \\
+$\mathsf{Core}$ & Canonical legality and global non-loss predicate & The semantic property of $\pi$ & A connection to commitment $C$ \\
+Commitment $C$ & Context-bound digest of policy bytes & Intended byte binding under the stated assumptions & Policy quality, knowledge, or chronology \\
+$\mathsf{Bind}$ & Opening relation for $C$ & The witness opens $C$ in the stated context & Legality or non-loss \\
+$R=\mathsf{Core}\land\mathsf{Bind}$ & The same policy satisfies both halves & The exact committed-policy statement & A proof protocol \\
+Argument of knowledge & Future protocol for the selected relation & Verifier acceptance plus a stated extraction property & Witness privacy by itself \\
+Zero knowledge & Privacy property of that protocol & A stated bound on transcript leakage & Identity, fairness, or delivery \\
+Lifecycle & Publication, reuse, opening, abort, and expiration & Real execution meaning & Supplied by none of the layers above \\
+\hline
+\end{tabular}
+\caption{The Tic-Tac-Toe concept ladder.}
+\label{tab:ttt-concept-ladder}
+\end{table}
+
+Later chapters may reuse this ladder only after replacing every
+problem-specific part: parties, canonical hidden object, public model,
+predicate, leakage, adversary, setup, and lifecycle. They may cite the
+shared-witness lesson in Section~\ref{sec:ttt-shared-witness} and the oracle
+leakage result in Section~\ref{sec:ttt-repeated-query}; they inherit no
+Tic-Tac-Toe security conclusion.
+
 \section{Fixed Game Model}
+\label{sec:ttt-model}
 
 The game is ordinary three-by-three Tic-Tac-Toe. Number the cells from $0$
 through $8$ in row-major order. Each cell is empty, X, or O. X moves first;
@@ -124,6 +194,27 @@ and encode a board $b$ by
     \operatorname{index}(b)=\sum_{i=0}^{8} b_i 3^i.
 \]
 
+For orientation, the cell numbering and one reachable board are
+
+\begin{center}
+\begin{tabular}{c|c|c}
+0 & 1 & 2 \\ \hline
+3 & 4 & 5 \\ \hline
+6 & 7 & 8
+\end{tabular}
+\qquad
+\begin{tabular}{c|c|c}
+X & $\cdot$ & $\cdot$ \\ \hline
+$\cdot$ & O & $\cdot$ \\ \hline
+$\cdot$ & $\cdot$ & $\cdot$
+\end{tabular}
+\end{center}
+
+The board on the right has index
+$1\cdot3^0+2\cdot3^4=163$. It is X's turn, so a policy for claimant X
+stores its selected next cell at byte $\pi[163]$. This one lookup is the small
+unit repeated across the complete table.
+
 Thus there are $3^9=19{,}683$ possible byte-addressable board encodings,
 although most do not describe legal reachable states. Exhaustive enumeration
 from the empty board, without expanding terminal states, gives 5,478 reachable
@@ -132,6 +223,8 @@ and 958 terminal boards. The C tests use these independently expected counts
 as finite-model cross-checks, not as cryptographic evidence.
 
 \section{Canonical Deterministic Policy}
+\label{sec:ttt-policy}
+\label{def:ttt-policy-v1}
 
 Fix a claimant role $p\in\{\mathsf{X},\mathsf{O}\}$. Let $S_p$ be the set
 of legal reachable nonterminal states in which $p$ moves, and let $A(s)$
@@ -170,6 +263,7 @@ construction; and a generation seed may compactly select a policy. None
 substitutes for the others.
 
 \section{Legal, Non-Losing, and Minimax-Optimal}
+\label{sec:ttt-policy-properties}
 
 These terms must not be merged.
 
@@ -197,6 +291,8 @@ statement, and distinguish a bad continuation from a position whose value was
 already losing. This remains open.
 
 \section{Public Exhaustive Predicate}
+\label{sec:ttt-public-predicate}
+\label{def:ttt-public-nonlose}
 
 For a role $p$ and canonical policy $\pi$, define
 $\mathsf{PublicNonLose}(p,\pi)=1$ exactly when:
@@ -227,6 +323,30 @@ non-loss. If such a connection is discovered, it should first be stated as a
 separate mathematical relation and compared with direct exhaustive checking.
 
 \section{C Implementation Companion and Evidence}
+\label{sec:ttt-implementation}
+
+The executable companion keeps four artifacts separate so their evidence
+cannot be confused:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}
+>{\raggedright\arraybackslash}p{0.19\textwidth}
+>{\raggedright\arraybackslash}p{0.31\textwidth}
+>{\raggedright\arraybackslash}p{0.39\textwidth}@{}}
+\hline
+Artifact & Teaching purpose & Boundary \\
+\hline
+Recursive checker & Explains rejection with a replayable losing line & Discloses the complete policy and uses diagnostic recursion \\
+Fixed DAG & Evaluates the same predicate on a public schedule & Still a plaintext C evaluation, not a circuit proof \\
+Core circuits & Encode canonical validity and non-loss as XOR/AND gates & Witness-typed inputs remain plaintext during evaluation \\
+Bind companion & Checks a disclosed commitment opening and measures one direct circuit shape & Does not check policy quality or produce a private proof \\
+\hline
+\end{tabular}
+\caption{The four current executable artifacts.}
+\label{tab:ttt-implementation-artifacts}
+\end{table}
 
 \begin{sloppypar}
 The preserved public-checker interface is \path{include/ac/ttt.h}; both
@@ -240,11 +360,35 @@ evaluators remain in \path{src/protocols/ttt.c}; and their tests remain in
 \path{tests/test_ttt_core_circuit.c}. The demonstration is
 \path{src/tic_tac_toe_without_revealing_the_strategy/ttt_demo.c}. The protected
 checker interface, implementation, and original 13-test suite remain
-byte-identical independent baselines. The implementation uses C11,
-caller-owned storage, and the standard library only. It performs no heap
+byte-identical independent baselines. These three public-predicate paths use C11,
+caller-owned storage, and the standard library only. They perform no heap
 allocation, randomness, hashing, commitment, network communication, or
 libsodium call.
 \end{sloppypar}
+
+\begin{sloppypar}
+The separate external-commitment interface is
+\path{include/ac/ttt_bind.h}; its wrapper and symbolic measurement are in
+\path{src/protocols/ttt_bind.c}; its focused tests are
+\path{tests/test_ttt_bind.c}; and its warning-bearing driver is
+\path{src/tic_tac_toe_without_revealing_the_strategy/ttt_bind_demo.c}.
+This component reuses the repository's existing
+\path{src/primitives/commitment.c} and therefore links libsodium for
+BLAKE2b-256, random nonce generation, comparison, and clearing. It adds no
+cryptographic library. The protected dependency-free \(\mathsf{Core}\)
+targets remain separately linkable without libsodium.
+\end{sloppypar}
+
+Two deterministic fixtures serve different lessons. The original synthetic
+Bind vector intentionally opens to a policy that fails Core, demonstrating
+that opening consistency does not imply strategy quality. The positive vector
+in \path{test-vectors/tic-tac-toe-reference-v1.txt} uses the valid X reference
+policy. One grouped test carries those exact bytes through the recursive
+checker, fixed DAG, actual Core-X Boolean evaluation, and Bind opening. The
+Bind demo also has a deterministic reference mode, invoked with
+\texttt{--reference-vector}. Its default mode still obtains a fresh session
+and nonce. The fixed nonce is
+public test material and supplies no hiding or deployment evidence.
 
 Both evaluators distinguish API execution from the mathematical verdict. Null
 pointers and invalid roles are API errors. A malformed but readable policy is
@@ -272,14 +416,18 @@ Most importantly, the checker receives the entire 19,683-byte table. It does
 not implement the title's non-revelation goal.
 
 \section{Five Claims That Must Remain Separate}
+\label{sec:ttt-five-claims}
 
-\subsection{Knowledge of a Strategy}
+\subsection{Knowledge of a Policy or of a Committed Policy}
 
-A commitment-shaped value does not demonstrate that its sender knows an
-opening. Formal proof of knowledge requires an extractor-based definition
-relating verifier acceptance to recovery of a witness
-\cite{bellare1993definingknowledge}. The current checker has no commitment and
-no extractor.
+The one-shot existential statement has policy witness $\pi$. The committed
+statement has witness $(\pi,r)$, because the extractor must recover both the
+policy and an opening accepted by the named relation. A commitment-shaped
+value does not demonstrate knowledge of either witness. Formal proof of
+knowledge requires an extractor-based definition relating verifier acceptance
+to recovery of the stated witness \cite{bellare1993definingknowledge}. The
+three public checker/Core paths have no commitment or extractor. The separate
+external wrapper verifies disclosed openings but still has no extractor.
 
 \subsection{Legality}
 
@@ -311,14 +459,30 @@ statefulness, fresh session policies, or randomized policies may change how
 quickly useful information accumulates, but each requires its own leakage
 definition.
 
-\section{Future Committed-Policy Relation}
+\section{Two Statement Modes and a Future Private Relation}
+\label{sec:ttt-future-relation}
 
 Commitment schemes formalize hiding and binding properties under stated
 assumptions; Naor's construction is one foundational reference
 \cite{naor1991bitcommitment}. That work does not prove the repository's
 instructional hash commitment or the Tic-Tac-Toe predicate.
 
-A future protocol may use the public instance
+The chapter has two distinct statement modes. In \emph{existential mode}, no
+external commitment is needed. With public statement
+$x_{\exists}=(v_G,p,s_0)$ and witness $w_{\exists}=\pi$, define
+
+\begin{equation}
+\label{eq:ttt-existential-relation}
+R_{\exists}(x_{\exists},w_{\exists})=
+\mathsf{Core}(v_G,p,s_0,\pi).
+\end{equation}
+
+This relation defines which policy witnesses satisfy Core. A future argument
+of knowledge for the relation could support the corresponding knowledge claim.
+The relation alone does not do so, and it does not say that the policy was
+fixed earlier or will be reused later.
+
+In \emph{committed mode}, a future protocol may use the public instance
 
 \[
  x=(v_G,p,s_0,C,\mathit{ctx})
@@ -331,10 +495,12 @@ and the private witness
 \]
 
 where $v_G$ fixes the game and policy versions, $s_0$ fixes the initial state,
-$C$ is a policy commitment, $\mathit{ctx}$ fixes the protocol and session
-context, and $r$ is its opening information. Define the relation
+$C$ is a policy commitment, $\mathit{ctx}$ fixes the protocol, session, and
+statement-round context, and $r$ is its opening information. Define the
+relation
 
-\[
+\begin{equation}
+\label{eq:ttt-committed-policy-relation}
  \begin{aligned}
  R(x,w)=1 \quad\Longleftrightarrow\quad{}
  &v_G=1 \;\land\; p\in\{\mathsf{X},\mathsf{O}\}
@@ -343,7 +509,48 @@ context, and $r$ is its opening information. Define the relation
      \mathsf{Encode}(v_G,p,s_0,\pi),r\bigr)=1 \\
  &{}\land\;\mathsf{PublicNonLose}(p,\pi)=1.
  \end{aligned}
-\]
+\end{equation}
+
+Here one policy $\pi$ must satisfy both semantic and opening conditions. The
+symbol $v_G$ is shorthand for the fixed Version~1 game and policy semantics,
+not a complete deployment version registry. A concrete private protocol must
+separately identify its game rules, policy encoding, relation, external
+commitment profile, proof system, and transcript versions. Adding those fields
+to the Version~1 bytes would require a new profile; this chapter does not
+silently reinterpret the existing digest.
+
+\subsection{Commitment Publication Lifecycle}
+\label{sec:ttt-commitment-lifecycle}
+
+A digest has temporal meaning only within an externally enforced lifecycle.
+Table~\ref{tab:ttt-commitment-lifecycle} states the minimum contract. No current
+C API implements the ordered record, authentication, replay database, or
+expiration policy.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}
+>{\raggedright\arraybackslash}p{0.16\textwidth}
+>{\raggedright\arraybackslash}p{0.33\textwidth}
+>{\raggedright\arraybackslash}p{0.40\textwidth}@{}}
+\hline
+Stage & Required event & Meaning and boundary \\
+\hline
+Allocate & Fix versions, role, session, round, and statement purpose & Context bytes distinguish statements but do not authenticate them \\
+Publish & Place $(C,\mathit{ctx})$ in an authenticated ordered record before the event it is meant to precede & Without this record, ``fixed earlier'' is not established \\
+Prove & Bind the proof transcript to the exact recorded statement and use one shared witness & A proof for another digest, context, or policy is irrelevant \\
+Reuse & Refer to the same recorded value under an explicit reuse policy & Reuse is not inferred from equal-looking local transcripts \\
+Open or close & Verify an optional opening, or record withdrawal, abort, or expiration & Cryptography does not explain an abort or force an opening \\
+\hline
+\end{tabular}
+\caption{External lifecycle required for a temporal commitment claim.}
+\label{tab:ttt-commitment-lifecycle}
+\end{table}
+
+The current session and statement-round fields supply domain context. Only an
+application or institution can supply the ordered publication event and decide
+who may write, read, challenge, reuse, revoke, or close it.
 
 Zero knowledge asks that the verifier learn no more from a proof than what is
 already implied by the public statement. The foundational definition is due
@@ -354,46 +561,75 @@ assumptions \cite{goldreich1991proofsvalidity}. This existence result does not
 select a practical backend, prove knowledge automatically, or establish the
 security of a concrete composition.
 
-The author's full technical goal would require an instantiated protocol having
-both a zero-knowledge property and a proof- or argument-of-knowledge property
-for $R$, under named setup, adversary, commitment, channel, and composition
-assumptions. The computational target selected below is an argument of
-knowledge. This chapter implements none of that machinery. In particular, the
-existing instructional hash commitment is not silently promoted into a proof
-system.
+\subsection{Target Security Experiments (Not Achieved)}
+\label{sec:ttt-security-target}
+
+The eventual object must be a family indexed by a security parameter
+$\lambda$, with an explicit setup algorithm
+$\mathsf{Setup}(1^\lambda)$ and a versioned relation family $R_\lambda$.
+For the selected existential or committed mode, the protocol must state the
+following; PPT denotes probabilistic polynomial-time.
+
+\noindent\textbf{Completeness.}
+For every $\lambda$, every public-parameter string
+$\mathit{pp}\leftarrow\mathsf{Setup}(1^\lambda)$, and every $(x,w)$ satisfying
+$R_\lambda(x,w)=1$, an honest prover using $\mathit{pp}$ makes an honest
+verifier accept except with a stated completeness error. If the setup model
+permits parameters not honestly sampled, their validation rule must be stated
+separately.
+
+\noindent\textbf{Argument of knowledge.}
+For every PPT malicious prover and auxiliary input
+that make the verifier accept statement $x$ above the selected knowledge error,
+there must exist an efficient extractor under the selected extractor interface.
+Except with a stated extraction-failure probability, it must output a witness
+$w$ satisfying $R_\lambda(x,w)=1$: $\pi$ in existential mode or $(\pi,r)$ in
+committed mode.
+
+\noindent\textbf{Zero knowledge.}
+For every PPT malicious verifier and auxiliary input $z$, there must exist a
+PPT simulator given
+$(1^\lambda,\mathit{pp},x,z)$ and the declared public outputs. Its simulated
+view must be computationally indistinguishable from the verifier's real view,
+under the selected setup and composition model.
+
+These are target experiments, not theorems about current code. The fixed
+32-byte Version~1 BLAKE2b profile is one concrete educational baseline and is
+not presented as an asymptotic instantiation for arbitrary $\lambda$. The
+author's full technical goal requires both the argument-of-knowledge and
+zero-knowledge properties under named setup, adversary, commitment, channel,
+and composition assumptions. This chapter implements none of that machinery.
 
 \section{Selecting a Private-Proof Route}
+\label{sec:ttt-proof-route}
 
-The immediate target is one global zero-knowledge argument of knowledge for the
-relation $R$, not a service that returns policy moves. The public instance and
-accept/reject outcome remain visible. A later instantiation that meets the
-selected zero-knowledge definition against a malicious verifier should reveal
-no additional information about the witness beyond that public instance and
-the truth of the statement. A per-state interface instead returns $\pi(s)$ and
-therefore reveals one policy output on every query. Private per-state
-evaluation is a separate two-party-computation problem with its own input
-privacy, output leakage, fairness, and repeated-query requirements.
+The immediate research target is one global argument of knowledge for the
+committed relation $R$, with the zero-knowledge target from
+Section~\ref{sec:ttt-security-target}; it is not a service that returns policy
+moves. The public instance and accept/reject outcome remain visible. A
+per-state interface instead returns $\pi(s)$ and therefore reveals one policy
+output on every query. Private per-state evaluation is a separate
+two-party-computation problem with its own input privacy, output leakage,
+fairness, and repeated-query requirements.
 
-This target is provisional, not achieved. It concerns one standalone
-interactive execution by classical probabilistic polynomial-time algorithms:
-completeness is perfect or explicitly bounded; computational knowledge
-soundness is stated against a malicious prover through an extractor for the
-complete witness; and computational zero knowledge is stated against a
-malicious verifier. For the combinatorial soundness calculation, the honest
-verifier samples independent uniform challenges after the first proof-internal
-commitments. The malicious-verifier zero-knowledge target must instead handle
-arbitrary probabilistic polynomial-time verifier challenge strategies under the
-selected transformation. The security definitions concern the direct abstract
-prover--verifier transcript. Human identity, transport authentication, relays,
-delivery, timing, concurrency, resets, composition, endpoint compromise,
-fairness, and recovery are outside this initial target.
+This target is provisional and concerns one standalone interactive execution
+by classical probabilistic polynomial-time algorithms. For the combinatorial
+soundness calculation below, the honest verifier samples independent uniform
+challenges after the first proof-internal commitments. The malicious-verifier
+zero-knowledge target must instead handle arbitrary polynomial-time challenge
+strategies under the selected transformation. Human identity, transport
+authentication, delivery, timing, concurrency, resets, adaptive corruption,
+composition, endpoint compromise, fairness, and recovery remain outside this
+initial target.
 
-The relation also has two costs that must remain visible. Write
+The relation also has two costs that must remain visible. For the direct
+Version~1 baseline, write
 
-\[
- R(x,w)=\mathsf{Core}(v_G,p,s_0,\pi)
+\begin{equation}
+\label{eq:ttt-v1-relation}
+ R_{\mathrm{V1}}(x,w)=\mathsf{Core}(v_G,p,s_0,\pi)
         \land \mathsf{Bind}(C,\mathit{ctx},v_G,p,s_0,\pi,r),
-\]
+\end{equation}
 
 The predicate $\mathsf{Core}$ checks the game version, valid role, and empty
 initial state. It also evaluates $\mathsf{PublicNonLose}$, which already
@@ -403,6 +639,123 @@ does not connect the policy to $C$. Proving only $\mathsf{Bind}$ says nothing
 about legality or non-loss.
 Dropping $C$ entirely would merely prove knowledge of some non-losing ordinary
 Tic-Tac-Toe policy, a capability that is already public and easy to reproduce.
+
+\subsection{Why the Witness Must Be Shared}
+\label{sec:ttt-shared-witness}
+
+\begin{center}
+\fbox{\begin{minipage}{0.88\textwidth}
+\textbf{Reusable lesson.} A commitment must be consumed by the relation, and
+the same witness must satisfy both halves.
+
+\[
+\begin{array}{ll}
+\text{Wrong:} &
+\mathsf{Core}(\pi_1)=1
+\quad\text{and separately}\quad
+\mathsf{Bind}(C,\pi_2,r)=1, \\[2mm]
+\text{Required:} &
+\mathsf{Core}(\pi)=1
+\quad\land\quad
+\mathsf{Bind}(C,\pi,r)=1.
+\end{array}
+\]
+\end{minipage}}
+\end{center}
+
+The public digest cannot bind the proved policy to the commitment merely by
+appearing in the statement. Let $y=(v_G,p,s_0)$ and define the Core-only lifted
+relation
+
+\[
+ R_{\mathsf{Core}}((y,C,\mathit{ctx}),\pi)
+   =\mathsf{Core}(y,\pi).
+\]
+
+\begin{proposition}[Unused commitment]
+\label{prop:ttt-unused-commitment}
+\mbox{}\par
+Fix any policy $\pi$ and any values
+$C,C',\mathit{ctx},\mathit{ctx}'$. Then
+
+\[
+ R_{\mathsf{Core}}((y,C,\mathit{ctx}),\pi)
+ =R_{\mathsf{Core}}((y,C',\mathit{ctx}'),\pi).
+\]
+
+Thus acceptance by this relation cannot establish that $\pi$ opens $C$.
+\end{proposition}
+
+\textbf{Proof.}
+By definition, both sides equal $\mathsf{Core}(y,\pi)$; neither $C$ nor its
+context is read. $\square$
+
+Consequently, even a perfectly sound argument of knowledge for this lifted
+relation may correctly extract a non-losing policy while proving nothing about
+$C$. That would be a relation-specification error, not a failure of the proof
+system or the commitment.
+
+The second failure is subtler. Define
+
+\[
+ \begin{aligned}
+ G_y&=\{\pi:\mathsf{Core}(y,\pi)=1\},\\
+ O_{C,\mathit{ctx},y}
+   &=\{\pi:\exists r\;\mathsf{Bind}(C,\mathit{ctx},y,\pi,r)=1\}.
+ \end{aligned}
+\]
+
+The committed-policy claim is
+$G_y\cap O_{C,\mathit{ctx},y}\ne\varnothing$. A Core-only proof establishes
+only $G_y\ne\varnothing$. Even separate proofs that $G_y$ and
+$O_{C,\mathit{ctx},y}$ are nonempty do not suffice: two nonempty sets need not
+intersect.
+
+\begin{proposition}[Shared-witness linkage is necessary]
+\label{prop:ttt-shared-witness}
+Fix $y$, $C$, and $\mathit{ctx}$. Suppose there are policies $\pi_+$ and
+$\pi_-$ and an opening $r_-$ such that
+
+\[
+ \mathsf{Core}(y,\pi_+)=1,\qquad
+ \mathsf{Core}(y,\pi_-)=0,\qquad
+ \mathsf{Bind}(C,\mathit{ctx},y,\pi_-,r_-)=1,
+\]
+
+and suppose $C$ has no accepting opening to any different policy byte string.
+Then the Core and Bind existential statements are each true, but there is no
+single $\pi,r$ satisfying their conjunction.
+\end{proposition}
+
+\textbf{Proof.}
+The witness $\pi_+$ establishes the Core existential statement, while
+$(\pi_-,r_-)$ establishes the Bind existential statement. The last assumption
+forces every policy in $O_{C,\mathit{ctx},y}$ to equal $\pi_-$. Since
+$\pi_-$ fails Core, $G_y\cap O_{C,\mathit{ctx},y}$ is empty. $\square$
+
+The actual hash profile does not establish the proposition's last condition as
+a theorem. Its published synthetic vector illustrates the mismatch: its
+opening verifies while its policy fails Core, whereas a reference policy
+passes Core. Given that known invalid opening, any efficiently produced
+full-relation opening with a different, non-losing policy would constitute an
+alternate-opening attack for the same digest and context. The profile's
+informal computational binding discussion assumes such an attack is
+infeasible; it supplies no formal reduction or numerical failure bound. The
+test demonstrates the two code paths, not the assumption.
+
+A future construction must share the exact policy, game-version, role, and
+initial-state wires between both predicates, or enforce their equality
+explicitly.
+
+The external $C$ is not logically required for the one-shot claim ``I know
+some non-losing policy.'' A proof of knowledge for Core would express that
+weaker statement. A public commitment, or a formally specified native witness
+commitment serving the same role, becomes necessary when the claim must refer
+to one particular policy fixed earlier, reused across declared proofs, or
+opened later. If $C$ is created alongside one proof and nothing else ever
+refers to it, it contributes little temporal meaning while retaining its
+relation cost. The current session and round fields separate contexts; they do
+not themselves prove chronology or authenticate a person.
 
 \subsection{Bounded Comparison}
 
@@ -443,10 +796,12 @@ term at most $2^{-128}$ is
 This equation is not a total soundness bound or proof-size estimate for our
 relation. A concrete argument must also include the binding-failure term of its
 chosen view commitment. The Boolean cost of \(\mathsf{Core}\) is now measured
-for the frozen construction below. The costs of \(\mathsf{Bind}\),
-proof-internal commitments, simulated views, transformations, and transcripts
-remain unmeasured. A \(\mathsf{Core}\) gate count is not a proof-size
-estimate. Transformations beyond the basic Sigma protocol are required for the chapter's
+for the frozen construction below. One direct, deliberately unoptimized
+Boolean representation of \(\mathsf{Bind}\) is also counted below, but not
+emitted. Proof-internal commitments, simulated views, transformations, and
+transcripts remain unselected or unmeasured. Neither a
+\(\mathsf{Core}\) count nor a \(\mathsf{Core}\land\mathsf{Bind}\) count is a
+proof-size estimate. Transformations beyond the basic Sigma protocol are required for the chapter's
 malicious-verifier zero-knowledge and knowledge target. Making the protocol
 non-interactive with Fiat--Shamir would additionally enter the random-oracle
 model and require exact transcript binding and challenge sampling. This chapter
@@ -533,10 +888,11 @@ constrained intermediates, not independent semantic witness inputs; a backend
 may nevertheless encode them as auxiliary wires or witness entries. The
 recurrence accepts exactly when the empty-board value is one.
 
-\noindent\textbf{Proposition.}
-\emph{DAG and recursive predicate equivalence.}
-For either claimant role and every Canonical Policy Version~1 table $\pi$, the
-fixed-DAG root value equals the Boolean verdict of the recursive checker.
+\begin{proposition}[DAG equivalence]
+\label{prop:ttt-dag-equivalence}
+For either claimant role, let $\pi$ be any Canonical Policy Version~1 table.
+The fixed-DAG root value equals the Boolean verdict of the recursive checker.
+\end{proposition}
 
 \textbf{Proof.}
 For a legal reachable state $s$, let $F(s)$ be the recursive semantic value
@@ -631,7 +987,8 @@ and applies a best-effort volatile wipe before returning. That wipe is not a
 guarantee about registers, compiler-created copies, operating-system state, or
 the caller-owned public and policy buffers.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
 \begin{tabular}{l@{\hspace{1.5em}}r@{\hspace{2em}}r}
 \hline
 Quantity & \(\mathsf{Core\mbox{-}X}\) & \(\mathsf{Core\mbox{-}O}\) \\
@@ -648,7 +1005,9 @@ Evaluator scratch (bytes) & 403,870 & 394,155 \\
 Canonical serialization (bytes) & 2,217,380 & 2,129,945 \\
 \hline
 \end{tabular}
-\end{center}
+\caption{Exact Core circuit costs for the frozen Version~1 construction.}
+\label{tab:ttt-core-cost}
+\end{table}
 
 These are exact counts for this frozen construction, confirmed by separately
 analyzing and parsing the emitted circuits. They are not lower bounds,
@@ -669,16 +1028,207 @@ the enormous canonical policy spaces, and testing is not formal verification.
 
 Serialization is not a commitment. Evaluating \(\mathsf{Core}\) does not
 evaluate the complete relation
-\(R=\mathsf{Core}\land\mathsf{Bind}\). The external policy commitment,
-proof-internal commitments, soundness, extraction, zero knowledge, privacy,
-interaction, and production security remain absent.
+\(R_{\mathrm{V1}}=\mathsf{Core}\land\mathsf{Bind}\). The emitted Core circuits still contain
+no commitment computation, proof-internal commitment, soundness, extraction,
+zero knowledge, privacy, interaction, or production security.
+
+\subsection{External Policy Commitment and Symbolic Bind Measurement}
+
+Policy Commitment Profile Version~1 instantiates the external commitment
+profile and disclosed-opening check in the future relation. It composes AC
+Commitment Version~1 with the
+fixed 16-byte protocol identifier
+\texttt{AC-TTT-POLICY-V1}. Its commitment context contains protocol version
+one, a public 32-byte session identifier, a public unsigned 32-bit statement
+round, fixed protocol-role labels \texttt{PROVER} and \texttt{VERIFIER}, and
+payload type one. The claimant's X/O game role is part of the payload and
+therefore cannot be confused with the protocol-role labels.
+
+The committed payload is exactly
+
+\begin{center}
+\texttt{[game version][claimant role][empty board u16be][policy:19683]}.
+\end{center}
+
+The public input proposed for the combined relation is 72 bytes:
+
+\begin{center}
+\texttt{[Core:4][session:32][statement round u32be][digest:32]}.
+\end{center}
+
+The witness-typed input is 19,715 bytes:
+
+\begin{center}
+\texttt{[canonical policy:19683][opening nonce:32]}.
+\end{center}
+
+The policy prefix is shared with \(\mathsf{Core}\). The canonical commitment
+framing contributes 122 bytes around the 19,687-byte payload, so the hashed
+message is 19,809 bytes. BLAKE2b uses 128-byte blocks and therefore performs
+155 compression calls for this fixed length
+\cite{saarinen2015blake2}. Protocol integers are encoded big-endian before
+hashing; within the BLAKE2b computation, message words have the algorithm's
+little-endian interpretation. The implementation uses the existing libsodium
+generic-hash and random-byte interfaces
+\cite{libsodium-generichash,libsodium-randombytes}.
+
+The executable wrapper can create a fresh commitment, recompute one from a
+caller-supplied nonce for test vectors, and verify a disclosed opening. The
+published deterministic vector uses a synthetic, semantically invalid policy:
+the external opening verifier accepts it, while the public policy checker
+rejects it. This negative test is intentional. It satisfies
+\(\mathsf{Bind}\)'s opening condition but not the complete relation.
+Commitment consistency does not imply policy legality or non-loss, just as
+\(\mathsf{Core}\) alone does not connect the accepted policy to \(C\).
+
+The same security boundary as AC Commitment Version~1 applies. Correct
+recomputation is tested. Hiding is only an informal random-oracle-style
+argument requiring a fresh unpredictable secret 32-byte nonce. Binding is
+only an informal collision/alternate-opening argument for the exact canonical
+encoding. The profile provides no commit-time proof of knowledge,
+authentication, identity, non-repudiation, fairness, delivery, availability,
+or production guarantee. Session and round fields separate byte contexts only
+if an application actually enforces fresh sessions and meaningful round
+allocation.
+
+Emitting a literal direct BLAKE2b Boolean circuit at this stage would create a
+large artifact without yet supplying a private proof. The companion instead
+walks the exact operation shape and wire depths of one frozen, deliberately
+unoptimized XOR/AND representation. Each 64-bit addition uses
+
+\[
+\begin{aligned}
+ c'&=((a\mathbin{\mathsf{XOR}}c)
+       \mathbin{\mathsf{AND}}(b\mathbin{\mathsf{XOR}}c))
+       \mathbin{\mathsf{XOR}}c,\\
+ s&=(a\mathbin{\mathsf{XOR}}c)\mathbin{\mathsf{XOR}}b,
+\end{aligned}
+\]
+
+Bit zero uses the one-AND/one-XOR half-adder implied by \(c=0\);
+bits 1 through 62 use the relation above; and bit 63 emits only its two-XOR
+sum because the final carry is discarded. This frozen construction therefore
+uses 63 AND and 251 XOR gates per 64-bit addition. The model follows all
+twelve rounds, rotations,
+feed-forward operations, digest comparison, and the nonzero-session check.
+It does not track bit values, emit a gate array, evaluate a circuit, or
+serialize one. The deterministic commitment vectors separately check the
+byte-level profile and the positive shared-policy path.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lr}
+\hline
+Quantity & Symbolic \(\mathsf{Bind}\) model \\
+\hline
+Public input bits & 576 \\
+Witness input bits & 157,720 \\
+BLAKE2b compression calls & 155 \\
+AND gates & 5,625,151 \\
+XOR gates & 26,378,049 \\
+Total gates & 32,003,200 \\
+Wires, including two constants & 32,161,498 \\
+Output depth & 1,558,999 \\
+Flat 12-byte gate storage if emitted & 384,038,400 \\
+One-byte-per-wire scratch if evaluated & 32,161,498 \\
+Nine-byte-gate serialization if emitted & 288,028,832 \\
+\hline
+\end{tabular}
+\caption{Exact symbolic Bind costs for the frozen direct representation.}
+\label{tab:ttt-bind-cost}
+\end{table}
+
+Sharing the 576 public bits and the 157,720-bit witness layout, then adding one
+final AND, gives the following purely arithmetical composition:
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{lrr}
+\hline
+Quantity & \(\mathsf{Core\mbox{-}X}\land\mathsf{Bind}\)
+         & \(\mathsf{Core\mbox{-}O}\land\mathsf{Bind}\) \\
+\hline
+AND gates & 5,840,174 & 5,834,465 \\
+XOR gates & 26,409,399 & 26,405,393 \\
+Total gates & 32,249,573 & 32,239,858 \\
+Wires & 32,407,871 & 32,398,156 \\
+Output depth & 1,559,000 & 1,559,000 \\
+Serialization if emitted & 290,246,189 & 290,158,754 \\
+\hline
+\end{tabular}
+\caption{Arithmetic composition of Core and Bind, without an emitted combined circuit.}
+\label{tab:ttt-combined-cost}
+\end{table}
+
+These counts are exact only for the frozen operation shape. They are not lower
+bounds, optimized-backend estimates, emitted circuits, equivalence proofs,
+running-time measurements, proof sizes, transcript sizes, or security
+parameters. The direct result is nevertheless informative:
+\(\mathsf{Bind}\), not the finite game, dominates this Boolean route.
+In this direct representation, Bind is about 130 to 135 times larger than Core
+and contributes more than 99.2 percent of the combined gate count.
+A proof-friendly commitment could change that tradeoff, but it would be a new
+profile with new assumptions rather than an invisible optimization.
+
+\subsection{Commitment Route Decision}
+
+Policy Commitment Profile Version~1 remains the exact direct baseline. Its
+API, vector, byte encoding, implementation, and symbolic counts remain
+authoritative for disclosed-opening education and later comparison. The next
+artifact will not materialize its 32,003,200-gate Bind circuit. This is a
+sequencing decision, not a claim that BLAKE2b is insecure or that an unnamed
+alternative is cheaper.
+
+Nor is a replacement selected here. ``Proof-friendly'' is not the name of a
+primitive or a security property. It is a measurable, backend-relative
+requirement: a construction can be inexpensive in one field or constraint
+language and expensive in another. Choosing it before the proof
+representation would add assumptions and likely implementation machinery
+without an end-to-end comparison. No new library is introduced by this
+decision.
+
+The next paper-first gate must compare source-backed pairs of proof
+representations and commitments against the Version~1 baseline, then select
+the two layers together. Any candidate pair must:
+
+\begin{enumerate}
+    \item preserve the intended temporal meaning: under its stated binding
+    notion, one public value is intended to bind the same complete policy
+    before the proof, across any declared repeated proofs, or at a later
+    opening;
+    \item define a new versioned profile, exact encoding, opening relation,
+    setup, hiding and binding notions, and migration boundary;
+    \item enforce the shared-witness condition above, rather than merely hash
+    $C$ into a transcript or prove Core and Bind with independent policies;
+    \item keep the external policy commitment distinct from any
+    proof-internal commitment to randomized views or witness polynomials; and
+    \item compare total relation, transcript, verifier, and proof costs under
+    one stated security target, rather than compare only hash-gate counts.
+\end{enumerate}
+
+If no candidate survives that review, Version~1 remains the reference direct
+route. If a candidate does survive, it must receive a new profile and relation
+version; the existing 32-byte digest must never be silently reinterpreted.
+
+No proof-internal view-commitment construction is selected. Conditioned only
+on a future three-view shape using one 32-byte digest per view and one 32-byte
+nonce per opened view, \(r\) repetitions would contribute \(96r\) digest
+bytes and \(64r\) opened-nonce bytes. At the illustrative \(r=219\), this
+conditional floor is 35,040 bytes. It excludes the opened views themselves,
+challenges, metadata, transformations, the external policy commitment, and
+every security reduction; it is not a proof-size estimate.
+Because no proof-internal commitment profile is selected, this arithmetic is
+recorded only here and is deliberately absent from the public C API.
 
 \section{Repeated-Query Reconstruction}
+\label{sec:ttt-repeated-query}
 
-\textbf{Proposition (exact finite-oracle reconstruction).}
+\begin{proposition}[Exact finite-oracle reconstruction]
+\label{prop:ttt-oracle-reconstruction}
 Let $D$ be a finite domain and let $\pi:D\rightarrow A$ be deterministic.
 Any party permitted to query an oracle $O_\pi(s)=\pi(s)$ at every $s\in D$
 can reconstruct $\pi$ using $|D|$ distinct queries.
+\end{proposition}
 
 \textbf{Proof.}
 Enumerate the elements of $D$. Query each element once and store the returned
@@ -704,6 +1254,7 @@ strategy as a service. It also does not prevent the verifier from independently
 constructing another non-losing Tic-Tac-Toe policy.
 
 \section{Attacks, Abort, Leakage, and Composition}
+\label{sec:ttt-attacks}
 
 The public checker is designed to expose malformed and losing policies rather
 than conceal them. Relevant cases include missing entries, out-of-range moves,
@@ -736,6 +1287,7 @@ therefore not consequences of the future relation $R$. They would require
 separate mechanisms and claims.
 
 \section{Ethical and Institutional Interpretation}
+\label{sec:ttt-ethics}
 
 The attractive general idea is broader than this small game: a party may wish
 to demonstrate that a private policy satisfies a public safety condition
@@ -753,6 +1305,7 @@ Tic-Tac-Toe is intentionally harmless and finite. It is a laboratory for this
 distinction, not evidence that the same construction should govern people.
 
 \section{What Cryptography Does Not Solve}
+\label{sec:ttt-cryptography-does-not-solve}
 
 Even a correct future zero-knowledge argument of knowledge for $R$ would not:
 
@@ -772,12 +1325,16 @@ cannot choose a just predicate or turn a public, easily computed capability
 into a unique strategic advantage.
 
 \section{Limitations and Open Problems}
+\label{sec:ttt-limitations}
 
 The current result is limited to fixed ordinary three-by-three Tic-Tac-Toe, a
 deterministic positional policy, one fixed role, and the standard empty board.
-The complete policy is disclosed in memory. The implementation contains no
-protocol-message parser, persistence, identity, transport, commitment, proof
-system, private computation, random policy, or generalized-game analysis.
+The complete policy is disclosed in memory. The external commitment wrapper
+checks disclosed openings and has only the stated heuristic binding and hiding
+arguments; verification receives the policy and nonce. The implementation contains no emitted
+\(\mathsf{Bind}\) circuit, protocol-message parser, persistence, identity,
+transport, proof system, private computation, random policy, or
+generalized-game analysis.
 
 The following questions remain open:
 
@@ -786,13 +1343,15 @@ The following questions remain open:
     the author's proposed session seed to a policy?
     \item Which initial positions may a verifier choose, and how should their
     pre-existing minimax values alter the claim?
-    \item Which separately versioned \(\mathsf{Bind}\) circuit should connect
-    the complete canonical policy to an external commitment and context, under
-    which commitment assumptions, and at what measured cost?
+    \item Which separately versioned commitment, if any, satisfies the
+    required hiding and binding definitions while reducing the complete
+    relation cost in the selected proof representation, and how does its total
+    proof cost compare with the frozen Version~1 baseline?
     \item Which concrete MPC-in-the-head transformation can prove knowledge of
     the complete committed witness while meeting a malicious-verifier
-    zero-knowledge definition; under which commitment, setup, and composition
-    assumptions; and with what rounds, transcript, and proof size?
+    zero-knowledge definition; under which proof-internal commitment, setup,
+    and composition assumptions; and with what rounds, transcript, and proof
+    size?
     \item Should per-state evaluation reveal the query, the move, both, or only
     a derived game action?
     \item What query budget and leakage metric would make a meaningful
@@ -804,12 +1363,30 @@ The following questions remain open:
     bound by the commitment?
 \end{enumerate}
 
-These are research questions. The recursive checker, fixed-DAG evaluator, and
-Boolean Core remain public-disclosure baselines against which later answers
-must be compared.
+These remain research questions. The recursive checker, fixed-DAG evaluator,
+Boolean Core, and disclosed-opening wrapper are public baselines for later
+comparisons.
 
 \section{Exercises}
+\label{sec:ttt-exercises}
 
+\subsection*{Conceptual}
+\begin{enumerate}
+    \item For the board with X at cell~0 and O at cell~4, calculate the
+    base-three board index and identify the policy-table entry used on X's
+    turn.
+    \item Identify the public input and witness in the existential and
+    committed statement modes. Explain why a commitment is not a proof of
+    legality or non-loss.
+    \item Classify Core, Bind, an argument of knowledge, zero knowledge, and
+    deployment using Table~\ref{tab:ttt-concept-ladder}.
+    \item Give one replay risk and one abort risk that remain even if a future
+    private argument for the relation is correct.
+    \item Apply the concept ladder to the Poker chapter. State one place where
+    the analogy holds and one place where the game introduces a new problem.
+\end{enumerate}
+
+\subsection*{Mathematical}
 \begin{enumerate}
     \item Independently enumerate the legal reachable states and reproduce the
     four state counts in this chapter.
@@ -826,9 +1403,17 @@ must be compared.
     \item Choose a legal state that is already losing for the player to move.
     Explain why unrestricted verifier-selected initial conditions make the
     original non-loss claim impossible.
-    \item Describe the difference between a zero-knowledge proof for $R$ and
-    a zero-knowledge proof of knowledge for $R$. Identify what an extractor
-    must output in the latter case.
+    \item Describe the difference between a zero-knowledge argument for $R$
+    and a zero-knowledge argument of knowledge for $R$. Identify what an
+    extractor must output in the latter case.
+    \item Construct two nonempty sets of policy witnesses whose intersection
+    is empty. Use them to explain why separate Core and Bind arguments do not
+    establish the committed-policy relation without explicit equality of the
+    policy witnesses.
+\end{enumerate}
+
+\subsection*{Implementation}
+\begin{enumerate}
     \item Prove directly from the base-three board encoding that every legal
     child index exceeds its parent index. Reimplement the bottom-up recurrence
     without calling either C evaluator and compare all three verdicts on a
@@ -836,4 +1421,14 @@ must be compared.
     \item Independently parse, recount, and evaluate both serialized Core
     circuits. Explain why agreement on a bounded corpus proves neither policy
     privacy nor circuit equivalence for every possible policy.
+\end{enumerate}
+
+\subsection*{Research}
+\begin{enumerate}
+    \item Compare two candidate proof representations against the target
+    experiments in Section~\ref{sec:ttt-security-target}. Account for setup,
+    commitment compatibility, verifier work, transcript size, and composition.
+    \item Propose an authenticated publication record for
+    Table~\ref{tab:ttt-commitment-lifecycle}. State exactly which temporal and
+    replay claims it supports and which it does not.
 \end{enumerate}

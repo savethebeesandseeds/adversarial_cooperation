@@ -1,16 +1,25 @@
+\chapter{Cryptographic Meta-Mathematics}
+\label{chap:cryptographic-meta-mathematics}
 
-NOTE! 
-    this is important, this is how we set up a game of cooperative agents that allows for individual advantages. 
+\researchstatus{Analogy and open problem}{The connection to Goedel's
+incompleteness theorems is not established. ``Hidden axiom'' is presently a
+metaphor for a private policy, preference, constraint, or witness.}
 
-Godel's improvable truths. 
-    Can be seen as speaking of a missing axiom in axiomatic systems. 
-    take Continuous_hypothesis/Large_cardinal_axioms as extensions to ZFC. 
+The motivating idea is important to the project: cooperating adversaries may
+retain individual advantages while proving that a shared condition holds.
 
-This has us thinking, 
-    Cooperating adversaries can commit to hidden axioms. 
-        - There be public and secret axioms. 
-        - Hidden axioms are the parties game advantage. 
-        - But proves need to hold for all hidden and public axioms. 
+The original note compared extensions of an axiomatic system, such as the
+continuum hypothesis or large-cardinal axioms, with a game containing public
+and private rules. It imagined that:
 
-This is to say that, 
-    We can hide an axiom and prove behavior compliance with this hidden and all public axioms via Zero Knowledge Proofs. 
+\begin{itemize}
+  \item some axioms or constraints are public;
+  \item some remain private and constitute a party's strategic advantage; and
+  \item a proof of compliant behavior must account for the relevant public and
+  private conditions.
+\end{itemize}
+
+A technically narrower future question is whether a party can commit to a
+private policy or constraint set and prove in zero knowledge that a proposed
+action satisfies a public relation involving that committed object. No such
+relation or proof system is supplied by this chapter.

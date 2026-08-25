@@ -2,22 +2,26 @@
 
 \label{chap:poker-without-revealing-the-cards}
 
+\researchstatus{Educational toy construction}{The present C program runs in one
+process and illustrates a staged design.  It does not establish private
+distributed execution, a verifiable shuffle, malicious security, fairness, or
+production readiness.}
+
 \begin{abstract}
-This chapter studies a dealer-free construction for the dealing phase of Texas
-Hold'em among mutually distrustful parties. The objective is not yet to
-implement the full game, but to isolate the minimal cryptographic mechanisms
-required to instantiate a hand without disclosing private cards before
-showdown. We decompose the problem into four stages: deck randomization,
-secure multi-party shuffling, secure dealing, and public commitment to private
-hands. The current implementation is an instructional demonstrator rather than
-a production protocol: it illustrates confidentiality and integrity properties
-of the deal while deferring betting, hand evaluation, malicious security, and
-network transport.
+This chapter studies a candidate decomposition of the dealing phase of
+dealer-free Texas Hold'em.  The objective is not yet to implement the full
+game, but to expose four questions that a complete construction would have to
+answer: how the deck is randomized, how several parties influence its order,
+how cards are delivered, and how a later opening can be checked against an
+earlier digest.  The accompanying program is an instructional, single-process
+demonstrator.  It makes the stages inspectable; it does not prove that the
+resulting procedure has the confidentiality, integrity, or fairness properties
+required of a deployed protocol.
 \end{abstract}
 
 \section{Problem Setting}
 Suppose a collection of players wishes to emulate the role of a trusted dealer
-in Texas Hold'em. A satisfactory protocol must preserve at least the following
+in Texas Hold'em. A satisfactory protocol would need at least the following
 properties:
 \begin{enumerate}
     \item \textbf{Card privacy.} No player should learn another player's hole
@@ -31,10 +35,12 @@ properties:
     in advance.
 \end{enumerate}
 
-The present chapter restricts attention to the dealing problem. That is, it
-addresses how cards are generated, shuffled, privately assigned, and later
-committed to, without yet formalizing betting rounds or final winner
-determination.
+The present chapter restricts attention to a model of the dealing problem.  It
+asks how cards might be generated, shuffled, assigned, and later opened,
+without yet formalizing betting rounds or final winner determination.  The
+current program simulates all parties inside one address space, so its printed
+``private'' views are presentation boundaries rather than confidentiality
+boundaries.
 
 \section{Assumptions and Scope}
 The current demonstrator makes three explicit assumptions.
@@ -53,107 +59,130 @@ is presently made regarding resistance to malicious deviations, adaptive
 adversaries, collusion strategies, or implementation-level side channels.
 
 \section{Four-Stage Construction}
-We organize the protocol into four stages so that each requirement can be
+We organize the candidate construction into four stages so that each
+requirement can be
 examined independently.
 \begin{enumerate}
-    \item \textbf{Deck randomization.} Establish a hidden permutation of a
-    canonical 52-card deck.
-    \item \textbf{Secure multi-party shuffling.} Have each player transform the
-    deck so that no single player controls the final ordering.
-    \item \textbf{Secure dealing.} Deliver hole cards privately and community
-    cards publicly.
-    \item \textbf{Hand commitment and showdown validation.} Bind each player to
-    the dealt hand before revelation.
+    \item \textbf{Intended deck randomization.} Form a permutation of a
+    canonical 52-card deck and identify the resulting in-memory state.
+    \item \textbf{Toy multi-party transformation.} Simulate each player
+    transforming the deck so that the intended joint-control structure is
+    visible.
+    \item \textbf{Toy dealing.} Simulate delivery of hole cards and publication
+    of community cards.
+    \item \textbf{Illustrative hand digest and opening check.} Record a digest
+    of each simulated hand and later recompute it from the revealed inputs.
 \end{enumerate}
 
-\section{Stage 1: Deck Randomization}
+\section{Stage 1: Intended Deck Randomization}
 Let \(D = (c_1,\dots,c_{52})\) denote the canonical deck. The first stage
 applies a random permutation to \(D\), thereby producing a deck order that is
 not publicly revealed. A public digest of the resulting state is then
-published. This digest does not expose the order of the cards, but it fixes a
-reference point for the subsequent transcript and prevents ambiguity about
-which deck instance is under discussion.
+printed.  Within this execution, the digest serves as a checkpoint derived
+from the array state used by later stages.  The program does not provide a
+network transcript, and the
+short non-cryptographic deck digest printed by the demo is not evidence that a
+remote party is bound to a hidden permutation.
 
-\section{Stage 2: Secure Multi-Party Shuffling}
+\section{Stage 2: Toy Multi-Party Transformation}
 Each player next applies two transformations to the entire deck: a private
 shuffle and a private commutative-encryption layer. Because the encryption
 operations commute, the layers may later be removed in different orders
-without changing the final plaintext card. This makes it possible to deliver a
-private card to one player without disclosing it to the others.
+without changing the final plaintext card in the toy arithmetic.  Both players
+and the deck nevertheless live inside one process.  Consequently, this stage
+illustrates the intended order of operations; it does not implement a private
+or verifiable multi-party shuffle.
 
-After each player finishes the transformation, a public commitment to the
-encrypted deck is published. These intermediate commitments do not reveal the
-card values, but they bind the protocol to a single encrypted deck state after
-each participant's action.
+After each simulated player finishes the transformation, the program prints a
+short digest of the encrypted deck.  These values are useful execution
+checkpoints.  They are not presented here as hiding or binding commitments
+against an adversarial participant.
 
-At the end of this stage, the protocol also publishes a hashed commitment for
-each encrypted card that is about to be dealt. Thus, before any decryption
-occurs, all participants can see a public digest of the sampled ciphertexts
-corresponding to future hole cards and community cards. These digests do not
-reveal the dealt cards, but they certify that the later deal came from the
-jointly shuffled deck rather than from an after-the-fact substitution.
+At the end of this stage, the program also prints a cryptographic digest for
+each encrypted card that is about to be dealt.  Later recomputation checks
+whether the encoded in-memory sample produces the recorded digest during an
+honest execution.  A
+complete protocol would still need canonical messages, session binding,
+participant authentication, and a security argument before these digests could
+support a claim about substitution by a malicious party.
 
-\section{Stage 3: Secure Dealing}
+\section{Stage 3: Toy Dealing}
 The dealing phase consumes cards from the jointly shuffled encrypted deck.
 Private hole cards are obtained by removing encryption layers in an order that
-leaves the final plaintext visible only to the intended recipient. Community
-cards are obtained by jointly removing all layers, after which the cards become
-public.
+would leave the final plaintext visible only to the intended recipient in a
+distributed realization.  In the current program, one process computes and can
+access every result.  Community cards are obtained by removing all toy layers
+and are then printed.
 
-At the end of this phase, the transcript should certify that the deal is
-internally consistent. In the current demonstrator this is checked by verifying
+At the end of this phase, a future transcript should support checks of the
+deal's internal consistency. In the current demonstrator this is checked by verifying
 that no plaintext card identifier appears twice among the dealt hole cards and
 community cards. In addition, each drawn encrypted card is checked against the
-public hash published in Stage~2, so that the plaintext revealed in this stage
-can be traced back to a previously committed random sample from the encrypted
-deck.
+digest printed in Stage~2.  These are implementation invariants for one run,
+not a proof of dealing integrity under adversarial execution.
 
-\section{Stage 4: Commitment to Private Hands}
-Once the hole cards have been privately assigned, each player \(P_i\) samples a
-private nonce \(N_i\) and publishes a commitment
+\section{Stage 4: Illustrative Hand Digest and Opening Check}
+Once the hole cards have been assigned in the simulation, each player \(P_i\) samples a
+private nonce \(N_i\) and publishes a digest
 \[
     C_i = H\!\left(N_i \parallel 2 \parallel h_{i,1} \parallel h_{i,2}\right),
 \]
 where \(h_{i,1}\) and \(h_{i,2}\) are the player's hole cards and \(H\) is a
-cryptographic hash function.
+cryptographic hash function.  In the implementation, the nonce has a fixed
+length, the count is one byte, and each card is encoded as a fixed-width
+little-endian integer.  The displayed formula is shorthand for that typed,
+fixed-length encoding rather than unrestricted string concatenation.
 
-This commitment serves two purposes. First, it binds the player to a specific
-private hand before showdown. Second, it does so without disclosing the hand,
-provided that the nonce remains secret and the hash function resists inversion
-and collisions at the intended security level. At showdown, the player reveals
-\(N_i\) together with the private cards, and every participant recomputes
-\(C_i\) to validate consistency with the earlier commitment.
+At showdown, the program reveals \(N_i\) together with the simulated private
+cards and recomputes \(C_i\).  A matching value shows only that the disclosed
+inputs recompute to the earlier digest inside that run.  Calling this a hiding and
+binding commitment between distrustful network participants would require a
+complete message format, session and identity binding, an adversary model, and
+a proof or reduction that this chapter does not yet provide.
 
-\section{Security Interpretation}
-The four-stage decomposition isolates the central ideas behind dealer-free
+\section{What the Decomposition Is Intended to Isolate}
+The four-stage decomposition separates four central questions behind dealer-free
 poker:
 \begin{enumerate}
     \item secrecy of the final deck order,
     \item joint control over the shuffle,
-    \item private delivery of hole cards,
-    \item and delayed public verifiability of private hands.
+    \item the goal of private delivery of hole cards,
+    \item and the goal of checking a delayed opening of a private hand.
 \end{enumerate}
 
-This already captures a substantial portion of the informational structure of
-the game. However, it does not yet resolve the full strategic problem of
-poker. A complete construction must additionally specify how actions are
-recorded, how betting rounds are synchronized, how hand values are computed,
-and how disputes are resolved when one or more parties deviate from the stated
-protocol.
+The demonstrator lets a reader inspect these questions in sequence.  It does
+not establish that the questions have been solved under distrust.  A complete
+construction must additionally specify how actions are recorded, how betting
+rounds are synchronized, how hand values are computed, and how disputes are
+resolved when one or more parties deviate from the stated protocol.
 
 \section{Implementation Companion}
-The executable demonstrator associated with this chapter lives in the source
-directory \path{/src/src/poker_without_revealing_the_cards/}. The primary file
-is \texttt{poker\_without\_revealing\_the\_cards.c}.
+The executable demonstrator associated with this chapter lives under
+\begin{center}
+\path{src/poker_without_revealing_the_cards/}
+\end{center}
+Its primary source file is
+\begin{center}
+\path{poker_without_revealing_the_cards.c}.
+\end{center}
 It can be run with:
 \begin{verbatim}
-cd /src
 make -C demostrations demo_poker
 \end{verbatim}
 
-The implementation prints stage-by-stage logs, deck commitments, encrypted deck
+The implementation prints stage-by-stage logs, deck digests, encrypted deck
 previews, dealt cards, and showdown validation data. Its purpose is to make the
 construction inspectable rather than to claim final protocol completeness.
+
+\section{What Cryptography Does Not Solve}
+Even a future dealer-free cryptographic construction would not decide whether
+the game is fair in a social or economic sense, prevent a player from refusing
+to continue, guarantee network availability, establish human identity, or make
+collusion irrational.  The present program does less: it does not isolate
+players' memories, transport authenticated messages, prove correct shuffles,
+or enforce simultaneous progress.  Cryptographic mechanisms can protect
+specified information and invariants only after those properties and the
+adversary have been defined.
 
 \section{Limitations and Next Steps}
 The current chapter and implementation deliberately stop short of a full poker
@@ -164,9 +193,13 @@ system. The following components remain open:
     \item authenticated network transport,
     \item protection against malicious rather than merely cooperative or
     semi-honest execution,
-    \item and stronger proofs for shuffle correctness and commitment validity.
+    \item canonical, session-bound protocol messages,
+    \item verifiable shuffle correctness,
+    \item a precise commitment construction and proof for the chosen model,
+    \item fairness, abort handling, and recovery,
+    \item and isolation of each participant's private state.
 \end{enumerate}
 
 These omissions are not accidental; they define the next research layers. The
-current contribution is the disciplined decomposition of the dealing problem
-into verifiable stages that can be refined independently.
+current contribution is an inspectable decomposition of the dealing problem
+into stages that can be refined and challenged independently.

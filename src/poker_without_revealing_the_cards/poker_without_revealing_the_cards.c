@@ -429,7 +429,7 @@ static void compute_draw_commitment(const char *label, uint64_t encrypted_card,
 
 static void publish_draw_samples(const uint64_t *deck, DrawSample *samples) {
     log_line(C_INFO, "info",
-             "Publishing hashed commitments for the encrypted cards that will be dealt.");
+             "Printing cryptographic digests for the encrypted cards that will be dealt.");
 
     for (size_t i = 0; i < TOTAL_DEALT_CARDS; ++i) {
         samples[i].label = DRAW_LABELS[i];
@@ -445,7 +445,7 @@ static void verify_draw_sample(const DrawSample *sample, uint64_t encrypted_card
 
     compute_draw_commitment(sample->label, encrypted_card, expected);
     if (sodium_memcmp(expected, sample->commitment, DRAW_COMMITMENT_BYTES) != 0) {
-        fatal("draw sample commitment verification failed");
+        fatal("draw sample digest check failed");
     }
 
     log_line(C_OK, "sample", "Verified sampled ciphertext for %s.", sample->label);
@@ -500,20 +500,21 @@ static void print_stage_header(int stage, const char *title) {
 }
 
 static void stage1_randomize_deck(uint64_t *deck) {
-    print_stage_header(1, "Randomization of the deck");
+    print_stage_header(1, "Toy deck randomization");
     init_clear_deck(deck);
     shuffle_u64(deck, DECK_SIZE);
     log_line(C_INFO, "info", "Initialized and shuffled a 52-card deck.");
-    log_line(C_WARN, "commit", "Public deck-order commitment: 0x%016" PRIx64,
+    log_line(C_WARN, "checkpoint",
+             "Non-cryptographic deck checkpoint: 0x%016" PRIx64,
              hash_u64_array(deck, DECK_SIZE));
-    log_line(C_OK, "ok", "Deck now has a hidden permutation.");
+    log_line(C_OK, "ok", "This process now holds one shuffled in-memory deck.");
 }
 
 static void stage2_secure_multiparty_shuffle(uint64_t *deck, Player *alice, Player *bob,
                                              DrawSample *samples) {
     uint64_t phi = PRIME_MODULUS - 1ULL;
 
-    print_stage_header(2, "Secure multi-party shuffling");
+    print_stage_header(2, "Toy multi-party transformation (single process)");
     log_line(C_INFO, "info", "Prime modulus: %" PRIu64 ", phi(modulus): %" PRIu64,
              (uint64_t)PRIME_MODULUS, phi);
 
@@ -530,12 +531,14 @@ static void stage2_secure_multiparty_shuffle(uint64_t *deck, Player *alice, Play
 
     shuffle_u64(deck, DECK_SIZE);
     encrypt_deck(deck, alice->e);
-    log_line(C_WARN, "commit", "%s encrypted-deck commitment: 0x%016" PRIx64, alice->name,
+    log_line(C_WARN, "checkpoint", "%s encrypted-deck checkpoint: 0x%016" PRIx64,
+             alice->name,
              hash_u64_array(deck, DECK_SIZE));
 
     shuffle_u64(deck, DECK_SIZE);
     encrypt_deck(deck, bob->e);
-    log_line(C_WARN, "commit", "%s encrypted-deck commitment:   0x%016" PRIx64, bob->name,
+    log_line(C_WARN, "checkpoint", "%s encrypted-deck checkpoint:   0x%016" PRIx64,
+             bob->name,
              hash_u64_array(deck, DECK_SIZE));
 
     print_encrypted_preview(deck, 8U);
@@ -549,7 +552,7 @@ static void stage3_secure_multiparty_deal(const uint64_t *deck, const DrawSample
     size_t cursor = 0U;
     size_t sample_index = 0U;
 
-    print_stage_header(3, "Secure multi-party dealing");
+    print_stage_header(3, "Toy dealing (single process)");
 
     for (size_t i = 0; i < HOLE_CARDS; ++i) {
         uint64_t encrypted_card = draw_encrypted(deck, &cursor);
@@ -579,44 +582,43 @@ static void stage3_secure_multiparty_deal(const uint64_t *deck, const DrawSample
         fatal("unexpected sampled-card count during dealing");
     }
 
-    print_card_list("Alice hole cards (private in real deployment)", alice->hole_cards,
+    print_card_list("Alice simulated hand (visible to this process)", alice->hole_cards,
                     HOLE_CARDS);
-    print_card_list("Bob hole cards   (private in real deployment)", bob->hole_cards,
+    print_card_list("Bob simulated hand   (visible to this process)", bob->hole_cards,
                     HOLE_CARDS);
     print_card_list("Community cards (public)", community_cards, COMMUNITY_CARDS);
     log_line(C_INFO, "info", "Dealt cards: %u",
              (unsigned int)(2U * HOLE_CARDS + COMMUNITY_CARDS));
-    log_line(C_OK, "ok", "Integrity check: no duplicated cards were detected.");
+    log_line(C_OK, "ok", "Duplicate-card invariant: no duplicates were detected.");
 }
 
 static void stage4_publish_hand_commitments(const Player *alice, const Player *bob) {
     int alice_valid;
     int bob_valid;
 
-    print_stage_header(4, "Hand commitments and validation");
+    print_stage_header(4, "Illustrative hand digests and opening checks");
 
-    printf("%s[commit]%s %s publishes commitment: %s", C_WARN, C_RESET, alice->name, C_DIM);
+    printf("%s[digest]%s %s records hand digest: %s", C_WARN, C_RESET, alice->name, C_DIM);
     print_hex(alice->hand_commitment, HAND_COMMITMENT_BYTES);
     printf("%s\n", C_RESET);
 
-    printf("%s[commit]%s %s publishes commitment:   %s", C_WARN, C_RESET, bob->name, C_DIM);
+    printf("%s[digest]%s %s records hand digest:   %s", C_WARN, C_RESET, bob->name, C_DIM);
     print_hex(bob->hand_commitment, HAND_COMMITMENT_BYTES);
     printf("%s\n", C_RESET);
 
-    log_line(C_INFO, "info",
-             "At showdown each player reveals cards + nonce for validation.");
+    log_line(C_INFO, "info", "The demo now reveals each hand and nonce for recomputation.");
 
     alice_valid = verify_player_commitment(alice);
     printf("%s[reveal]%s %s nonce: %s", C_INFO, C_RESET, alice->name, C_DIM);
     print_hex(alice->hand_nonce, HAND_NONCE_BYTES);
     printf("%s | verification: %s%s%s\n", C_RESET,
-           alice_valid ? C_OK : C_ERR, alice_valid ? "valid" : "invalid", C_RESET);
+           alice_valid ? C_OK : C_ERR, alice_valid ? "matches" : "mismatch", C_RESET);
 
     bob_valid = verify_player_commitment(bob);
     printf("%s[reveal]%s %s nonce:   %s", C_INFO, C_RESET, bob->name, C_DIM);
     print_hex(bob->hand_nonce, HAND_NONCE_BYTES);
     printf("%s | verification: %s%s%s\n", C_RESET,
-           bob_valid ? C_OK : C_ERR, bob_valid ? "valid" : "invalid", C_RESET);
+           bob_valid ? C_OK : C_ERR, bob_valid ? "matches" : "mismatch", C_RESET);
 }
 
 int main(int argc, char **argv) {
@@ -635,7 +637,9 @@ int main(int argc, char **argv) {
 
     print_rule('=');
     printf("%s%sMENTAL POKER DEMO%s\n", C_BOLD, C_STAGE, C_RESET);
-    log_line(C_INFO, "info", "Texas Hold'em staged protocol.");
+    log_line(C_WARN, "warning",
+             "Educational single-process toy; not private, distributed, or production-safe.");
+    log_line(C_INFO, "info", "Texas Hold'em staged construction sketch.");
     log_line(C_INFO, "info", "This run demonstrates Stage 1 to Stage 4.");
     log_line(C_INFO, "info", "Suit display mode: %s",
              (G_SUIT_MODE == SUIT_MODE_UNICODE) ? "unicode" : "ascii");
@@ -650,8 +654,10 @@ int main(int argc, char **argv) {
 
     putchar('\n');
     print_rule('-');
-    log_line(C_OK, "done", "Demo scope: secrecy, integrity, and commitments.");
-    log_line(C_WARN, "next", "Deferred: betting protocol, hand ranking, networked peers.");
+    log_line(C_OK, "done",
+             "Demo scope: stage flow, digest recomputation, and duplicate-card checks.");
+    log_line(C_WARN, "next",
+             "Deferred: peer isolation, verifiable shuffles, malicious security, and fairness.");
     print_rule('=');
 
     return 0;

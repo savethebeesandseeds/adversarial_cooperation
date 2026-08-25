@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173b35">
+  <meta name="description" content="Read Adversarial Cooperation and run its working C and WebAssembly demonstrations.">
+  <title>Adversarial Cooperation</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to the content</a>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="wordmark" href="#read" aria-label="Adversarial Cooperation, read the book">
+        <span class="wordmark-mark" aria-hidden="true">AC</span>
+        <span class="wordmark-copy">
+          <strong>Adversarial Cooperation</strong>
+          <small>Book &amp; executable companions</small>
+        </span>
+      </a>
+
+      <nav class="site-navigation" aria-label="Primary navigation">
+        <a href="#read" data-route="read">Read</a>
+        <a href="#demos" data-route="demos">Demos</a>
+        <a href="#about" data-route="about">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main" id="main-content" tabindex="-1">
+    <div id="app">
+      <div class="loading-state" role="status">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Opening the book&hellip;</span>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>One manuscript. Small, inspectable demonstrations. Explicit limits.</p>
+  </footer>
+
+  <noscript>
+    <section class="noscript" aria-label="JavaScript unavailable">
+      <h1>Read the book</h1>
+      <p>The demonstrations require JavaScript. The complete manuscript is still available as a PDF.</p>
+      <p><a href="./book/Adversarial-Cooperation.pdf">Open Adversarial Cooperation (PDF)</a></p>
+    </section>
+  </noscript>
+
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "adversarial-cooperation-reader",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Dependency-free static reader and educational WebAssembly demonstrations for Adversarial Cooperation.",
+  "scripts": {
+    "build": "node tools/build-site.mjs",
+    "build:wasm": "node tools/build-wasm.mjs --output web/dist/assets",
+    "serve": "node tools/serve.mjs",
+    "test": "node tools/test-site.mjs && node tools/test-demo-contract.mjs && node tools/test-static-ui.mjs && node tools/test-wasm.mjs",
+    "test:site": "node tools/test-site.mjs",
+    "test:contract": "node tools/test-demo-contract.mjs",
+    "test:ui": "node tools/test-static-ui.mjs",
+    "test:wasm": "node tools/test-wasm.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

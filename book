@@ -17,7 +17,7 @@ Targets:
   section_rps     Build the canonical Two Oracles RPS chapter PDF
   section_hash    Build the canonical Hash Functions appendix PDF
   section_trust   Build the canonical Trust Establishment chapter PDF
-  section_ttt     Build the canonical Tic-Tac-Toe public-checker chapter PDF
+  section_ttt     Build the canonical Tic-Tac-Toe Core-Bind reference chapter PDF
 
 Examples:
   bash book -pdf section_poker

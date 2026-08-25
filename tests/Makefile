@@ -8,6 +8,7 @@ HASH_TEST_BIN := $(TEST_BIN_DIR)/test_hash
 TTT_TEST_BIN := $(TEST_BIN_DIR)/test_ttt
 BOOL_CIRCUIT_TEST_BIN := $(TEST_BIN_DIR)/test_bool_circuit
 TTT_CORE_CIRCUIT_TEST_BIN := $(TEST_BIN_DIR)/test_ttt_core_circuit
+TTT_BIND_TEST_BIN := $(TEST_BIN_DIR)/test_ttt_bind
 
 COMMITMENT_SRC := $(SRC_DIR)/primitives/commitment.c
 RPS_SRC := $(SRC_DIR)/protocols/rps.c
@@ -15,15 +16,16 @@ HASH_SRC := $(SRC_DIR)/primitives/hash.c
 TTT_SRC := $(SRC_DIR)/protocols/ttt.c
 BOOL_CIRCUIT_SRC := $(SRC_DIR)/circuits/bool_circuit.c
 TTT_CORE_CIRCUIT_SRC := $(SRC_DIR)/circuits/ttt_core_circuit.c
+TTT_BIND_SRC := $(SRC_DIR)/protocols/ttt_bind.c
 
 TEST_CPPFLAGS := $(CPPFLAGS) -I$(INCLUDE_DIR) -I$(TESTS_DIR)
 
 .PHONY: all test commitment rps adversarial hash ttt bool_circuit \
-	ttt_core_circuit sanitize clean
+	ttt_core_circuit ttt_bind sanitize clean
 
 all: $(COMMITMENT_TEST_BIN) $(RPS_TEST_BIN) $(RPS_ADVERSARIAL_TEST_BIN) \
 	$(HASH_TEST_BIN) $(TTT_TEST_BIN) $(BOOL_CIRCUIT_TEST_BIN) \
-	$(TTT_CORE_CIRCUIT_TEST_BIN)
+	$(TTT_CORE_CIRCUIT_TEST_BIN) $(TTT_BIND_TEST_BIN)
 
 test: all
 	$(COMMITMENT_TEST_BIN)
@@ -33,6 +35,7 @@ test: all
 	$(TTT_TEST_BIN)
 	$(BOOL_CIRCUIT_TEST_BIN)
 	$(TTT_CORE_CIRCUIT_TEST_BIN)
+	$(TTT_BIND_TEST_BIN)
 
 commitment: $(COMMITMENT_TEST_BIN)
 	$(COMMITMENT_TEST_BIN)
@@ -54,6 +57,9 @@ bool_circuit: $(BOOL_CIRCUIT_TEST_BIN)
 
 ttt_core_circuit: $(TTT_CORE_CIRCUIT_TEST_BIN)
 	$(TTT_CORE_CIRCUIT_TEST_BIN)
+
+ttt_bind: $(TTT_BIND_TEST_BIN)
+	$(TTT_BIND_TEST_BIN)
 
 $(COMMITMENT_TEST_BIN): test_commitment.c test_support.h $(COMMITMENT_SRC) \
 		$(INCLUDE_DIR)/ac/status.h $(INCLUDE_DIR)/ac/commitment.h | $(TEST_BIN_DIR)
@@ -96,6 +102,18 @@ $(TTT_CORE_CIRCUIT_TEST_BIN): test_ttt_core_circuit.c test_support.h \
 	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) test_ttt_core_circuit.c \
 		$(TTT_SRC) $(BOOL_CIRCUIT_SRC) $(TTT_CORE_CIRCUIT_SRC) \
 		$(LDFLAGS) -o $@
+
+$(TTT_BIND_TEST_BIN): test_ttt_bind.c test_support.h \
+		$(COMMITMENT_SRC) $(TTT_SRC) $(BOOL_CIRCUIT_SRC) \
+		$(TTT_CORE_CIRCUIT_SRC) $(TTT_BIND_SRC) \
+		$(INCLUDE_DIR)/ac/status.h $(INCLUDE_DIR)/ac/commitment.h \
+		$(INCLUDE_DIR)/ac/ttt.h $(INCLUDE_DIR)/ac/bool_circuit.h \
+		$(INCLUDE_DIR)/ac/ttt_core_circuit.h \
+		$(INCLUDE_DIR)/ac/ttt_bind.h | $(TEST_BIN_DIR)
+	$(CC) $(TEST_CPPFLAGS) $(CFLAGS) test_ttt_bind.c \
+		$(COMMITMENT_SRC) $(TTT_SRC) $(BOOL_CIRCUIT_SRC) \
+		$(TTT_CORE_CIRCUIT_SRC) $(TTT_BIND_SRC) \
+		$(LDFLAGS) -o $@ $(LDLIBS)
 
 $(TEST_BIN_DIR):
 	mkdir -p $@

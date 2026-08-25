@@ -1,12 +1,25 @@
-This game is set where advantage is lost by referencing the rules of the game. 
-Here the rules are visible to all parties at all time. What changes is the verification system. 
----We aim to prove that an event follows all the rules without disclosing the event. 
----But specially we aim to prove that an event breaks one or multiple rules without telling which ones, nor the event. 
+\chapter{Law Without Referencing the Law}
+\label{chap:law-without-referencing}
 
-When freedom is very serious, you want to be able to use the law without referecing it, because 
-referencing the law puts the law in great danger of being modified. 
+\researchstatus{Design intuition and open problem}{No judicial protocol,
+privacy definition, authority model, or due-process mechanism is established.}
 
-The following artifcat shows how to build a jury that can impart a decition guarantee to follow the law 
-without specifying the chapter and articles. It separates legislation from judicary power. 
+This game is set where an advantage is lost by referencing the rules of the
+game. The rules are visible to all parties; what changes is the verification
+system.
 
-Think about it as, a jury who orders "x because of hash(y)" instead of "x bacause of y" ---and so to protect "y". 
+The proposed aim is to prove that a hidden event follows all the rules without
+disclosing the event. A second, more delicate aim is to prove that an event
+breaks one or more rules without revealing the event or which rules were
+broken.
+
+When freedom is serious, referencing a rule may expose it to modification or
+retaliation. The original artifact therefore imagines a jury that can issue a
+decision derived from a committed rule set without identifying the decisive
+chapter and article: informally, ``\(x\) because of
+\(\operatorname{hash}(y)\)'' rather than ``\(x\) because of \(y\).''
+
+This remains only an intuition. A defensible construction must address policy
+versioning, authority over the encoded rules, reasons, audit, appeal,
+discriminatory hidden inputs, and the risk that secrecy protects domination
+rather than due process.

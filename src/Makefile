@@ -36,19 +36,30 @@ TTT_PROTOCOL_SRC := $(SRC_DIR)/protocols/ttt.c
 BOOL_CIRCUIT_SRC := $(SRC_DIR)/circuits/bool_circuit.c
 TTT_CORE_CIRCUIT_SRC := $(SRC_DIR)/circuits/ttt_core_circuit.c
 TTT_DEMO_SRC := $(SRC_DIR)/$(TTT_NAME)/ttt_demo.c
+TTT_BIND_PROTOCOL_SRC := $(SRC_DIR)/protocols/ttt_bind.c
+TTT_BIND_DEMO_SRC := $(SRC_DIR)/$(TTT_NAME)/ttt_bind_demo.c
 TTT_OBJ_DIR := $(TEMP_DIR)/$(TTT_NAME)
 TTT_PROTOCOL_OBJ := $(TTT_OBJ_DIR)/ttt.o
 BOOL_CIRCUIT_OBJ := $(TTT_OBJ_DIR)/bool_circuit.o
 TTT_CORE_CIRCUIT_OBJ := $(TTT_OBJ_DIR)/ttt_core_circuit.o
 TTT_DEMO_OBJ := $(TTT_OBJ_DIR)/ttt_demo.o
+TTT_BIND_COMMITMENT_OBJ := $(TTT_OBJ_DIR)/ttt_commitment.o
+TTT_BIND_PROTOCOL_OBJ := $(TTT_OBJ_DIR)/ttt_bind.o
+TTT_BIND_DEMO_OBJ := $(TTT_OBJ_DIR)/ttt_bind_demo.o
 TTT_OBJS := $(TTT_PROTOCOL_OBJ) $(BOOL_CIRCUIT_OBJ) \
 	$(TTT_CORE_CIRCUIT_OBJ) $(TTT_DEMO_OBJ)
+TTT_BIND_OBJS := $(TTT_BIND_COMMITMENT_OBJ) $(TTT_PROTOCOL_OBJ) \
+	$(BOOL_CIRCUIT_OBJ) $(TTT_CORE_CIRCUIT_OBJ) \
+	$(TTT_BIND_PROTOCOL_OBJ) $(TTT_BIND_DEMO_OBJ)
 TTT_BIN_DIR := $(BUILD_DIR)/$(TTT_NAME)
 TTT_BIN := $(TTT_BIN_DIR)/ttt_demo
+TTT_BIND_BIN := $(TTT_BIN_DIR)/ttt_bind_demo
+TTT_BIND_ARGS ?=
 
-.PHONY: all poker run_poker rps run_rps hash run_hash ttt run_ttt clean
+.PHONY: all poker run_poker rps run_rps hash run_hash ttt run_ttt \
+	ttt_bind run_ttt_bind clean
 
-all: poker rps hash ttt
+all: poker rps hash ttt ttt_bind
 
 poker: $(POKER_BIN)
 
@@ -69,6 +80,11 @@ ttt: $(TTT_BIN)
 
 run_ttt: ttt
 	$(TTT_BIN)
+
+ttt_bind: $(TTT_BIND_BIN)
+
+run_ttt_bind: ttt_bind
+	$(TTT_BIND_BIN) $(TTT_BIND_ARGS)
 
 $(POKER_OBJ): $(POKER_SRC) | $(POKER_OBJ_DIR)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
@@ -115,6 +131,27 @@ $(TTT_DEMO_OBJ): $(TTT_DEMO_SRC) $(INCLUDE_DIR)/ac/status.h \
 
 $(TTT_BIN): $(TTT_OBJS) | $(TTT_BIN_DIR)
 	$(CC) $(LDFLAGS) $(TTT_OBJS) -o $@
+
+$(TTT_BIND_COMMITMENT_OBJ): $(COMMITMENT_SRC) \
+		$(INCLUDE_DIR)/ac/status.h $(INCLUDE_DIR)/ac/commitment.h | $(TTT_OBJ_DIR)
+	$(CC) $(CPPFLAGS) -I$(INCLUDE_DIR) $(CFLAGS) -c $< -o $@
+
+$(TTT_BIND_PROTOCOL_OBJ): $(TTT_BIND_PROTOCOL_SRC) \
+		$(INCLUDE_DIR)/ac/status.h $(INCLUDE_DIR)/ac/commitment.h \
+		$(INCLUDE_DIR)/ac/ttt.h $(INCLUDE_DIR)/ac/bool_circuit.h \
+		$(INCLUDE_DIR)/ac/ttt_core_circuit.h \
+		$(INCLUDE_DIR)/ac/ttt_bind.h | $(TTT_OBJ_DIR)
+	$(CC) $(CPPFLAGS) -I$(INCLUDE_DIR) $(CFLAGS) -c $< -o $@
+
+$(TTT_BIND_DEMO_OBJ): $(TTT_BIND_DEMO_SRC) \
+		$(INCLUDE_DIR)/ac/status.h $(INCLUDE_DIR)/ac/commitment.h \
+		$(INCLUDE_DIR)/ac/ttt.h $(INCLUDE_DIR)/ac/bool_circuit.h \
+		$(INCLUDE_DIR)/ac/ttt_core_circuit.h \
+		$(INCLUDE_DIR)/ac/ttt_bind.h | $(TTT_OBJ_DIR)
+	$(CC) $(CPPFLAGS) -I$(INCLUDE_DIR) $(CFLAGS) -c $< -o $@
+
+$(TTT_BIND_BIN): $(TTT_BIND_OBJS) | $(TTT_BIN_DIR)
+	$(CC) $(LDFLAGS) $(TTT_BIND_OBJS) -o $@ $(LDLIBS)
 
 $(POKER_OBJ_DIR):
 	mkdir -p $@

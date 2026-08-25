@@ -8,8 +8,9 @@ does not become a project dependency. An RFC is a published technical
 specification. Across Rock--Paper--Scissors, Hash Functions, the
 manuscript-only Trust repair, the verified Tic-Tac-Toe public checker, and its
 private-proof route-selection note, the only external C library remains
-libsodium. The Tic-Tac-Toe targets use only the C11 standard library and do not
-link that backend. The route selection adds papers, not software.
+libsodium. The Tic-Tac-Toe public checker and Core targets use only the C11
+standard library; the separate Bind target reuses libsodium. The route
+selection adds papers, not software.
 
 Add a citation only when it supports a sentence that the chapter actually
 needs. A related paper must not be presented as proof of a different
