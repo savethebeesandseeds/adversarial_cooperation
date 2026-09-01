@@ -28,7 +28,7 @@ Latin, Chinese, Spanish, and the author's intended titles in display prose.
 | RN-014 | `document/content/aprendix/block_chains/` | `document/content/appendix/blockchains/` | Blockchains | Empty document and demonstration directories only | **Optional/defer.** Conventional spelling; no content exists to preserve. |
 | RN-015 | `demostrations/aprendix/block_chains/` | `demonstrations/appendix/blockchains/` | Blockchain demonstrations | RN-001, RN-002, RN-003, RN-014 | **Optional/defer.** |
 | RN-016 | `document/content/adversario_sibi_perfidiam_revelare/` and source/backup | **No proposal yet** | Intended Latin title pending | Empty mirrored demonstration directory; registers currently use the filesystem slug plus an English gloss | **Blocked on author/Latin review.** The charter explicitly prohibits guessing the intended Latin. |
-| RN-017 | README container name `adverarial_cooperation` | `adversarial_cooperation` | Adversarial Cooperation container | Root README only; may affect users with an existing container | **Documentation identifier, defer.** Correct spelling, but changing a container name can break copied workflows and should accompany build-doc repair. |
+| RN-017 | Historical README container names `adverarial_cooperation` and `adversarial_cooperation` | `adversarial-cooperation-dev` | Adversarial Cooperation development container | Root README, container-boundary documentation, CI, and users with a retained container | **Approved operational migration.** The author selected one reusable raw-Docker development container on 2026-09-01. Same-named existing containers must be inspected and preserved; the new name does not authorize replacing an old container. |
 
 ## Empty Directory Preservation
 

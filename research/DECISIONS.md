@@ -694,7 +694,8 @@ Material deviations require a new entry with rationale and evidence.
 
 ### D-CONTAINER-001 --- Make provisioning visible and project-owned
 
-- **Status:** Accepted operational boundary; not a security theorem.
+- **Status:** Superseded operational boundary; not a security theorem. See
+  D-CONTAINER-006. The text below records the former disposable-Compose design.
 - **Decision:** Use the Docker Official Debian stable-slim image pinned by
   digest in `compose.yaml`, and provision each fresh disposable container by
   running the checked-in `setup.sh`. Do not add a Dockerfile or reuse an
@@ -713,7 +714,8 @@ Material deviations require a new entry with rationale and evidence.
 
 ### D-CONTAINER-002 --- Minimize the package and host-access surfaces
 
-- **Status:** Accepted implementation boundary.
+- **Status:** Superseded implementation boundary. See D-CONTAINER-006. The
+  read-only source allowlist below is retained as historical rationale.
 - **Decision:** Install explicit, mode-specific top-level Debian package
   profiles with recommended and suggested packages disabled, require
   authenticated APT repository metadata, and reject insecure or
@@ -730,7 +732,8 @@ Material deviations require a new entry with rationale and evidence.
 
 ### D-CONTAINER-003 --- Separate privileged setup from unprivileged builds
 
-- **Status:** Accepted implementation boundary.
+- **Status:** Superseded implementation boundary. D-CONTAINER-006 retains
+  root-only provisioning and non-root project work but changes the lifecycle.
 - **Decision:** Restrict root authority to provisioning the disposable
   container with APT. Run compilation, tests, manuscript assembly, WebAssembly
   generation, and preview serving as a numeric non-root user under
@@ -747,7 +750,8 @@ Material deviations require a new entry with rationale and evidence.
 
 ### D-CONTAINER-004 --- Use the same path for local verification and Pages
 
-- **Status:** Accepted deployment boundary.
+- **Status:** Superseded deployment boundary. See D-CONTAINER-006. The Pages
+  workflow no longer depends on a Compose service.
 - **Decision:** Local hosts and GitHub Actions invoke the same Compose service.
   The Pages workflow runs `docker compose run --rm toolchain web` and uploads
   only `.container-output/pages-<run-id>-<attempt>/web-dist` as a static
@@ -763,7 +767,8 @@ Material deviations require a new entry with rationale and evidence.
 
 ### D-CONTAINER-005 --- Keep preview ephemeral and artifact publication write-once
 
-- **Status:** Accepted lifecycle boundary.
+- **Status:** Superseded lifecycle boundary. See D-CONTAINER-006. The text below
+  remains the completion record for the former dedicated preview service.
 - **Decision:** Build and serve preview entirely in disposable container
   storage. Do not publish a preview run directory. Continue to publish `web`
   and `verify` results only to explicit, write-once artifact destinations that
@@ -776,3 +781,41 @@ Material deviations require a new entry with rationale and evidence.
   without deleting or renaming host evidence. The preview remains reachable
   only through host loopback port 4173. This separation changes no package,
   source-mount, non-root, capability, network, or scientific claim boundary.
+
+### D-CONTAINER-006 --- Use one reusable raw-Docker development container
+
+- **Status:** Accepted operational boundary; not a security theorem.
+- **Decision:** Replace the disposable `toolchain` and `preview` services with
+  one named container, `adversarial-cooperation-dev`, created from the existing
+  digest-pinned Debian base by the exact raw `docker run` command recorded in
+  the root README after verification. Keep no Dockerfile, Compose file, or host
+  lifecycle launcher. Mount the complete repository read-write at `/workspace`,
+  attach the named `adversarial-cooperation-dev-home` volume at `/home/ac`, and
+  publish container port 4173 only on host loopback. Run `setup.sh` explicitly
+  as root only to install the declared dependencies and configure the
+  environment; normal shells, builds, tests, manuscript work, WebAssembly
+  generation, and preview serving run as the configured non-root identity.
+  Keep the container stopped or running for reuse rather than deleting it.
+  Before creation, inspect any same-named container and volume; preserve and
+  report a mismatched object instead of replacing it. Pass no Docker socket,
+  host credential, GPU, or explicitly mapped device. GitHub Pages may create a
+  uniquely named raw-Docker container on its ephemeral runner, invoke the same
+  dependency setup separately from the web build, and upload only
+  `.container-output/local/web-dist`.
+- **Rationale:** One durable environment matches the author's development
+  workflow: start it, enter a Linux shell, work in the mounted checkout, and
+  stop it. The exact raw command keeps the runtime configuration visible
+  without maintaining a Dockerfile, Compose model, or Windows-specific helper.
+  Separating setup from project operations also keeps dependency installation
+  auditable and prevents the setup entry point from becoming a lifecycle or
+  task dispatcher.
+- **Consequence:** The usability boundary is intentionally broader than the
+  former verification container. Processes in the development container can
+  read and modify canonical source, uncommitted work, generated files, and
+  `.git`; the environment is not appropriate for hostile source. The Docker
+  daemon, host kernel, pinned Debian userspace, authenticated live Debian
+  repositories, installed packages, and repository source remain trusted.
+  The pinned base digest and explicit package request support inspection but do
+  not make Debian package resolution or cross-architecture output bit-for-bit
+  reproducible. Existing completed plans and `.container-output` evidence
+  remain historical records of the superseded disposable design.

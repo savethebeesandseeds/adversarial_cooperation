@@ -12,7 +12,10 @@ permissions:
   id-token: write
 
 env:
-  AC_RUN_ID: pages-${{ github.run_id }}-${{ github.run_attempt }}
+  AC_BASE_IMAGE: debian:13.6-slim@sha256:020c0d20b9880058cbe785a9db107156c3c75c2ac944a6aa7ab59f2add76a7bd
+  AC_CI_CONTAINER: adversarial-cooperation-pages-${{ github.run_id }}-${{ github.run_attempt }}
+  AC_CI_HOME_VOLUME: adversarial-cooperation-pages-${{ github.run_id }}-${{ github.run_attempt }}-home
+  AC_CONTAINER_CONTEXT: adversarial-cooperation-dev-v1
 
 concurrency:
   group: pages
@@ -24,22 +27,150 @@ jobs:
     steps:
       - name: Check out the canonical sources
         uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Prepare the dedicated artifact directory
+      - name: Record the runner build identity
         run: |
-          mkdir -p .container-output
           echo "AC_UID=$(id -u)" >> "$GITHUB_ENV"
           echo "AC_GID=$(id -g)" >> "$GITHUB_ENV"
 
-      - name: Build and verify in the dedicated project toolchain
-        run: docker compose run --rm toolchain web
+      - name: Refuse conflicting Docker objects
+        run: |
+          set -Eeuo pipefail
+          if docker container inspect "$AC_CI_CONTAINER" >/dev/null 2>&1; then
+            echo "Refusing to replace existing container: $AC_CI_CONTAINER" >&2
+            exit 1
+          fi
+          if docker volume inspect "$AC_CI_HOME_VOLUME" >/dev/null 2>&1; then
+            echo "Refusing to reuse unverified volume: $AC_CI_HOME_VOLUME" >&2
+            exit 1
+          fi
+
+      - name: Create the labeled CI home volume
+        run: |
+          set -Eeuo pipefail
+          created_volume=$(docker volume create \
+            --label io.adversarial-cooperation.owner=adversarial-cooperation \
+            --label io.adversarial-cooperation.role=pages-ci-home \
+            --label io.adversarial-cooperation.config=single-dev-v1 \
+            "$AC_CI_HOME_VOLUME")
+          test "$created_volume" = "$AC_CI_HOME_VOLUME"
+
+      - name: Create the raw Docker build container
+        run: |
+          set -Eeuo pipefail
+          container_id=$(docker run --detach \
+            --name "$AC_CI_CONTAINER" \
+            --hostname "$AC_CI_CONTAINER" \
+            --platform linux/amd64 \
+            --label io.adversarial-cooperation.owner=adversarial-cooperation \
+            --label io.adversarial-cooperation.role=pages-ci \
+            --label io.adversarial-cooperation.config=single-dev-v1 \
+            --env "AC_CONTAINER_CONTEXT=$AC_CONTAINER_CONTEXT" \
+            --env "AC_BASE_IMAGE=$AC_BASE_IMAGE" \
+            --env "AC_UID=$AC_UID" \
+            --env "AC_GID=$AC_GID" \
+            --env HOME=/home/ac \
+            --user "$AC_UID:$AC_GID" \
+            --workdir /workspace \
+            --restart no \
+            --pids-limit 1024 \
+            --security-opt no-new-privileges=true \
+            --cap-drop ALL \
+            --cap-add CHOWN \
+            --cap-add DAC_OVERRIDE \
+            --cap-add FOWNER \
+            --cap-add FSETID \
+            --cap-add SETFCAP \
+            --cap-add SETGID \
+            --cap-add SETPCAP \
+            --cap-add SETUID \
+            --init \
+            --tmpfs '/tmp:rw,nosuid,nodev,exec,mode=1777,size=4g' \
+            --tmpfs '/run:rw,nosuid,nodev,noexec,mode=755,size=16m' \
+            --mount "type=bind,source=$GITHUB_WORKSPACE,target=/workspace" \
+            --mount "type=bind,source=$GITHUB_WORKSPACE/setup.sh,target=/bootstrap/setup.sh,readonly" \
+            --mount "type=volume,source=$AC_CI_HOME_VOLUME,target=/home/ac" \
+            "$AC_BASE_IMAGE" \
+            /bin/sleep infinity)
+          test -n "$container_id"
+          test "$(docker inspect --format '{{.Id}}' "$AC_CI_CONTAINER")" = "$container_id"
+
+      - name: Verify the complete CI container configuration
+        run: |
+          set -Eeuo pipefail
+          workspace_source=$(readlink -f "$GITHUB_WORKSPACE")
+          setup_source=$(readlink -f "$GITHUB_WORKSPACE/setup.sh")
+          image_id=$(docker image inspect --format '{{.Id}}' "$AC_BASE_IMAGE")
+          docker inspect "$AC_CI_CONTAINER" | jq -e \
+            --arg name "$AC_CI_CONTAINER" \
+            --arg base "$AC_BASE_IMAGE" \
+            --arg image_id "$image_id" \
+            --arg uid_gid "$AC_UID:$AC_GID" \
+            --arg workspace "$workspace_source" \
+            --arg setup "$setup_source" \
+            --arg volume "$AC_CI_HOME_VOLUME" '
+              .[0] |
+              .Name == ("/" + $name) and
+              .Config.Hostname == $name and
+              .Config.Image == $base and
+              .Image == $image_id and
+              .Path == "/bin/sleep" and
+              .Args == ["infinity"] and
+              .Config.User == $uid_gid and
+              .Config.WorkingDir == "/workspace" and
+              .Config.Labels["io.adversarial-cooperation.owner"] == "adversarial-cooperation" and
+              .Config.Labels["io.adversarial-cooperation.role"] == "pages-ci" and
+              .Config.Labels["io.adversarial-cooperation.config"] == "single-dev-v1" and
+              .HostConfig.RestartPolicy.Name == "no" and
+              .HostConfig.Privileged == false and
+              .HostConfig.AutoRemove == false and
+              .HostConfig.Init == true and
+              .HostConfig.PidsLimit == 1024 and
+              .HostConfig.SecurityOpt == ["no-new-privileges=true"] and
+              .HostConfig.CapDrop == ["ALL"] and
+              .HostConfig.CapAdd == ["CAP_CHOWN", "CAP_DAC_OVERRIDE", "CAP_FOWNER", "CAP_FSETID", "CAP_SETFCAP", "CAP_SETGID", "CAP_SETPCAP", "CAP_SETUID"] and
+              .HostConfig.Tmpfs == {"/run": "rw,nosuid,nodev,noexec,mode=755,size=16m", "/tmp": "rw,nosuid,nodev,exec,mode=1777,size=4g"} and
+              ((.HostConfig.Devices // []) | length) == 0 and
+              ((.HostConfig.DeviceRequests // []) | length) == 0 and
+              ((.NetworkSettings.Ports // {}) | length) == 0 and
+              (.Mounts | length) == 3 and
+              any(.Mounts[]; .Type == "bind" and .Source == $workspace and .Destination == "/workspace" and .RW == true) and
+              any(.Mounts[]; .Type == "bind" and .Source == $setup and .Destination == "/bootstrap/setup.sh" and .RW == false) and
+              any(.Mounts[]; .Type == "volume" and .Name == $volume and .Destination == "/home/ac" and .RW == true)
+            '
+          docker volume inspect "$AC_CI_HOME_VOLUME" | jq -e '
+            .[0].Labels["io.adversarial-cooperation.owner"] == "adversarial-cooperation" and
+            .[0].Labels["io.adversarial-cooperation.role"] == "pages-ci-home" and
+            .[0].Labels["io.adversarial-cooperation.config"] == "single-dev-v1"
+          '
+          docker image inspect "$AC_BASE_IMAGE" | jq -e '
+            .[0].Os == "linux" and .[0].Architecture == "amd64"
+          '
+
+      - name: Provision dependencies separately as root
+        run: |
+          set -Eeuo pipefail
+          docker exec --user 0:0 "$AC_CI_CONTAINER" \
+            /bin/bash /bootstrap/setup.sh
+          docker exec "$AC_CI_CONTAINER" \
+            grep -Fqx status=complete /var/lib/adversarial-cooperation/setup-complete
+
+      - name: Build and verify the static reader as the runner identity
+        run: |
+          set -Eeuo pipefail
+          test "$(docker exec "$AC_CI_CONTAINER" id -u)" = "$AC_UID"
+          test "$(docker exec "$AC_CI_CONTAINER" id -g)" = "$AC_GID"
+          docker exec "$AC_CI_CONTAINER" \
+            /bin/bash /workspace/container/tasks.sh web
 
       - name: Confirm the complete static edition
         run: |
-          site=".container-output/${AC_RUN_ID}/web-dist"
+          site=".container-output/local/web-dist"
           test -s "$site/index.html"
           test -s "$site/book/Adversarial-Cooperation.pdf"
           test "$(head -c 5 "$site/book/Adversarial-Cooperation.pdf")" = '%PDF-'
@@ -50,7 +181,7 @@ jobs:
       - name: Upload only the generated static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .container-output/${{ env.AC_RUN_ID }}/web-dist
+          path: .container-output/local/web-dist
 
   deploy:
     environment:

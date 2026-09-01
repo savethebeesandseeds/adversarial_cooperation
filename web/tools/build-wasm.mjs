@@ -77,9 +77,9 @@ export async function buildTicTacToeWasm(outputDirectory) {
 
   if (result.error) {
     throw new Error(
-      `Unable to execute ${emcc}. Run the dedicated project environment with ` +
-        "`docker compose run --rm toolchain web`; its auditable setup.sh " +
-        `provisions Emscripten. ${result.error.message}`,
+      `Unable to execute ${emcc}. Enter the documented Adversarial Cooperation ` +
+        "development container; its setup.sh provisions Emscripten. " +
+        `${result.error.message}`,
     );
   }
   if (result.status !== 0) {

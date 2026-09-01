@@ -15,44 +15,44 @@ build result.
 
 ## Build and preview
 
-The supported environment requires only Docker Engine with Docker Compose on
-the host. The checked-in `setup.sh` installs Node.js, Emscripten, a native C
-compiler, and the LaTeX packages needed to compile the book for the web and
-preview modes. The broader verify mode additionally installs the existing
-libsodium development backend. There are no JavaScript package dependencies
-and no host toolchain installation. The
-Compose build commands are shared; only artifact-ownership variables differ on
-POSIX hosts. Command portability does not claim bit-identical output across
-processor architectures. Each run records the selected platform and
-architecture.
+Use the one reusable development container documented in the root
+[`README.md`](../README.md). Start it, enter its Linux shell, and run project
+operations from `/workspace`; no Dockerfile, Compose service, host toolchain,
+or JavaScript package download is required.
 
-Before `web` or `verify`, create the ignored `.container-output/` directory
-once after checkout. Compose deliberately refuses to create that missing host
-bind path. Preview uses isolated container storage and does not need it.
-On POSIX hosts, export `AC_UID=$(id -u)` and `AC_GID=$(id -g)` so the
-unprivileged build can create its run directory without changing host
-ownership. Docker Desktop hosts may use the Compose defaults.
-
-From the repository root:
+Inside the container:
 
 ```text
-docker compose run --rm -e AC_RUN_ID=web-local toolchain web
-docker compose up preview
+AC_RUN_ID=web-unique bash container/tasks.sh web
+bash container/tasks.sh serve
 ```
 
-Open `http://127.0.0.1:4173`. Compose publishes no non-loopback preview port.
-The preview service performs its own build in ephemeral container storage and
-publishes no host artifact. Stop and start it again without choosing or
-clearing a run ID. The `web` and `verify` operations are different: they copy
-complete results to `.container-output/<run-id>/` and fail closed if that run
-already exists. All URLs in `web-dist/` are relative, so the same directory
-works at a GitHub Pages project subpath.
+`web` snapshots the declared source inputs into the container's `/tmp` tmpfs,
+checks
+the browser modules, compiles the canonical PDF and registered WebAssembly
+demonstrations, assembles the static site there, and runs the existing static,
+contract, UI, and native/WebAssembly agreement tests. It exports the verified
+site to `.container-output/<run-id>/web-dist/`. `serve` performs the same build
+and tests without publishing an evidence bundle, then listens inside the
+container on port 4173. Open
+`http://127.0.0.1:4173`; the raw-Docker configuration publishes the port only
+on host loopback.
 
-`docker compose run --rm toolchain verify` performs the broader manuscript and
-native-companion verification. The source allowlist is mounted read-only;
-`.container-output/` is the only writable project bind mount. The provisioning,
-package, and shared-kernel limitations are recorded in
-[`container/SECURITY.md`](../container/SECURITY.md).
+For the broader native build, test, sanitizer, manuscript, and browser check,
+run:
+
+```text
+AC_RUN_ID=verify-unique bash container/tasks.sh verify
+```
+
+The repository is mounted read-write for direct editing, while automated build
+scratch stays in a fresh directory in `/tmp` so stale or foreign-owned generated
+checkout data is not changed. Scratch accumulates only for the current container
+session and is discarded when the container stops or restarts. Published results
+appear under `.container-output/<run-id>/`; the `web-dist/` artifact uses only
+relative URLs and can be previewed locally or deployed below a GitHub Pages
+project path. The source-authority, package, network, and shared-kernel
+limitations are recorded in [`container/SECURITY.md`](../container/SECURITY.md).
 
 ## Read, Demos, and About
 
@@ -111,13 +111,14 @@ reader continues to work and reports the affected run as unavailable.
 
 ## Static deployment
 
-The Pages workflow runs exactly `docker compose run --rm toolchain web` and
-uploads only `.container-output/pages-<run-id>-<attempt>/web-dist`. Repository
-build tools, tests, container privileges, and repository permissions are not
-deployed as server capabilities. The artifact contains the compiled PDF,
-reader assets, and registered WebAssembly demonstrations. It does not contain
-`book.json` or a second runtime copy of the LaTeX manuscript. GitHub Pages
-serves those static files and receives no repository write capability.
+The Pages workflow creates a uniquely named raw-Docker container on its
+ephemeral runner, invokes the same dependency setup and `web` task, and uploads
+only `.container-output/local/web-dist`. Repository build tools, tests, container privileges, and
+repository permissions are not deployed as server capabilities. The artifact
+contains the compiled PDF, reader assets, and registered WebAssembly
+demonstrations. It does not contain `book.json` or a second runtime copy of the
+LaTeX manuscript. GitHub Pages serves those static files and receives no
+repository write capability.
 
 ## Layout
 

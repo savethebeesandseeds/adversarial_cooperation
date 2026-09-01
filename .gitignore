@@ -1,3 +1,6 @@
 scholarship/*
 web/dist/
 .container-output/
+/.temp/
+/demostrations/.build/
+/document/.temp/
