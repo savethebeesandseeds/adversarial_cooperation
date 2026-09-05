@@ -36,16 +36,71 @@ async function assertCopiedSourceAssets() {
   assert.equal(noJekyll.size, 0);
 }
 
-async function assertPdf() {
-  const pdfPath = path.join(
-    distributionRoot,
-    "book",
-    "Adversarial-Cooperation.pdf",
+async function assertEditionCoverage() {
+  const documentRoot = path.resolve(webDirectory, "..", "document");
+  const companionMain = await readFile(path.join(documentRoot, "adversarial_cooperation.tex"), "utf8");
+  const shortMain = await readFile(path.join(documentRoot, "adversarial_cooperation_short.tex"), "utf8");
+  const companionPaths = [...companionMain.matchAll(/^\s*\\include\{([^}]+)\}/gmu)]
+    .map((match) => match[1]).filter((file) => file !== "content/research_draft_status");
+  const shortPaths = [...shortMain.matchAll(/^\s*\\input\{(short\/\d{2}-[^}]+)\}/gmu)]
+    .map((match) => match[1]);
+  assert.equal(companionPaths.length, 27, "companion must retain 22 chapters and five appendices");
+  assert.equal(shortPaths.length, 27, "short book must cover every companion chapter and appendix");
+  assert.equal(new Set(companionPaths).size, 27, "duplicate companion chapter");
+  assert.equal(new Set(shortPaths).size, 27, "duplicate short chapter");
+  assert.ok(companionMain.includes("\\appendix"), "companion appendix boundary missing");
+  assert.ok(shortMain.includes("\\appendix"), "short appendix boundary missing");
+  for (let index = 0; index < 27; index += 1) {
+    const companion = await readFile(path.join(documentRoot, companionPaths[index] + ".tex"), "utf8");
+    const short = await readFile(path.join(documentRoot, shortPaths[index] + ".tex"), "utf8");
+    const title = companion.match(/^\s*\\chapter\{([^}]+)\}/mu)?.[1];
+    assert.ok(title, "missing companion title: " + companionPaths[index]);
+    assert.equal(short.match(/^\s*\\chapter\{([^}]+)\}/mu)?.[1], title,
+      "short chapter title/order differs from companion: " + shortPaths[index]);
+    assert.ok(shortPaths[index].startsWith("short/" + String(index + 1).padStart(2, "0") + "-"),
+      "short source numbering differs from its reading order");
+    const isAppendix = index >= 22;
+    const number = isAppendix ? String.fromCharCode(65 + index - 22) : String(index + 1);
+    const destination = (isAppendix ? "appendix." : "chapter.") + number;
+    const references = [...short.matchAll(/\\companionref\{([^}]+)\}\{([^}]+)\}/gu)];
+    assert.equal(references.length, 1, "each short chapter needs one companion reference");
+    assert.deepEqual(references[0].slice(1), [number, destination],
+      "incorrect companion number/destination: " + shortPaths[index]);
+    assert.equal(
+      companionMain.indexOf("\\include{" + companionPaths[index] + "}") > companionMain.indexOf("\\appendix"),
+      isAppendix, "companion appendix boundary moved",
+    );
+    assert.equal(
+      shortMain.indexOf("\\input{" + shortPaths[index] + "}") > shortMain.indexOf("\\appendix"),
+      isAppendix, "short appendix boundary moved",
+    );
+  }
+  const layout = await readFile(path.join(documentRoot, "short", "layout.tex"), "utf8");
+  assert.ok(layout.includes("\\href{Adversarial-Cooperation.pdf\\##2}"),
+    "short chapter links must address named destinations in the preserved companion PDF");
+}
+
+async function assertPdfs() {
+  const editions = [
+    ["Adversarial-Cooperation-Short.pdf", "adversarial_cooperation_short.pdf"],
+    ["Adversarial-Cooperation.pdf", "adversarial_cooperation.pdf"],
+  ];
+  const published = [];
+  for (const [publicName, compiledName] of editions) {
+    const pdf = await readFile(path.join(distributionRoot, "book", publicName));
+    const compiled = await readFile(path.join(webDirectory, "..", "document", ".temp", "pdf", compiledName));
+    assert.ok(pdf.length >= 1024, publicName + ": compiled PDF is implausibly small");
+    assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-", publicName + ": missing PDF header");
+    assert.match(pdf.subarray(Math.max(0, pdf.length - 1024)).toString("latin1"), /%%EOF\s*$/u);
+    assert.deepEqual(pdf, compiled, publicName + ": differs from its canonical compiled edition");
+    published.push(pdf);
+  }
+  assert.notDeepEqual(published[0], published[1], "the short book must not duplicate the companion PDF");
+  assert.deepEqual(
+    (await listFiles(distributionRoot)).filter((file) => file.startsWith("book/")),
+    editions.map(([name]) => "book/" + name).sort(),
+    "the reading surface must contain exactly the two canonical PDFs",
   );
-  const pdf = await readFile(pdfPath);
-  assert.ok(pdf.length >= 1024, "compiled book PDF is implausibly small");
-  assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-", "compiled book has no PDF header");
-  assert.match(pdf.subarray(Math.max(0, pdf.length - 1024)).toString("latin1"), /%%EOF\s*$/u);
 }
 
 function moduleSpecifiers(source) {
@@ -73,6 +128,8 @@ async function assertStaticBoundaries() {
     "demos/ttt-demo.mjs",
     "ttt-worker.mjs",
     "book/Adversarial-Cooperation.pdf",
+    "book/Adversarial-Cooperation-Short.pdf",
+    "book-editions.mjs",
     "assets/ttt-module.mjs",
     "assets/ttt-module.wasm",
   ]) {
@@ -128,9 +185,10 @@ async function assertNoJavaScriptDependencies() {
   assert.equal(Object.hasOwn(packageJson, "devDependencies"), false);
 }
 
+await assertEditionCoverage();
 await assertCopiedSourceAssets();
-await assertPdf();
+await assertPdfs();
 await assertStaticBoundaries();
 await assertNoJavaScriptDependencies();
 
-process.stdout.write("Static site tests passed: compiled PDF, complete reader assets, one demo, relative URLs, and no manuscript serialization or JavaScript dependencies.\n");
+process.stdout.write("Static site tests passed: 27 matching chapters and companion links, both canonical PDFs, complete reader assets, one demo, relative URLs, and no manuscript serialization or JavaScript dependencies.\n");

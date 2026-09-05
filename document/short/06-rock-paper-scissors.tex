@@ -1,0 +1,18 @@
+\chapter{Two Oracles Play Rock--Paper--Scissors}
+\label{short:rock-paper-scissors}
+
+The original question imagines two oracles who can foresee each other's
+move. The companion studies a narrower difficulty: whoever learns first may
+choose afterward.
+
+The educational protocol asks both parties to commit before either reveals.
+Each later opening is checked against the earlier commitment. The intended
+protection depends on computational assumptions and an authenticated channel,
+set out in the companion.
+
+One difficulty survives. After receiving the first reveal, a player can learn
+the outcome and refuse to reveal in return. The demonstration includes this
+failure. A fixed choice still leaves a choice about continuing.
+
+\shortlimit{This protocol cannot compel a participant to finish the round.}
+\companionref{6}{chapter.6}{A conditional commit--reveal construction, C demonstration, and abort tests.}

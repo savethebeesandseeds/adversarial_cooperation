@@ -1,10 +1,10 @@
 import { createDemoRunner } from "./demo-contract.mjs";
 import { demos, getDemo } from "./demo-registry.mjs";
+import { bookEditions, editionPdfPath, readingEdition } from "./book-editions.mjs";
 
 const app = document.querySelector("#app");
 const main = document.querySelector("#main-content");
 const routeLinks = [...document.querySelectorAll("[data-route]")];
-const PDF_PATH = "./book/Adversarial-Cooperation.pdf";
 
 let activeRunner = null;
 let renderGeneration = 0;
@@ -45,7 +45,8 @@ function pageIntro(kicker, title, description) {
 }
 
 function parseRoute(hash) {
-  if (!hash || hash === "#" || hash === "#read") return { name: "read" };
+  const edition = readingEdition(hash);
+  if (edition) return { name: "read", edition };
   if (hash === "#demos") return { name: "demos" };
   if (hash === "#about") return { name: "about" };
   if (hash.startsWith("#demo=")) {
@@ -82,33 +83,45 @@ function show(view) {
   app.replaceChildren(view);
 }
 
-function renderRead() {
-  const openPdf = link("Open PDF in a new tab", PDF_PATH, "button secondary");
-  openPdf.target = "_blank";
-  openPdf.rel = "noopener";
+function renderRead(edition) {
+  const pdfPath = editionPdfPath(edition);
+  const editionSelector = node("nav", {
+    className: "edition-selector",
+    attributes: { "aria-label": "Book edition" },
+  }, bookEditions.map((choice) => {
+    const editionLink = link(choice.title, `#read=${choice.id}`, "button secondary");
+    if (choice.id === edition.id) editionLink.setAttribute("aria-current", "page");
+    return editionLink;
+  }));
+  const pdfLinks = node("div", { className: "edition-downloads" }, bookEditions.map((choice) => {
+    const pdfLink = link(`Open ${choice.title.toLowerCase()} PDF`, editionPdfPath(choice), "text-link");
+    pdfLink.target = "_blank";
+    pdfLink.rel = "noopener";
+    return pdfLink;
+  }));
 
   const fallback = node("div", { className: "pdf-fallback" }, [
     node("p", { text: "This browser could not place the PDF inside the page." }),
-    link("Open the complete PDF", PDF_PATH, "text-link"),
+    link(`Open the ${edition.title.toLowerCase()} PDF`, pdfPath, "text-link"),
   ]);
   const object = node("object", {
     className: "pdf-object",
     attributes: {
-      data: `${PDF_PATH}#view=FitH`,
+      data: `${pdfPath}#view=FitH`,
       type: "application/pdf",
-      "aria-label": "Adversarial Cooperation manuscript PDF",
+      "aria-label": `Adversarial Cooperation: ${edition.title} PDF`,
     },
   }, [fallback]);
 
   return node("section", { className: "page read-page" }, [
     node("div", { className: "reader-heading" }, [
       pageIntro(
-        "The complete manuscript",
+        edition.title,
         "Read the book",
-        "This is the PDF compiled from the canonical LaTeX manuscript, including its current chapters, front matter, and references.",
+        edition.description,
       ),
-      openPdf,
     ]),
+    node("div", { className: "reader-controls" }, [editionSelector, pdfLinks]),
     node("div", { className: "pdf-shell" }, [object]),
   ]);
 }
@@ -307,8 +320,8 @@ function renderAbout() {
   const principles = node("div", { className: "about-grid" }, [
     node("article", { className: "about-card" }, [
       node("p", { className: "step-number", text: "01" }),
-      node("h2", { text: "The manuscript remains authoritative" }),
-      node("p", { text: "The Read view opens the PDF compiled from the project's LaTeX manuscript. The website does not maintain an editable shadow copy of the book." }),
+      node("h2", { text: "Two ways into the same questions" }),
+      node("p", { text: "Start with the short book for a brief reflection on every chapter. Follow the same chapter in the research companion for its detailed reasoning, demonstrations, and open questions. Both PDFs are compiled from their canonical LaTeX sources." }),
     ]),
     node("article", { className: "about-card" }, [
       node("p", { className: "step-number", text: "02" }),
@@ -323,9 +336,9 @@ function renderAbout() {
   ]);
   return node("section", { className: "page about-page" }, [
     pageIntro(
-      "How this edition works",
-      "One book, one codebase",
-      "The public website has a deliberately small job: make the manuscript comfortable to read and make the working executable companions easy to inspect.",
+      "How the editions work",
+      "A short book, a deeper companion",
+      "Read the central ideas, follow the research, and inspect the working executable companions.",
     ),
     principles,
     node("div", { className: "about-note" }, [
@@ -354,7 +367,7 @@ async function renderRoute() {
 
   const route = parseRoute(location.hash);
   setActiveNavigation(route);
-  if (route.name === "read") show(renderRead());
+  if (route.name === "read") show(renderRead(route.edition));
   else if (route.name === "demos") show(renderDemos());
   else if (route.name === "about") show(renderAbout());
   else if (route.name === "demo") {

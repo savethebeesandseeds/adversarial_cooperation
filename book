@@ -13,6 +13,8 @@ Usage:
   bash book -h | --help
 
 Targets:
+  short_book          Build the complete short reading edition PDF
+  research_companion  Build the complete expanded research companion PDF
   section_poker   Build poker demonstration section PDF
   section_rps     Build the canonical Two Oracles RPS chapter PDF
   section_hash    Build the canonical Hash Functions appendix PDF
@@ -30,6 +32,8 @@ EOF
 
 list_targets() {
   cat <<'EOF'
+short_book -> document/adversarial_cooperation_short.tex
+research_companion -> document/adversarial_cooperation.tex
 section_poker -> demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex
 section_rps -> document/content/two_oracles_play_rock–paper–scissors/two_oracles_play_rock–paper–scissors.tex
 section_hash -> document/content/aprendix/hash_functions/hash_functions.tex
@@ -41,6 +45,12 @@ EOF
 target_to_tex() {
   local target="$1"
   case "$target" in
+    short_book)
+      printf '%s\n' "document/adversarial_cooperation_short.tex"
+      ;;
+    research_companion)
+      printf '%s\n' "document/adversarial_cooperation.tex"
+      ;;
     section_poker)
       printf '%s\n' "demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex"
       ;;
@@ -83,8 +93,28 @@ compile_pdf_target() {
     exit 1
   fi
 
-  mkdir -p "$OUT_DIR" "$TMP_DIR"
+  mkdir -p "$OUT_DIR"
+  if [[ "$target" == "short_book" || "$target" == "research_companion" ]]; then
+    local resolved_output compiled_name public_name
+    if [[ "$target" == "short_book" ]]; then
+      public_name="Adversarial-Cooperation-Short.pdf"
+    else
+      public_name="Adversarial-Cooperation.pdf"
+    fi
+    resolved_output="$(cd "$OUT_DIR" && pwd)"
+    compiled_name="$(basename "$section_tex_abs" .tex).pdf"
+    (
+      cd "$ROOT_DIR"
+      LATEX_OUTDIR="$resolved_output" bash compile_latex.sh -s "$section_tex_rel"
+    )
+    cp -- "$resolved_output/$compiled_name" "$resolved_output/$target.pdf"
+    cp -- "$resolved_output/$compiled_name" "$resolved_output/$public_name"
+    echo "PDF generated: $resolved_output/$target.pdf"
+    echo "Linked edition: $resolved_output/$public_name"
+    return
+  fi
 
+  mkdir -p "$TMP_DIR"
   wrapper_tex="${TMP_DIR}/${target}.tex"
 
   cat >"$wrapper_tex" <<EOF

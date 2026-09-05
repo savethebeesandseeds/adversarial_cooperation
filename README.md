@@ -132,31 +132,42 @@ recreation is inspectable rather than bit-for-bit frozen.
 
 ## Compile book
 
-The in-container verification task compiles the corrected full-book entry point
-and exports its artifacts without requiring LaTeX on the host:
+The in-container verification task compiles both canonical book entries
+and exports their artifacts without requiring LaTeX on the host:
 
 ```bash
 AC_RUN_ID=verify-unique bash container/tasks.sh verify
 ```
 
-The main manuscript is now the inclusive **Complete Research Draft**. Its five
-parts expose all **27 live content sources**: 22 chapters and research notes,
-followed by five appendices. Early fragments and placeholders carry visible
-research-status notices alongside the more developed Trust Establishment,
-Rock--Paper--Scissors, Tic-Tac-Toe, Poker, and Hash Functions material.
+The work has two editions with the same **22 chapters and five appendices**:
 
-Presence in the Complete Research Draft means that an idea is preserved and
-visible. It does **not** mean that the chapter is mature, that its claims are
-validated, that its protocol is secure, or that its contribution is novel.
-Build and test evidence remains scoped to the exact chapters and executable
-companions named in their verification records.
+- **The Short Book**, from
+  [document/adversarial_cooperation_short.tex](document/adversarial_cooperation_short.tex),
+  gives each chapter a brief contemplative reading, a limit, and a reference
+  to its companion chapter.
+- **Research Companion**, from
+  [document/adversarial_cooperation.tex](document/adversarial_cooperation.tex),
+  preserves the expanded models, arguments, algorithms, citations, and
+  implementation references. Some chapters remain notes or open problems.
+
+The short edition is a first editorial draft. The companion retains the
+existing research boundaries: inclusion does not establish a claimed property,
+maturity, or novelty. Read the [edition map](research/EDITION_MAP.md) for the
+complete source correspondence and available demonstrations.
+
+The verification task exports both PDFs under
+.container-output/<run-id>/pdf/. The existing Adversarial-Cooperation.pdf
+filename continues to identify the companion; Adversarial-Cooperation-Short.pdf
+is the short book. Keep them together for links between PDFs. Matching chapter
+numbers and appendix letters provide a fallback for readers without remote
+PDF-link support.
 
 ## Browser reader and demonstrations
 
 The static website has three deliberately small areas:
 
-- **Read** embeds the PDF compiled from the canonical LaTeX manuscript and
-  provides a direct PDF link.
+- **Read** starts with the short book and offers a research-companion choice,
+  with direct links to both PDFs compiled from their canonical LaTeX entries.
 - **Demos** lists only executable companions that have been explicitly
   registered and built. The first is the disclosed-policy Tic-Tac-Toe checker,
   compiled from the existing C implementation to WebAssembly.
@@ -192,12 +203,19 @@ install or run the toolchain directly on the host:
 
 ```bash
 bash book -list
+bash book -pdf short_book
+bash book -pdf research_companion
 bash book -pdf section_poker
 bash book -pdf section_rps
 bash book -pdf section_hash
 bash book -pdf section_trust
 bash book -pdf section_ttt
 ```
+
+Build both whole-book targets into the same output folder to retain links
+between editions. They emit short_book.pdf and research_companion.pdf plus
+the public Adversarial-Cooperation-Short.pdf and Adversarial-Cooperation.pdf
+filenames under demostrations/.build/pdf/.
 
 Within the mounted working tree, the helper outputs are:
 

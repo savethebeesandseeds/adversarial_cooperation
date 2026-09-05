@@ -16,6 +16,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { demos } from "../src/demo-registry.mjs";
+import { bookEditions } from "../src/book-editions.mjs";
 import { buildRegisteredWasm, registeredWasmBuilds } from "./build-wasm.mjs";
 
 const toolsDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -30,8 +31,18 @@ export const manuscriptPdf = path.join(
   "pdf",
   "adversarial_cooperation.pdf",
 );
+export const shortManuscriptPdf = path.join(
+  repositoryRoot,
+  "document",
+  ".temp",
+  "pdf",
+  "adversarial_cooperation_short.pdf",
+);
 
-const publicPdfName = "Adversarial-Cooperation.pdf";
+const editionSources = {
+  short: { source: "document/adversarial_cooperation_short.tex", pdf: shortManuscriptPdf },
+  companion: { source: "document/adversarial_cooperation.tex", pdf: manuscriptPdf },
+};
 const reservedWebDirectories = new Set(["src", "tools", "wasm", "tests"]);
 
 /**
@@ -47,6 +58,7 @@ export async function buildSite({ outputRoot = distributionRoot } = {}) {
   assertRegistrationParity();
   await assertSafeOutputParent(resolvedOutput);
   await compileCanonicalPdf();
+  await compilePdf(editionSources.short.source, shortManuscriptPdf);
   await mkdir(stageRoot, { recursive: false });
 
   try {
@@ -55,7 +67,8 @@ export async function buildSite({ outputRoot = distributionRoot } = {}) {
     await replaceGeneratedDirectory(stageRoot, resolvedOutput, backupRoot);
     return Object.freeze({
       outputRoot: resolvedOutput,
-      pdfPath: path.join(resolvedOutput, "book", publicPdfName),
+      pdfPath: path.join(resolvedOutput, "book", "Adversarial-Cooperation.pdf"),
+      shortPdfPath: path.join(resolvedOutput, "book", "Adversarial-Cooperation-Short.pdf"),
       wasmBuilds: builds,
     });
   } finally {
@@ -75,9 +88,13 @@ export function assertRegistrationParity() {
 }
 
 export async function compileCanonicalPdf() {
+  return compilePdf(editionSources.companion.source, manuscriptPdf);
+}
+
+async function compilePdf(source, pdf) {
   const result = spawnSync(
     "bash",
-    ["compile_latex.sh", "-s", "document/adversarial_cooperation.tex"],
+    ["compile_latex.sh", "-s", source],
     {
       cwd: repositoryRoot,
       env: { ...process.env, LATEX_OUTDIR: ".temp/pdf" },
@@ -92,11 +109,11 @@ export async function compileCanonicalPdf() {
     );
   }
   if (result.status !== 0) {
-    throw new Error(`compile_latex.sh exited with status ${result.status}.`);
+    throw new Error(`compile_latex.sh exited with status ${result.status} for ${source}.`);
   }
 
-  await assertPdf(manuscriptPdf);
-  return manuscriptPdf;
+  await assertPdf(pdf);
+  return pdf;
 }
 
 /**
@@ -107,7 +124,9 @@ export async function assembleStaticSite(stageRoot) {
   const resolvedStage = path.resolve(stageRoot);
   await copyDirectory(sourceRoot, resolvedStage);
   await mkdir(path.join(resolvedStage, "book"), { recursive: true });
-  await copyFile(manuscriptPdf, path.join(resolvedStage, "book", publicPdfName));
+  for (const edition of bookEditions) {
+    await copyFile(editionSources[edition.id].pdf, path.join(resolvedStage, "book", edition.pdfName));
+  }
   await writeFile(path.join(resolvedStage, ".nojekyll"), "", "utf8");
   return buildRegisteredWasm(path.join(resolvedStage, "assets"));
 }
@@ -118,7 +137,7 @@ export async function validateCompleteSite(siteRoot, wasmBuilds) {
     "index.html",
     "app.mjs",
     "styles.css",
-    path.join("book", publicPdfName),
+    ...bookEditions.map((edition) => path.join("book", edition.pdfName)),
   ];
 
   for (const relativePath of requiredFiles) {
@@ -127,7 +146,9 @@ export async function validateCompleteSite(siteRoot, wasmBuilds) {
       throw new Error(`Static build is missing a non-empty ${relativePath}.`);
     }
   }
-  await assertPdf(path.join(resolvedSite, "book", publicPdfName));
+  for (const edition of bookEditions) {
+    await assertPdf(path.join(resolvedSite, "book", edition.pdfName));
+  }
 
   if (!Array.isArray(wasmBuilds) || wasmBuilds.length === 0) {
     throw new Error("A complete site must contain at least one registered WebAssembly demo.");
@@ -303,7 +324,7 @@ if (isDirectExecution()) {
   const outputRoot = parseArguments(process.argv.slice(2));
   const result = await buildSite({ outputRoot });
   process.stdout.write(
-    `Built complete static edition in ${path.relative(repositoryRoot, result.outputRoot)} ` +
+    `Built both book editions in ${path.relative(repositoryRoot, result.outputRoot)} ` +
       `with ${result.wasmBuilds.length} registered WebAssembly demo(s).\n`,
   );
 }

@@ -7,6 +7,23 @@ state machine, transcript, tests, attacks, limitations, and citations agree.
 Do not polish every fragment in parallel and do not use a green demo as a
 substitute for a security argument.
 
+## Short Book and Research Companion - 2026-09-05
+
+The author's reading direction is now a short, contemplative book with a
+separate detailed research companion. The short entry is
+document/adversarial_cooperation_short.tex; the existing
+document/adversarial_cooperation.tex remains the companion entry.
+
+Both follow the same 22 chapters and five appendices. The companion's research
+maturity is unchanged by this separation. The short book is a complete first
+editorial pass across that existing corpus, not completion of the research
+phases below. research/EDITION_MAP.md connects the two sources for each chapter
+and identifies the currently available executable work.
+
+Continue in two coordinated passes: refine a short chapter's thought and
+language, then develop one bounded companion problem with its model, attacks,
+algorithm, evidence, and limitations. More pages are not an exit condition.
+
 ## Complete Research Draft Assembly - 2026-08-01
 
 The main manuscript now exposes every one of the repository's **27 live

@@ -1,0 +1,19 @@
+\chapter{Hash Functions}
+\label{short:hash-functions}
+
+Can we express something about a secret without revealing it?
+
+A digest is a small, repeatable fingerprint of exact bytes. The same bytes
+produce the same digest. This offers a useful instrument for larger
+constructions, but it does not answer the opening question by itself.
+
+If the secret is one of three moves, an observer can hash all three and
+compare. The secret was hidden from sight, yet remained available to a
+guess.
+
+Attend to the whole construction: the possible inputs, their encoding, the
+reference value, and what an adversary can try. A compact expression is not
+necessarily a private one.
+
+\shortlimit{A bare digest neither hides a guessable input nor authenticates its sender.}
+\companionref{A}{appendix.A}{Definitions, attack examples, and the BLAKE2b C demonstration.}

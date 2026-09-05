@@ -1,5 +1,13 @@
 # Chapter Matrix
 
+## Edition Scope
+
+This matrix tracks the research companion's technical maturity. The short
+book now has a corresponding reading chapter for every row, without promoting
+the companion's evidence status. See research/EDITION_MAP.md for all 27 source
+pairs. References below to the complete research draft describe the preserved
+companion corpus and its earlier assembly.
+
 ## Reading Key
 
 - **Included** describes the live include graph rooted at

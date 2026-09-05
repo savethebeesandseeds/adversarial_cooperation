@@ -1,0 +1,67 @@
+\documentclass[11pt,oneside,openany]{book}
+\input{short/layout}
+
+\begin{document}
+\frontmatter
+\hypersetup{pageanchor=false}
+\begin{titlepage}
+\vspace*{20mm}
+{\small\scshape Waajacu\par}
+\vspace{16mm}
+{\Huge Adversarial\par Cooperation\par}
+\vspace{8mm}
+{\large The Short Book\par}
+\vfill
+{\large Victory is not the defeat\par of the adversaries.\par}
+\vspace{14mm}
+{\small First reading-edition draft\par September 2026\par}
+\end{titlepage}
+\hypersetup{pageanchor=true}
+
+\input{short/reading-note}
+\begingroup
+\setlength{\parskip}{0pt}
+\small
+\tableofcontents
+\endgroup
+\mainmatter
+\raggedright
+
+\shortpart{Foundations}
+\input{short/01-introduction}
+\input{short/02-defining-victory}
+\input{short/03-primitives}
+\input{short/04-trust-establishment}
+\input{short/05-byzantine-generals}
+
+\shortpart{Finite Games and Verifiable Commitment}
+\input{short/06-rock-paper-scissors}
+\input{short/07-tic-tac-toe}
+\input{short/08-poker}
+
+\shortpart{Private Joint Action}
+\input{short/09-telling-an-adversary-it-is-wrong}
+\input{short/10-stag-hunt}
+\input{short/11-obstacle-avoidance}
+\input{short/12-multiparty-optimization}
+\input{short/13-law}
+\input{short/14-cryptographic-meta-mathematics}
+
+\shortpart{Institutions, Dynamics, and Repair}
+\input{short/15-conflict-arbitrage}
+\input{short/16-aggregation-disadvantage}
+\input{short/17-momentum-zero-trap}
+\input{short/18-friendly-fire}
+\input{short/19-fighting-dissipates-strength}
+\input{short/20-helmsmans-game}
+\input{short/21-goodharts-law}
+\input{short/22-adversarial-aftermath}
+
+\appendix
+\shortpart{Appendices}
+\input{short/23-hash-functions}
+\input{short/24-non-repudiation}
+\input{short/25-cryptographic-forgiveness}
+\input{short/26-standards}
+\input{short/27-ast-and-hls}
+\end{document}

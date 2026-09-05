@@ -20,6 +20,27 @@ The book should remain hospitable to philosophy, game theory, political
 economy, distributed systems, mechanism design, formal methods, and ethics.
 Cryptography is the principal instrument, not the only source of truth.
 
+## Two Editions (Author Direction, 2026-09-05)
+
+The public work has two linked reading depths:
+
+- The short book contains every existing chapter and appendix, in brief,
+  contemplative prose. It carries the central insight and question, a concise
+  limit, and a reference to the matching research companion.
+- The research companion follows the same chapter order and contains detailed
+  models, arguments, algorithms, citations, implementation mappings, and
+  demonstrations where they exist. Incomplete work remains explicitly open.
+
+The canonical technical chapter structure below governs mature chapters in
+the companion. The short book does not need to reproduce that apparatus; it
+must preserve the meaning and limits of the companion's claims and retain a
+brief "What Cryptography Does Not Solve" passage.
+
+Develop the editions together. A technical correction must be checked against
+its short chapter. A new insight in the short book may motivate companion
+research, but cannot establish a theorem or an implemented property. The
+edition map is maintained in research/EDITION_MAP.md.
+
 ## 2. Working Definition
 
 Use the following as a provisional definition, not as a final theorem:

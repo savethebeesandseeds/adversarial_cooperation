@@ -1,0 +1,18 @@
+\chapter{AST, C, VHDL, and High-Level Synthesis}
+\label{short:ast-and-hls}
+
+A rule written in one form may need to travel into another before it can
+be executed. What must survive that journey?
+
+This appendix proposes a path from an abstract syntax tree toward C or
+VHDL, possibly through high-level synthesis. The path has not yet been
+specified. Its connection to protocol circuits and verification remains
+an open question.
+
+Before trusting a translation, we must say which behavior it should
+preserve and how that preservation will be checked. Producing another
+representation would begin the inquiry; it would not, by itself, finish
+the argument.
+
+\shortlimit{A translation alone does not establish that the intended behavior has been preserved.}
+\companionref{E}{appendix.E}{An open topic; no translation flow or equivalence result is established.}

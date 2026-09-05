@@ -1,11 +1,12 @@
 # Adversarial Cooperation Reader
 
-This directory builds a small static reader and a gallery of working
-WebAssembly demonstrations. Its source boundary is strict:
+This directory builds a static reader for the short book and research
+companion, plus a gallery of working WebAssembly demonstrations. Its source
+boundary is strict:
 
 1. LaTeX beneath `document/` is the only authored manuscript source.
-2. The compiled PDF is the browser's complete reading surface and typographic
-   authority.
+2. The two compiled PDFs are the browser's reading surfaces and typographic
+   authority. Each has its own canonical LaTeX entry point.
 3. The existing C implementation is the computational source of each browser
    demonstration. JavaScript adapts inputs and results; it does not reproduce
    the protocol or game evaluator.
@@ -29,7 +30,7 @@ bash container/tasks.sh serve
 
 `web` snapshots the declared source inputs into the container's `/tmp` tmpfs,
 checks
-the browser modules, compiles the canonical PDF and registered WebAssembly
+the browser modules, compiles both canonical PDFs and registered WebAssembly
 demonstrations, assembles the static site there, and runs the existing static,
 contract, UI, and native/WebAssembly agreement tests. It exports the verified
 site to `.container-output/<run-id>/web-dist/`. `serve` performs the same build
@@ -58,11 +59,29 @@ limitations are recorded in [`container/SECURITY.md`](../container/SECURITY.md).
 
 The public shell contains only these top-level views:
 
-- **Read** embeds `book/Adversarial-Cooperation.pdf` and links to that same
-  file for browsers whose embedded PDF viewer is unavailable.
+- **Read** starts with the short book, `book/Adversarial-Cooperation-Short.pdf`.
+  A labeled edition selector opens either volume in the same reading view.
+  The research companion keeps the existing `book/Adversarial-Cooperation.pdf`
+  URL. Both PDFs have direct links and remain available without JavaScript.
 - **Demos** shows only registered companions whose WebAssembly assets are part
   of the completed build.
 - **About** explains that LaTeX and C remain authoritative.
+
+The short book and research companion preserve the same 22 chapters and five
+appendices in the same order. Every short chapter links to the corresponding
+named destination in the companion. Some companion sources remain early
+notes or placeholders; inclusion in either edition does not establish a
+technical claim.
+
+The build compiles `document/adversarial_cooperation_short.tex` and
+`document/adversarial_cooperation.tex`. Publication tests require each PDF to
+match its own compiled source artifact, verify chapter titles and order across
+both editions, and check every short chapter's companion number and destination.
+The existing static UI checks also exercise edition-route selection. In
+`verify` mode, the container task exports both PDFs under
+`.container-output/<run-id>/pdf/` as well as beneath `web-dist/book/`.
+The names there remain `Adversarial-Cooperation-Short.pdf` and
+`Adversarial-Cooperation.pdf`.
 
 The static artifact contains no serialized manuscript text, source ranges,
 source hashes, raw LaTeX, local-folder access, change indications, comments, or
@@ -115,7 +134,7 @@ The Pages workflow creates a uniquely named raw-Docker container on its
 ephemeral runner, invokes the same dependency setup and `web` task, and uploads
 only `.container-output/local/web-dist`. Repository build tools, tests, container privileges, and
 repository permissions are not deployed as server capabilities. The artifact
-contains the compiled PDF, reader assets, and registered WebAssembly
+contains both compiled PDFs, reader assets, and registered WebAssembly
 demonstrations. It does not contain `book.json` or a second runtime copy of the
 LaTeX manuscript. GitHub Pages serves those static files and receives no
 repository write capability.

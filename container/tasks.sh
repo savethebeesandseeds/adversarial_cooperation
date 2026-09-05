@@ -250,7 +250,7 @@ build_web() {
   while IFS= read -r -d '' module; do
     node --check "$module"
   done < <(find web/src -type f -name '*.mjs' -print0 | LC_ALL=C sort -z)
-  note 'Compiling the canonical PDF and assembling the complete staged site'
+  note 'Compiling both canonical PDFs and assembling the complete staged site'
   node web/tools/build-site.mjs
   note 'Running the static, demo-contract, and native/WebAssembly parity tests'
   node web/tools/test-site.mjs
@@ -284,18 +284,24 @@ publish_artifacts() {
     mkdir -p "$PUBLICATION_STAGE/pdf"
     cp "$RUN_REPOSITORY/document/.temp/pdf/adversarial_cooperation.pdf" \
       "$PUBLICATION_STAGE/pdf/Adversarial-Cooperation.pdf"
+    cp "$RUN_REPOSITORY/document/.temp/pdf/adversarial_cooperation_short.pdf" \
+      "$PUBLICATION_STAGE/pdf/Adversarial-Cooperation-Short.pdf"
   fi
 
   {
     printf 'mode=%s\n' "$AC_MODE"
     printf 'complete_static_edition=passed\n'
     printf 'compiled_pdf_in_site=passed\n'
+    printf 'short_book_pdf_in_site=passed\n'
+    printf 'research_companion_pdf_in_site=passed\n'
     printf 'registered_wasm_demos=passed\n'
     printf 'native_and_wasm_parity=passed\n'
     if [[ "$AC_MODE" == verify ]]; then
       printf 'native_tests=passed\n'
       printf 'sanitizer_tests=passed\n'
       printf 'manuscript_build=passed\n'
+      printf 'short_book_build=passed\n'
+      printf 'research_companion_build=passed\n'
     fi
   } > "$PUBLICATION_STAGE/verification.txt"
   (
