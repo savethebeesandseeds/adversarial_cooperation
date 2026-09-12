@@ -30,6 +30,26 @@ Latin, Chinese, Spanish, and the author's intended titles in display prose.
 | RN-016 | `document/content/adversario_sibi_perfidiam_revelare/` and source/backup | **No proposal yet** | Intended Latin title pending | Empty mirrored demonstration directory; registers currently use the filesystem slug plus an English gloss | **Blocked on author/Latin review.** The charter explicitly prohibits guessing the intended Latin. |
 | RN-017 | Historical README container names `adverarial_cooperation` and `adversarial_cooperation` | `adversarial-cooperation-dev` | Adversarial Cooperation development container | Root README, container-boundary documentation, CI, and users with a retained container | **Approved operational migration.** The author selected one reusable raw-Docker development container on 2026-09-01. Same-named existing containers must be inspected and preserved; the new name does not authorize replacing an old container. |
 
+## Research Proposal Delivery (2026-09-12)
+
+The author requested a research-proposal designation and delivery at the
+repository root. These four paths were untracked at the time of the rename;
+native PowerShell moves were used after verifying that all resolved paths
+remained inside the workspace.
+Original artifacts are preserved in
+`.temp/white-paper/proposal-relocation-20260912/before/`.
+
+| ID | Original path | Authorized destination | Status |
+|---|---|---|---|
+| RN-018 | `document/white-paper/` | `document/research-proposal/` | Complete. Includes the byte-verified unmodified vendor distribution. |
+| RN-019 | `document/white-paper/adversarial-cooperation-white-paper.tex` | `document/research-proposal/adversarial-cooperation-research-proposal.tex` | Complete. Build helper and active documentation use the new basename. |
+| RN-020 | `output/pdf/Adversarial-Cooperation-White-Paper.pdf` | `Adversarial-Cooperation-Research-Proposal.pdf` | Complete. Rebuilt with the revised visible label and metadata; both pages inspected. |
+| RN-021 | `output/pdf/Adversarial-Cooperation-White-Paper-Source.zip` | `Adversarial-Cooperation-Research-Proposal-Source.zip` | Complete. Refreshed and independently rebuilt with identical PDF text and page drawing streams. |
+
+The historical execution-plan filename, baseline evidence paths, vendor
+provenance, and empty output directories are preserved. This authorization
+does not apply to any earlier proposed rename in this register.
+
 ## Empty Directory Preservation
 
 The following document appendix directories contain no tracked file and will

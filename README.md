@@ -1,3 +1,13 @@
+## Research proposal
+
+[Read Adversarial Cooperation](Adversarial-Cooperation-Research-Proposal.pdf)
+— a two-page IEEE-format research proposal by Santiago Restrepo, seeking
+resources and support to investigate cryptographic cooperation between
+adversarial parties and the hardware they would use.
+
+[Download the source bundle](Adversarial-Cooperation-Research-Proposal-Source.zip)
+or [edit and rebuild the proposal](document/research-proposal/README.md).
+
 ## License
 This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
 
