@@ -1,0 +1,4 @@
+# Keep build entry points runnable after a Windows checkout.
+*.sh text eol=lf
+Makefile text eol=lf
+Makefile.config text eol=lf

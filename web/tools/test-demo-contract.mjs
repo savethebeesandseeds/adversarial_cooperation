@@ -14,7 +14,7 @@ function validDefinition(overrides = {}) {
     id: "fixture-demo",
     chapter: {
       title: "Fixture chapter",
-      sourcePath: "document/content/fixture/fixture.tex",
+      sourcePath: "doc/content/fixture/fixture.tex",
     },
     title: "Fixture demonstration",
     summary: "Exercises the reusable contract without a WebAssembly runtime.",
@@ -133,7 +133,7 @@ const second = defineDemo(validDefinition({
   id: "second-demo",
   chapter: {
     title: "Second chapter",
-    sourcePath: "document/content/second/second.tex",
+    sourcePath: "doc/content/second/second.tex",
   },
   title: "Second demonstration",
 }));

@@ -26,22 +26,22 @@ export const sourceRoot = path.join(webRoot, "src");
 export const distributionRoot = path.join(webRoot, "dist");
 export const manuscriptPdf = path.join(
   repositoryRoot,
-  "document",
-  ".temp",
+  ".local",
+  "build",
   "pdf",
   "adversarial_cooperation.pdf",
 );
 export const shortManuscriptPdf = path.join(
   repositoryRoot,
-  "document",
-  ".temp",
+  ".local",
+  "build",
   "pdf",
   "adversarial_cooperation_short.pdf",
 );
 
 const editionSources = {
-  short: { source: "document/adversarial_cooperation_short.tex", pdf: shortManuscriptPdf },
-  companion: { source: "document/adversarial_cooperation.tex", pdf: manuscriptPdf },
+  short: { source: "doc/adversarial_cooperation_short.tex", pdf: shortManuscriptPdf },
+  companion: { source: "doc/adversarial_cooperation.tex", pdf: manuscriptPdf },
 };
 const reservedWebDirectories = new Set(["src", "tools", "wasm", "tests"]);
 
@@ -94,10 +94,10 @@ export async function compileCanonicalPdf() {
 async function compilePdf(source, pdf) {
   const result = spawnSync(
     "bash",
-    ["compile_latex.sh", "-s", source],
+    ["doc/tools/compile_latex.sh", "-s", source],
     {
       cwd: repositoryRoot,
-      env: { ...process.env, LATEX_OUTDIR: ".temp/pdf" },
+      env: { ...process.env, LATEX_OUTDIR: path.dirname(pdf) },
       stdio: "inherit",
     },
   );
@@ -109,7 +109,7 @@ async function compilePdf(source, pdf) {
     );
   }
   if (result.status !== 0) {
-    throw new Error(`compile_latex.sh exited with status ${result.status} for ${source}.`);
+    throw new Error(`doc/tools/compile_latex.sh exited with status ${result.status} for ${source}.`);
   }
 
   await assertPdf(pdf);

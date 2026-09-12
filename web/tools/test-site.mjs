@@ -37,7 +37,7 @@ async function assertCopiedSourceAssets() {
 }
 
 async function assertEditionCoverage() {
-  const documentRoot = path.resolve(webDirectory, "..", "document");
+  const documentRoot = path.resolve(webDirectory, "..", "doc");
   const companionMain = await readFile(path.join(documentRoot, "adversarial_cooperation.tex"), "utf8");
   const shortMain = await readFile(path.join(documentRoot, "adversarial_cooperation_short.tex"), "utf8");
   const companionPaths = [...companionMain.matchAll(/^\s*\\include\{([^}]+)\}/gmu)]
@@ -88,7 +88,7 @@ async function assertPdfs() {
   const published = [];
   for (const [publicName, compiledName] of editions) {
     const pdf = await readFile(path.join(distributionRoot, "book", publicName));
-    const compiled = await readFile(path.join(webDirectory, "..", "document", ".temp", "pdf", compiledName));
+    const compiled = await readFile(path.join(webDirectory, "..", ".local", "build", "pdf", compiledName));
     assert.ok(pdf.length >= 1024, publicName + ": compiled PDF is implausibly small");
     assert.equal(pdf.subarray(0, 5).toString("ascii"), "%PDF-", publicName + ": missing PDF header");
     assert.match(pdf.subarray(Math.max(0, pdf.length - 1024)).toString("latin1"), /%%EOF\s*$/u);

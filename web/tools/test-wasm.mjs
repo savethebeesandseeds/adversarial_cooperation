@@ -94,10 +94,10 @@ async function runNativeBoundaryTest() {
       "-Wextra",
       "-Wpedantic",
       "-Werror",
-      "-Iinclude",
+      "-Icode/include",
       "web/tests/test_ttt_web.c",
       "web/wasm/ttt_web.c",
-      "src/protocols/ttt.c",
+      "code/src/protocols/ttt.c",
       "-o",
       executable,
     ]);

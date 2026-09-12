@@ -1,0 +1,62 @@
+[
+  {
+    "source": "document",
+    "destination": "doc",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "research",
+    "destination": "doc/research",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "demonstrations",
+    "destination": "code",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "src",
+    "destination": "code/src",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "include",
+    "destination": "code/include",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "tests",
+    "destination": "code/tests",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "test-vectors",
+    "destination": "code/tests/vectors",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "Makefile.config",
+    "destination": "code/Makefile.config",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "book",
+    "destination": "doc/tools/book.sh",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "compile_latex.sh",
+    "destination": "doc/tools/compile_latex.sh",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "container",
+    "destination": ".local/container",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "Adversarial-Cooperation-Research-Proposal.pdf",
+    "destination": "doc/Adversarial-Cooperation-Research-Proposal.pdf",
+    "kind": "tracked-source"
+  }
+]

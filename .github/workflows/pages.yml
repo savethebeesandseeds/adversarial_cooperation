@@ -166,11 +166,11 @@ jobs:
           test "$(docker exec "$AC_CI_CONTAINER" id -u)" = "$AC_UID"
           test "$(docker exec "$AC_CI_CONTAINER" id -g)" = "$AC_GID"
           docker exec "$AC_CI_CONTAINER" \
-            /bin/bash /workspace/container/tasks.sh web
+            /bin/bash /workspace/.local/container/tasks.sh web
 
       - name: Confirm the complete static edition
         run: |
-          site=".container-output/local/web-dist"
+          site=".local/evidence/local/web-dist"
           test -s "$site/index.html"
           test -s "$site/book/Adversarial-Cooperation.pdf"
           test "$(head -c 5 "$site/book/Adversarial-Cooperation.pdf")" = '%PDF-'
@@ -181,7 +181,7 @@ jobs:
       - name: Upload only the generated static site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: .container-output/local/web-dist
+          path: .local/evidence/local/web-dist
 
   deploy:
     environment:

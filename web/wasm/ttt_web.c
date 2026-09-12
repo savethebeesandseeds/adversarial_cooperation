@@ -18,7 +18,7 @@
  * below, then reads the immutable result through the scalar getters.  The
  * Emscripten module exposes each function as Module._ac_ttt_web_... .  No
  * policy checking or game-tree logic is implemented here; that remains in
- * src/protocols/ttt.c.  This bridge is an educational execution adapter, not
+ * code/src/protocols/ttt.c.  This bridge is an educational execution adapter, not
  * a privacy, zero-knowledge, authorship, or cryptographic mechanism.
  */
 

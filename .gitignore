@@ -1,6 +1,16 @@
-scholarship/*
+# Machine-local builds, evidence, archives, and private material.
+/.local/*
+# Versioned container tooling lives here; all other local material stays ignored.
+!/.local/container/
+!/.local/container/**
+# Constrained output of the browser builder.
 web/dist/
+# Legacy destinations: prevent generated files from being tracked again.
+scholarship/*
 .container-output/
 /.temp/
+/temp/
 /demostrations/.build/
+/demonstrations/.build/
 /document/.temp/
+/document/temp/

@@ -1,0 +1,192 @@
+[
+  {
+    "source": ".temp",
+    "destination": ".local/archive/session-work",
+    "kind": "local-archive"
+  },
+  {
+    "source": ".container-output",
+    "destination": ".local/evidence",
+    "kind": "local-evidence"
+  },
+  {
+    "source": "temp",
+    "destination": ".local/archive/generated/root-temp",
+    "kind": "local-archive"
+  },
+  {
+    "source": "document/temp",
+    "destination": ".local/archive/generated/document-temp",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/.build",
+    "destination": ".local/archive/generated/demonstration-build",
+    "kind": "local-archive"
+  },
+  {
+    "source": "src/poker_without_revealing_the_cards/poker_demo",
+    "destination": ".local/archive/generated/source-poker-demo",
+    "kind": "local-archive"
+  },
+  {
+    "source": "Adversarial-Cooperation-Research-Proposal-Source.zip",
+    "destination": ".local/archive/proposal/Adversarial-Cooperation-Research-Proposal-Source.zip",
+    "kind": "local-archive"
+  },
+  {
+    "source": "scholarship",
+    "destination": ".local/personal/scholarship",
+    "kind": "local-private"
+  },
+  {
+    "source": "demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex",
+    "destination": "research/archive/manuscript/demostrations/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "demostrations/adversarial_aftermatch",
+    "destination": ".local/archive/demonstration-placeholders/adversarial_aftermatch",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/adversario_sibi_perfidiam_revelare",
+    "destination": ".local/archive/demonstration-placeholders/adversario_sibi_perfidiam_revelare",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/aggregation_disadvantage",
+    "destination": ".local/archive/demonstration-placeholders/aggregation_disadvantage",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/aprendix",
+    "destination": ".local/archive/demonstration-placeholders/aprendix",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/byzantine_generals_problem",
+    "destination": ".local/archive/demonstration-placeholders/byzantine_generals_problem",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/conflict_arbitrage",
+    "destination": ".local/archive/demonstration-placeholders/conflict_arbitrage",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/cryptographic_meta_mathematics",
+    "destination": ".local/archive/demonstration-placeholders/cryptographic_meta_mathematics",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/defining_victory",
+    "destination": ".local/archive/demonstration-placeholders/defining_victory",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/friendly_fire",
+    "destination": ".local/archive/demonstration-placeholders/friendly_fire",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/helmsmans_game",
+    "destination": ".local/archive/demonstration-placeholders/helmsmans_game",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/interactive_secure_stag_hunt",
+    "destination": ".local/archive/demonstration-placeholders/interactive_secure_stag_hunt",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/joint_secure_obstacle_avoidance",
+    "destination": ".local/archive/demonstration-placeholders/joint_secure_obstacle_avoidance",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/law_without_referencering_the_law",
+    "destination": ".local/archive/demonstration-placeholders/law_without_referencering_the_law",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/momentum_zero_trap",
+    "destination": ".local/archive/demonstration-placeholders/momentum_zero_trap",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/poker_without_revealing_the_cards",
+    "destination": ".local/archive/demonstration-placeholders/poker_without_revealing_the_cards",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/secure_multiparty_optimization",
+    "destination": ".local/archive/demonstration-placeholders/secure_multiparty_optimization",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/tic_tac_toe_without_revealing_the_strategy",
+    "destination": ".local/archive/demonstration-placeholders/tic_tac_toe_without_revealing_the_strategy",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations/trust_establishment",
+    "destination": ".local/archive/demonstration-placeholders/trust_establishment",
+    "kind": "local-archive"
+  },
+  {
+    "source": "demostrations",
+    "destination": "demonstrations",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/adversarial_aftermatch/adversarial_aftermatch.tex.bak",
+    "destination": "research/archive/manuscript/document/content/adversarial_aftermatch/adversarial_aftermatch.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/adversario_sibi_perfidiam_revelare/adversario_sibi_perfidiam_revelare.tex.bak",
+    "destination": "research/archive/manuscript/document/content/adversario_sibi_perfidiam_revelare/adversario_sibi_perfidiam_revelare.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/aprendix/hash_functions/hash_functions.tex.bak",
+    "destination": "research/archive/manuscript/document/content/aprendix/hash_functions/hash_functions.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/aprendix/non_repudiation/non_repudiation.tex.bak",
+    "destination": "research/archive/manuscript/document/content/aprendix/non_repudiation/non_repudiation.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/conflict_arbitrage/conflict_arbitrage.tex.bak",
+    "destination": "research/archive/manuscript/document/content/conflict_arbitrage/conflict_arbitrage.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/cryptographic_meta_mathematics/cryptographic_meta_mathematics.tex.bak",
+    "destination": "research/archive/manuscript/document/content/cryptographic_meta_mathematics/cryptographic_meta_mathematics.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/interactive_secure_stag_hunt/interactive_secure_stag_hunt.tex.bak",
+    "destination": "research/archive/manuscript/document/content/interactive_secure_stag_hunt/interactive_secure_stag_hunt.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/joint_secure_obstacle_avoidance/joint_secure_obstacle_avoidance.tex.bak",
+    "destination": "research/archive/manuscript/document/content/joint_secure_obstacle_avoidance/joint_secure_obstacle_avoidance.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex.bak",
+    "destination": "research/archive/manuscript/document/content/poker_without_revealing_the_cards/poker_without_revealing_the_cards.tex.bak",
+    "kind": "tracked-source"
+  },
+  {
+    "source": "document/content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy.tex.bak",
+    "destination": "research/archive/manuscript/document/content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy.tex.bak",
+    "kind": "tracked-source"
+  }
+]

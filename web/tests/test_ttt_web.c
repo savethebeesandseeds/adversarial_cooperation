@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "../../tests/test_support.h"
+#include "../../code/tests/test_support.h"
 
 /* Public scalar ABI implemented by web/wasm/ttt_web.c. */
 ac_status ac_ttt_web_run(uint32_t scenario);

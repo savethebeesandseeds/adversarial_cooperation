@@ -217,7 +217,7 @@ export const ticTacToeDemo = defineDemo({
   id: "ttt-disclosed-policy-v1",
   chapter: {
     title: "Tic-Tac-Toe without Revealing the Strategy",
-    sourcePath: "document/content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy.tex",
+    sourcePath: "doc/content/tic_tac_toe_without_revealing_the_strategy/tic_tac_toe_without_revealing_the_strategy.tex",
   },
   title: "Disclosed-policy Tic-Tac-Toe checker",
   summary: "Run the existing C11 checker in WebAssembly against complete public policy tables and inspect its exhaustive verdict.",

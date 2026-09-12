@@ -42,8 +42,8 @@ export async function buildTicTacToeWasm(outputDirectory) {
 
   const arguments_ = [
     "web/wasm/ttt_web.c",
-    "src/protocols/ttt.c",
-    "-Iinclude",
+    "code/src/protocols/ttt.c",
+    "-Icode/include",
     "-std=c11",
     "-O2",
     "-Wall",

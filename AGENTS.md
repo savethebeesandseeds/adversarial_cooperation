@@ -23,15 +23,15 @@ permits, what it prevents, what it assumes, and how that universe can end.
 
 Before any substantial change, read:
 
-1. `research/RESEARCH_CHARTER.md`
+1. `doc/research/RESEARCH_CHARTER.md`
 2. The relevant chapter source and any associated C implementation.
-3. The active execution plan under `research/plans/`, if one exists.
+3. The active execution plan under `doc/research/plans/`, if one exists.
 4. Existing build files, tests, bibliography, and repository conventions.
 
 For work affecting multiple chapters, protocol architecture, public C APIs, or
 cryptographic claims, create or update a self-contained execution plan in:
 
-`research/plans/<descriptive-name>.md`
+`doc/research/plans/<descriptive-name>.md`
 
 Keep the plan current while working. Record discoveries, decisions, tests, and
 remaining uncertainties in it.

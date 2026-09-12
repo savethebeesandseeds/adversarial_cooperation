@@ -1,5 +1,5 @@
 const DEMO_ID_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
-const SOURCE_PATH_PATTERN = /^document\/content\/.+\.tex$/u;
+const SOURCE_PATH_PATTERN = /^doc\/content\/.+\.tex$/u;
 const RESULT_TONES = new Set(["neutral", "positive", "warning", "negative"]);
 const definedDemos = new WeakSet();
 

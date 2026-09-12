@@ -4,7 +4,7 @@ This directory builds a static reader for the short book and research
 companion, plus a gallery of working WebAssembly demonstrations. Its source
 boundary is strict:
 
-1. LaTeX beneath `document/` is the only authored manuscript source.
+1. LaTeX beneath `doc/` is the only authored manuscript source.
 2. The two compiled PDFs are the browser's reading surfaces and typographic
    authority. Each has its own canonical LaTeX entry point.
 3. The existing C implementation is the computational source of each browser
@@ -24,8 +24,8 @@ or JavaScript package download is required.
 Inside the container:
 
 ```text
-AC_RUN_ID=web-unique bash container/tasks.sh web
-bash container/tasks.sh serve
+AC_RUN_ID=web-unique bash .local/container/tasks.sh web
+bash .local/container/tasks.sh serve
 ```
 
 `web` snapshots the declared source inputs into the container's `/tmp` tmpfs,
@@ -33,7 +33,7 @@ checks
 the browser modules, compiles both canonical PDFs and registered WebAssembly
 demonstrations, assembles the static site there, and runs the existing static,
 contract, UI, and native/WebAssembly agreement tests. It exports the verified
-site to `.container-output/<run-id>/web-dist/`. `serve` performs the same build
+site to `.local/evidence/<run-id>/web-dist/`. `serve` performs the same build
 and tests without publishing an evidence bundle, then listens inside the
 container on port 4173. Open
 `http://127.0.0.1:4173`; the raw-Docker configuration publishes the port only
@@ -43,17 +43,17 @@ For the broader native build, test, sanitizer, manuscript, and browser check,
 run:
 
 ```text
-AC_RUN_ID=verify-unique bash container/tasks.sh verify
+AC_RUN_ID=verify-unique bash .local/container/tasks.sh verify
 ```
 
 The repository is mounted read-write for direct editing, while automated build
 scratch stays in a fresh directory in `/tmp` so stale or foreign-owned generated
 checkout data is not changed. Scratch accumulates only for the current container
 session and is discarded when the container stops or restarts. Published results
-appear under `.container-output/<run-id>/`; the `web-dist/` artifact uses only
+appear under `.local/evidence/<run-id>/`; the `web-dist/` artifact uses only
 relative URLs and can be previewed locally or deployed below a GitHub Pages
 project path. The source-authority, package, network, and shared-kernel
-limitations are recorded in [`container/SECURITY.md`](../container/SECURITY.md).
+limitations are recorded in [`.local/container/SECURITY.md`](../.local/container/SECURITY.md).
 
 ## Read, Demos, and About
 
@@ -73,13 +73,13 @@ named destination in the companion. Some companion sources remain early
 notes or placeholders; inclusion in either edition does not establish a
 technical claim.
 
-The build compiles `document/adversarial_cooperation_short.tex` and
-`document/adversarial_cooperation.tex`. Publication tests require each PDF to
+The build compiles `doc/adversarial_cooperation_short.tex` and
+`doc/adversarial_cooperation.tex`. Publication tests require each PDF to
 match its own compiled source artifact, verify chapter titles and order across
 both editions, and check every short chapter's companion number and destination.
 The existing static UI checks also exercise edition-route selection. In
 `verify` mode, the container task exports both PDFs under
-`.container-output/<run-id>/pdf/` as well as beneath `web-dist/book/`.
+`.local/evidence/<run-id>/pdf/` as well as beneath `web-dist/book/`.
 The names there remain `Adversarial-Cooperation-Short.pdf` and
 `Adversarial-Cooperation.pdf`.
 
@@ -117,7 +117,7 @@ demo.
 ## Tic-Tac-Toe demonstration
 
 The worker loads the Emscripten module generated from the repository's existing
-`src/protocols/ttt.c` through the thin bridge in `wasm/ttt_web.c`. JavaScript
+`code/src/protocols/ttt.c` through the thin bridge in `wasm/ttt_web.c`. JavaScript
 selects one of three fixed fixtures, invokes the bridge, and displays its scalar
 report. It does not reproduce the game evaluator.
 
@@ -132,7 +132,7 @@ reader continues to work and reports the affected run as unavailable.
 
 The Pages workflow creates a uniquely named raw-Docker container on its
 ephemeral runner, invokes the same dependency setup and `web` task, and uploads
-only `.container-output/local/web-dist`. Repository build tools, tests, container privileges, and
+only `.local/evidence/local/web-dist`. Repository build tools, tests, container privileges, and
 repository permissions are not deployed as server capabilities. The artifact
 contains both compiled PDFs, reader assets, and registered WebAssembly
 demonstrations. It does not contain `book.json` or a second runtime copy of the
