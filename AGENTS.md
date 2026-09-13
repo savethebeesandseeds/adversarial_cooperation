@@ -200,6 +200,13 @@ tables, code blocks, bibliography entries, and spelling in touched regions.
 
 Do not allow LaTeX success to substitute for scientific correctness.
 
+For proposal revisions, always rebuild the reader-facing PDF from the revised
+source, inspect every rendered page, and update
+`doc/Adversarial-Cooperation-White-Paper.pdf` in the same task. The author
+explicitly authorized this workflow on 2026-09-13; the earlier restriction on
+recompiling artifacts during repository cleanup does not apply to PDF revisions.
+Use the existing project build environment and do not install Windows software.
+
 ## Required Work Report
 
 At the end of every task, report:

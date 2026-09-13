@@ -1,7 +1,7 @@
 # Documents
 
-- [Research proposal](Adversarial-Cooperation-Research-Proposal.pdf), with
-  [editable source and build instructions](research-proposal/README.md).
+- [Evolving white paper](Adversarial-Cooperation-White-Paper.pdf), with
+  [editable source and build instructions](white-paper/README.md).
 - [Short book](adversarial_cooperation_short.tex): the brief reading edition.
 - [Research companion](adversarial_cooperation.tex): expanded chapters.
 - [Edition map](research/EDITION_MAP.md): correspondence between both books,
@@ -17,8 +17,10 @@ existing development environment:
 bash doc/tools/book.sh -list
 bash doc/tools/book.sh -pdf short_book
 bash doc/tools/book.sh -pdf research_companion
-bash doc/research-proposal/build.sh
+bash doc/white-paper/build.sh
 ```
 
-Generated PDFs go under `.local/build/`. The checked-in proposal PDF is a
+Generated PDFs go under `.local/build/`. The checked-in white-paper PDF is a
 deliberate reader-facing document; building does not silently replace it.
+Each proposal revision includes rebuilding, visually checking, and updating
+the reader-facing PDF from the revised source.

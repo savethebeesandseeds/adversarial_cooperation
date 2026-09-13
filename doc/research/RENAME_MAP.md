@@ -2,6 +2,9 @@
 
 ## Policy
 
+The 2026-09-13 white-paper naming update is recorded below. It supersedes the
+proposal filenames in earlier maps without changing their historical records.
+
 The author subsequently specified the current doc/code/web/.local layout.
 The exact second-pass moves are recorded in [structure-moves.json](structure-moves.json);
 see [REPOSITORY_LAYOUT.md](REPOSITORY_LAYOUT.md) for the final locations.
@@ -62,6 +65,20 @@ Original artifacts are preserved in
 The historical execution-plan filename, baseline evidence paths, vendor
 provenance, and empty output directories are preserved. This authorization
 does not apply to any earlier proposed rename in this register.
+
+## White-paper filenames (2026-09-13)
+
+The author requested `white-paper` filenames for the evolving document, to
+distinguish it from the broader `doc/research/` records. These are sequential
+`git mv` operations; manuscript and PDF bytes remain unchanged. The PDF stays
+directly in `doc/` and linked from the root README. Build products will use
+`.local/build/white-paper/`; existing local evidence remains at its recorded path.
+
+| ID | Original path | Authorized destination | Status |
+|---|---|---|---|
+| RN-022 | `doc/research-proposal/` | `doc/white-paper/` | Complete; includes the byte-verified complete vendor distribution. |
+| RN-023 | `doc/white-paper/adversarial-cooperation-research-proposal.tex` | `doc/white-paper/adversarial-cooperation-white-paper.tex` | Complete; manuscript bytes unchanged. |
+| RN-024 | `doc/Adversarial-Cooperation-Research-Proposal.pdf` | `doc/Adversarial-Cooperation-White-Paper.pdf` | Complete; existing PDF moved and byte-verified without regeneration. |
 
 ## Empty Directory Preservation
 

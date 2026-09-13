@@ -1,9 +1,9 @@
-# Adversarial Cooperation: IEEE-format research proposal
+# Adversarial Cooperation: evolving white paper
 
-Status: research-proposal relabel and root-level delivery complete,
-2026-09-12. All earlier edits remain applied. The historical filename and
-revision records are retained; the latest record at the end supersedes the
-original document designation and delivery paths.
+Status: one-page condensation rebuilt and visually verified, 2026-09-13.
+The document remains a research proposal in its text. All earlier edits remain
+applied. The revision records are retained; the latest record at the end
+supersedes earlier delivery paths and naming choices.
 
 ## Request and acceptance criteria
 
@@ -596,3 +596,338 @@ Publication source ZIP SHA-256:
 `93406b1ad8c7c2bd101ee89d48174fa9f14742a21137f87177ce228103aba150`
 
 Publication source ZIP size: 1,839,388 bytes.
+
+## White-paper filenames (2026-09-13)
+
+The author requested a stable white-paper filename as the document develops,
+avoiding confusion between `doc/research/` and `doc/research-proposal/`.
+Use `doc/white-paper/` for its editable sources and retain the reader-facing
+PDF directly in `doc/` as `Adversarial-Cooperation-White-Paper.pdf`.
+The exact sequential moves are RN-022 through RN-024 in `../RENAME_MAP.md`.
+
+Scope: rename the tracked folder, TeX entry and existing PDF; update the build
+helper, navigation and current path guidance. Keep the manuscript, bibliography,
+vendor distribution, existing generated objects and historical evidence intact.
+The internal research-proposal designation remains appropriate to the current
+stage and is unchanged. No cryptographic or editorial revision is inferred.
+
+Baseline: clean Git worktree at `070f368`. Read the charter, current manuscript
+and bibliography, its build helper and README, the root/doc/research navigation,
+repository layout/rename records and the relevant proposal/organization plans.
+Capture hashes before moving, validate resolved paths stay within this workspace,
+and use Git renames. Check byte preservation, local links, active path references,
+Bash syntax and the helper's path/argument routing without invoking TeX. The
+author's no-compilation, no-Docker and no-Windows-installation instructions remain
+in effect. No new commit or push is part of this naming request.
+
+### Required work report
+
+1. **Read:** the instructions, charter, manuscript, bibliography, build helper,
+   navigation and relevant plans listed above. An independent path audit also
+   checked for affected container, CI, code and web references; none were found.
+2. **Changed:** the three Git renames RN-022 through RN-024; root, document,
+   research and white-paper READMEs; repository layout and rename guides;
+   the white-paper build helper's source/output paths; and this plan.
+   `doc/research/` continues to hold the broader program's working records.
+3. **Claims:** none introduced, strengthened, weakened or removed. Manuscript,
+   bibliography, PDF and vendor bytes are unchanged; scientific text was not
+   revised as part of the filesystem naming change.
+4. **Assumptions:** `white-paper` is the stable filename for an evolving document.
+   Its internal designation remains research proposal. No new cryptographic,
+   hardware, dependency or deployment assumption was introduced.
+5. **Commands/checks:** Git status/diff checks; pre-move SHA-256 inventory;
+   three workspace-bounded `git mv` operations; immediate verification of all
+   44 moved files; final preservation checks; resolution of 38 local Markdown
+   links; old active-path search; Bash `-n` before and after; argument-recording
+   checks of the build helper's default and custom output paths. In those checks
+   a shell function replaced `latexmk`; no TeX process or compiler ran.
+6. **Results:** all 44 files were unchanged immediately after moving. Following
+   the deliberate README/build-helper edits, the remaining 42 files still
+   match their original hashes, including all 36 IEEEtran distribution files.
+   Links, Bash syntax and both output-path checks pass. The first routing check
+   expected one extra recorded field; correcting that check's count resolved
+   the failure without changing the helper. Old active file locations are absent.
+7. **Limits:** no compilation, PDF regeneration, Docker operation or installation
+   was performed. A real build from the new paths remains unverified under the
+   author's standing instruction. This task establishes no additional protocol
+   property; the manuscript's stated research limitations remain unchanged.
+8. **Next smallest step:** resume editing this evolving document at the new
+   source path. The technical next step remains specifying one concrete output
+   release functionality and its device/communication assumptions. Commit and
+   push require a new publication request for this naming change.
+
+Local naming evidence: `.local/white-paper-naming-20260913/before.json` and
+`checks.json`. Existing generated artifacts and historical maps are unchanged.
+Preserved PDF SHA-256:
+`e1a682d86137c4d22f7f3fbc801deb8a5f52cd2cde1e110b1641d86bb1a7922b`.
+
+## Conservative scope revision (2026-09-13)
+
+The author requests five bounded revisions: simplify Section I's privacy
+paragraph; center Section II on two parties with their own inspectable protocol
+implementations in equivalent hardware, leaving concrete models to later
+protocol work; shorten Tic-Tac-Toe to an example and identify elemental-game
+composition as an open research question; present C/circuits/RTL/FPGA work as
+an intended research direction; and aim for a complete inspectable demonstrator
+for each selected problem without claiming unestablished proofs or composition.
+
+Preserve the five sections, professional tone, author details, existing
+citations and prior chess/poker motivation. Keep existing uncommitted naming
+changes. Read the current manuscript, bibliography, charter, plan, source README
+and build helper; independently check the TTT reference contract and C sources
+against the compressed implementation description. Snapshot the current source,
+README and PDF in `.local/white-paper-revision-20260913/before/` before editing.
+
+Revise the requested paragraphs, review scientific scope independently, and
+check LaTeX structure, citation keys and the diff. The earlier Docker/build
+restriction remains in force pending the author's response to a clarification;
+no TeX engine was found on the current Windows PATH. Complete the text work
+while that PDF-build question is pending. Do not install software or rebuild
+C objects. If the PDF remains pending, identify its older content explicitly.
+
+### Required work report
+
+1. **Read:** current source, bibliography, charter, proposal plan, build helper,
+   navigation/README, TTT source documentation and canonical reference contract.
+   An independent reviewer inspected the associated TTT C source and headers
+   and compared the complete revised manuscript with the preserved original.
+2. **Changed:** the requested Section I privacy paragraph, Section II scope,
+   Section III example, Section IV research direction and Section V demonstrator
+   aim. Updated the white-paper README and root/doc navigation to disclose that
+   the source is newer than the PDF, and maintained this plan. Earlier uncommitted
+   filename changes remain intact; no code, bibliography or vendor files changed.
+3. **Claims:** removed proposal-level commitments to authenticated channels,
+   static single-party corruption, an ideal-functionality formalism and a selected
+   output-release construction. Kept privacy and correctness as requirements for
+   later protocols and withdrawal protection as a research objective. Removed the
+   TTT displayed relation and chronology discussion while retaining the same-policy
+   requirement and present implementation limits. Introduced elemental-game
+   composition explicitly as an open research question. Hardware realization,
+   translation correctness and complete demonstrators are intended work, not
+   established proofs or general composability results.
+4. **Assumptions:** the intended physical arrangement is two parties with their
+   own inspectable implementations in equivalent hardware. Equivalence is to be
+   assessed against the common specification and each party's role; inspecting
+   one's own implementation does not establish peer compliance. Exact adversary,
+   technical and physical assumptions are to be justified for each protocol.
+5. **Commands/checks:** Git scope/diff checks, before-file preservation, a Python
+   source comparison checking all five section titles, unchanged opening/author/
+   abstract/chess text and final contact/ethical paragraph, matching citation keys,
+   balanced LaTeX braces and environments, required content, section word counts
+   and unchanged PDF bytes. Independent editorial and cryptographic review found
+   no substantive issues. No compiler, Docker action or installation was run.
+6. **Results:** source checks pass; the same five bibliography entries remain
+   cited. The TTT section decreased from 317 to 155 whitespace-delimited words;
+   Section II decreased from 307 to 195. All five author requests are addressed
+   in the source. The existing PDF retains its earlier content and is explicitly
+   marked as such in navigation and source documentation.
+7. **Limits:** no local TeX engine was found on PATH. The earlier instruction to
+   avoid Docker/recompilation remains in effect pending the author's answer to
+   the build clarification. Source checks do not establish successful typesetting
+   or visual layout. No cryptographic proof, hardware result or composition
+   guarantee is established by this editorial revision.
+8. **Next smallest step:** when the build restriction is clarified and the
+   existing environment is available, rebuild only this proposal with its current
+   helper, check citations/fonts/layout on every page, and replace the reader-facing
+   PDF after review. No C objects, package installs, new container or source ZIP
+   are needed. No commit or push was performed for this revision.
+
+Evidence: `.local/white-paper-revision-20260913/source-checks.json` and `before/`.
+
+## Authorized PDF rebuild and standing instruction (2026-09-13)
+
+The author clarified: "yes, on changes to the pdf always rebuild it".
+This authorizes using the existing project container for proposal rebuilds and
+supersedes the cleanup-specific restriction for this purpose. Every subsequent
+proposal revision includes rebuilding, rendering, inspecting and updating its
+reader-facing PDF. This instruction is recorded in AGENTS.md and the document
+READMEs so it persists beyond this task.
+
+### Required work report
+
+1. **Read:** current manuscript/build helper, source/root/doc READMEs, this plan,
+   container README and setup definition, PDF skill and installed runtime paths;
+   inspected the existing container and named volume before reuse.
+2. **Changed:** rebuilt `doc/Adversarial-Cooperation-White-Paper.pdf`; removed
+   stale PDF-pending notices; recorded the standing rebuild instruction in
+   AGENTS.md, document guides and this report. Manuscript text, bibliography,
+   C code, vendor distribution and existing uncommitted renames are preserved.
+3. **Claims:** no scientific claims introduced or altered by this rebuild.
+   The PDF now represents the five source revisions documented above.
+4. **Assumptions:** the author's PDF-rebuild authorization is standing.
+   Reused the inspected `adversarial-cooperation-dev` container, immutable ID
+   `087f758ebdc8c512223a1414e871d84b3850a6491483b390900b12b2dc661738`, with its
+   existing base image, configuration, workspace/setup mounts and home volume.
+5. **Commands/checks:** existing `doc/white-paper/build.sh` through `docker exec`
+   with output in `.local/white-paper-revision-20260913/build`; latexmk/pdfLaTeX/
+   BibTeX; final-log checks; Poppler rendering and visual inspection of both
+   pages; pypdf/pdfplumber metadata, font embedding, hyperlinks and page bounds;
+   independent full-text comparison; copied the reviewed PDF and checked hashes;
+   Git whitespace and navigation checks; final container identity/config check.
+6. **Results:** two US Letter pages, five resolved references, four embedded
+   Type 1 fonts, and seven distinct email/site/DOI links. No undefined references,
+   overfull boxes, clipping, overlap or broken glyphs. The existing underfull
+   paragraph notice (badness 1810) remains visually acceptable. `pdffonts` was
+   absent from PATH; font descriptors were verified directly with pypdf instead.
+   Docker returned mounts in a different array order; comparison by destination
+   confirmed identical mount contents. The container was healthy and idle before
+   being returned to its original stopped state with unchanged identity/config.
+7. **Limits:** typesetting and content checks establish document fidelity,
+   not cryptographic proofs, hardware results or composition guarantees.
+   No remaining document failure; no Windows installations, C object rebuilds,
+   container creation, volume changes, source ZIP, commit or push.
+8. **Next smallest step:** review the updated PDF. Future source revisions
+   automatically include the same rebuild and visual-check workflow.
+
+Final PDF: 67,614 bytes; SHA-256
+`44f434b9852df9e262a1c69253fb89510b0fac64d1443337547966066f1fb3da`.
+QA evidence: `.local/white-paper-revision-20260913/pdf-checks.json`, rendered
+pages, final TeX log and before/after container inspection records.
+
+## Abstract wording correction (2026-09-13)
+
+1. **Read:** current abstract, build helper, instructions, latest report and
+   existing container configuration.
+2. **Changed:** "investigates cryptographic protocols for classical" becomes
+   "investigates cryptographic solutions to classical" in the abstract;
+   rebuilt the reader-facing PDF and added this record.
+3. **Claims:** clarified the object of investigation; no solution, proof or
+   result is newly claimed. All other manuscript text is unchanged.
+4. **Assumptions:** none changed; standing PDF-rebuild authorization applies.
+5. **Checks:** exact source replacement comparison; existing latexmk build;
+   Poppler rendering and inspection of both pages; embedded-font and final-log
+   checks; independent before/after PDF text comparison; delivery hash check;
+   container idle/state/configuration verification; Git whitespace check.
+6. **Results:** two pages with exactly the requested wording change in extracted
+   text; no new layout or reference issue. The existing underfull paragraph
+   notice remains visually acceptable. Container restored to its original
+   stopped state with unchanged identity, configuration and mounts.
+7. **Limits:** no scientific result established; no code build, installation,
+   container recreation, commit or push performed.
+8. **Next smallest step:** review the updated abstract in the PDF.
+
+Evidence and before snapshots:
+`.local/white-paper-revision-20260913/abstract-solutions/`.
+Updated PDF: 67,608 bytes; SHA-256
+`18c32fcbcae5640367cfeb2fe1efa565b85271726c6306ebabc68d0f22efe671`.
+
+## Author's corrected opening (2026-09-13)
+
+1. **Read:** current abstract, build helper, latest work record and inspected
+   existing container configuration.
+2. **Changed:** the opening now reads "Adversarial Cooperation derives solutions
+   to classical and modern problems in game theory using cryptographic protocols
+   without a trusted referee, and investigates hardware for their execution."
+   Rebuilt the PDF and added this record. All remaining manuscript text and
+   final layout commands are unchanged.
+3. **Claims:** adopted the author's requested description of the program as
+   deriving solutions using protocols. This edit adds no particular construction,
+   theorem or proof; the existing research-status qualifications remain.
+4. **Assumptions:** no technical assumptions changed; PDF rebuilding remains
+   authorized under the standing instruction.
+5. **Checks:** source comparison; existing latexmk build; Poppler renders and
+   inspection of both pages; PDF text/font/size/log checks and delivery hash;
+   independent review of the requested opening; container restoration and Git
+   whitespace checks.
+6. **Results:** two pages with the requested wording, embedded fonts, resolved
+   citations and no overfull boxes. The first expanded hardware clause caused
+   a column-balancing notice; concise equivalent wording resolved it. Trial
+   layout adjustments were reverted. The known underfull paragraph notice is
+   visually acceptable. Container restored stopped with unchanged configuration.
+7. **Limits:** no scientific result established by this edit; no code build,
+   installation, container recreation, commit or push.
+8. **Next smallest step:** review the corrected opening in the updated PDF.
+
+Evidence: `.local/white-paper-revision-20260913/abstract-derives/`.
+PDF: 67,616 bytes; SHA-256
+`1a6007786b2e446b6b31be9a3d4aab3b7274c8b67c861f501c8ee53bc33f0ffa`.
+
+## One-page condensation (2026-09-13)
+
+The author first removed the Scope and Tic-Tac-Toe sections, then requested
+that the remaining document fit on exactly one page. Preserve the three
+surviving sections, author/contact details, central cooperation question,
+poker/chess intuition, inspectable hardware direction and request for support.
+Condense prose while retaining IEEEtran's normal typography and geometry.
+
+1. **Read:** current author-edited source, build helper, prior work record,
+   instructions and existing container configuration. An independent reviewer
+   compared the condensed draft with the preserved pre-edit source.
+2. **Changed:** condensed abstract and three surviving sections; moved the
+   existing column-balancing command for a one-page document; rebuilt the PDF;
+   updated source README status and this record. No deleted section was restored.
+3. **Claims:** preserved privacy under explicit assumptions, research status of
+   hardware correspondence, and no proof/novelty/general-composability claim.
+   The institutional exposure statement is now explicitly an author concern
+   rather than an unsupported general finding. No research result was added.
+4. **Assumptions:** no new technical assumptions or toolchain commitments.
+   IEEEtran class, title/author metadata, 10-point type, Letter size and margins
+   are unchanged. Existing Docker environment and PDF-rebuild authorization apply.
+5. **Checks:** independent meaning review; latexmk build; one-page count; Poppler
+   render and visual inspection; unchanged preamble, sections and citation-key
+   checks; embedded fonts, seven URI links and page bounds; delivery hash and
+   Git whitespace checks. No code build or installation.
+6. **Results:** exactly one page with all three sections and five references.
+   Manuscript whitespace-delimited word count fell from 829 to 484, including
+   LaTeX commands. Four embedded Type 1 fonts; no overfull boxes, unresolved
+   citations, clipping, overlap or broken glyphs. The underfull paragraph notice
+   remains visually acceptable. Existing idle container returned to stopped.
+7. **Limits:** condensation and typesetting establish no cryptographic or hardware
+   result. Detailed models and evidence remain future research. No commit/push.
+8. **Next smallest step:** review the one-page document; further edits include
+   rebuilding and checking the PDF under the standing instruction.
+
+Before snapshots and QA: `.local/white-paper-revision-20260913/one-page/`.
+PDF: 62,323 bytes; SHA-256
+`3962ac557b817171438028c4d7cb9e688e1b6d754507893bb62e25274be47f25`.
+
+## Selected games section (2026-09-13)
+
+The author selected exactly six cases for a new Section II: Rock-Paper-Scissors,
+Tic-Tac-Toe, Poker, Chess, Stag Hunt, and Joint Optimization. Add one short
+explanation per item, preserve the surrounding manuscript, and rebuild only
+this white paper using the existing environment. Verify its rendered layout.
+
+- Read the current manuscript, bibliography, build helper, source README,
+  research charter, edition map/matrix, relevant game chapters, earlier chess
+  clarification, and existing container instructions/configuration.
+- Baseline: preserved current source and one-page PDF under
+  `.local/white-paper-revision-20260913/games-section/`. The preceding revision
+  already established a successful build; retain its typography and prose.
+- Add the selected list as research targets, with the composition of elemental
+  games/protocols explicitly an open question. Do not claim new protocols,
+  implementations, proofs, novelty, or general composability. Existing
+  protocol-specific model and assumption requirements still apply.
+- Chess retains fixed deterministic algorithms, agreed rules and computation
+  bounds. The Stag Hunt entry supplies a proposed coordination motivation;
+  its book chapter remains an undefined fragment, not a formal construction.
+- Independent review checked the six entries against chapter status and author
+  intent. Clarify RPS as verification of a completed round and Poker privacy
+  relative to what the agreed outcome implies.
+- The author's follow-up removed Section I's intuition quotation and adjacent
+  poker/chess explanation, and removed the abstract's classical/modern game
+  theory framing. The examples now appear in Section II. Hardware and support
+  prose, typography, bibliography and author/contact metadata are unchanged.
+- Changed files: white-paper source, delivered PDF, source README status and
+  this work record. No code, book chapter, dependency or container definition
+  changed. No commit or push.
+- Commands/checks: existing container `build.sh` through latexmk/pdfLaTeX and
+  BibTeX; `pdfinfo`; `pdftoppm -r 120 -png`; full-page visual inspection;
+  pypdf/pdfplumber checks of text, six entries, four sections, five references,
+  Letter dimensions, embedded fonts, URI links and page bounds; source diff
+  review and SHA-256 equality of reviewed and delivered PDF.
+- Results: the initial addition produced two pages; the author's follow-up
+  brings the final PDF to one page at unchanged IEEEtran 10pt and margins.
+  Five embedded fonts and seven distinct URI links. No unresolved references,
+  missing glyphs, clipping, overlap or overfull boxes. The preexisting underfull
+  paragraph notice (badness 1810) remains visually acceptable. The initial
+  text-extraction check needed whitespace normalization for IEEE small-cap
+  headings; the corrected final check passed. Existing idle container restored
+  stopped with unchanged identity, configuration and mounts.
+- Research limits: these are selected aims, not achieved protocol, privacy,
+  equilibrium, hardware or composition results. No new setup assumptions or
+  implementation commitments introduced. Next smallest step: author review
+  of the six descriptions in the rebuilt proposal.
+
+Final PDF: 71,559 bytes; SHA-256
+`817e4fbdec17765e941dfca5b85704b41451e159c3979d56f6a262abcb63e606`.

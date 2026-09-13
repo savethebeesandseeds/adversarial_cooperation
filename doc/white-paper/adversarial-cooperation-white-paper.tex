@@ -1,0 +1,112 @@
+\documentclass[conference,letterpaper]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage{balance}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle={Adversarial Cooperation},
+  pdfauthor={Santiago Restrepo},
+  pdfsubject={Research proposal, September 2026},
+  pdfkeywords={adversarial cooperation, applied cryptography, zero knowledge,
+    multiparty computation, hardware},
+  pdfdisplaydoctitle=true
+}
+\urlstyle{same}
+
+\title{Adversarial Cooperation}
+\author{\IEEEauthorblockN{Santiago Restrepo}
+\IEEEauthorblockA{\href{mailto:contact@waajacu.com}{contact@waajacu.com}\quad
+\url{https://waajacu.com/}\\[3pt]
+\textit{Research proposal --- September 2026}}}
+\date{}
+
+\begin{document}
+\maketitle
+\balance
+
+\begin{abstract}
+Adversarial Cooperation seeks solutions to cooperation problems using
+cryptographic protocols without a trusted referee, and hardware for their
+execution. The aim is cooperation that preserves
+private information and the strategic advantages it supports. We seek
+resources to develop, analyze, implement, and demonstrate these protocols
+and their hardware.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Applied cryptography, cooperation, zero knowledge, multiparty computation,
+hardware.
+\end{IEEEkeywords}
+
+\section{The Cooperation Problem}
+The central question is: \emph{how can adversarial parties cooperate without
+a referee while retaining their strategic advantage?} Parties should verify
+an agreed result without surrendering cards, strategies, or other secrets.
+We are concerned that public and private institutions may underestimate the
+information their interactions expose.
+
+The privacy objective is to reveal nothing about private inputs beyond the
+agreed outputs and public information. Each protocol must specify its
+adversary model, assumptions, and privacy and correctness requirements.
+
+The program builds on commitments, zero-knowledge proofs, and multiparty
+computation \cite{naor1991,gmr1989,gmw1987}, alongside prior work on replacing
+mediators in strategic games \cite{dodis2000}. No new primitive or general
+solution is claimed; each proposed construction requires its own analysis.
+
+\section{Games and Cooperation Problems}
+The following cases define initial research targets:
+\begin{itemize}
+\item \textit{Rock--Paper--Scissors:} Fix each player's choice before either
+learns the other's move, then verify the completed round's outcome.
+\item \textit{Tic-Tac-Toe:} Demonstrate that a private strategy avoids defeat
+under specified game conditions, without disclosing its move-selection rules.
+\item \textit{Poker:} Investigate dealing and winner verification without a
+trusted dealer, without revealing private cards beyond what the agreed
+outcome implies.
+\item \textit{Chess:} Determine the outcome between fixed, private deterministic
+move-selection algorithms under agreed rules and computation bounds, without
+publishing their moves or strategies.
+\item \textit{Stag Hunt:} Coordinate mutually beneficial action when each
+party's willingness to cooperate depends on the other's participation.
+\item \textit{Joint Optimization:} Optimize an agreed objective using private
+inputs or constraints, revealing only the agreed result.
+\end{itemize}
+Each case requires its own specification and analysis. Whether more complex
+cooperation can be composed from simpler, elemental games and protocols
+remains an open question.
+
+\section{From Specification to Hardware}
+The goal is to take formally defined protocols through inspectable executable
+representations into specialized hardware that participants can independently
+inspect and reproduce. Candidate methods include C reference code, Boolean
+circuits, register-transfer-level (RTL) descriptions in Verilog or VHDL, and
+FPGA evaluation; choices depend on the protocol.
+
+Translation correctness and correspondence between specification, code,
+circuits, and devices are research tasks. Prior work on verified high-level
+synthesis provides a foundation \cite{herklotz2021}. Evaluation must address
+functional behavior, costs, fabrication and device integrity, and physical
+leakage or faults. Functional correspondence alone does not establish
+protection against such physical attacks.
+
+\section{Resources and Support}
+We seek funding, research collaborators, computing resources, FPGA boards,
+and measurement equipment. Support would enable dedicated research,
+independent cryptographic review, implementation, and hardware experiments.
+
+For each selected cooperation problem, the aim is a complete, inspectable
+demonstrator: protocol definition, implementation, adversarial evaluation,
+and hardware realization. Proof status and limitations will be explicit;
+a working demonstrator does not establish a cryptographic proof or general
+composability.
+
+For funding, equipment access, or collaboration, contact
+\href{mailto:contact@waajacu.com}{contact@waajacu.com}.
+Peace is the ethical motivation, not a property a cryptographic proof can
+establish.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}

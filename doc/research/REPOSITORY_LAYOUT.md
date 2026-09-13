@@ -5,10 +5,10 @@
 ```text
 doc/
   content/, short/, utils/       book sources
-  research-proposal/             editable proposal
+  white-paper/                  editable evolving white paper
   research/                     charter, registers, plans, earlier writing
   tools/                        book and LaTeX build helpers
-  Adversarial-Cooperation-Research-Proposal.pdf
+  Adversarial-Cooperation-White-Paper.pdf
 code/
   src/                          C implementations
   include/                      public headers
@@ -27,6 +27,10 @@ web/                            browser reader and demonstrations
 Tests and vectors belong together: tests are executable checks; vectors are
 fixed inputs and expected results used to reproduce them. Both now live inside
 `code/tests/`.
+
+`doc/white-paper/` holds the short document and its build instructions;
+`doc/research/` holds the broader program's charter, registers and plans. The
+white paper is evolving; its current text presents a research proposal.
 
 Root files are limited to the README, license, agent instructions, Git rules,
 and `setup.sh`. The saved Docker container directly mounts that exact setup
@@ -65,16 +69,19 @@ that status; they are not presented as a new build of the reorganized sources.
 | `Makefile.config` | `code/Makefile.config` |
 | `book`, `compile_latex.sh` | `doc/tools/book.sh`, `doc/tools/compile_latex.sh` |
 | `container/` | `.local/container/` |
-| Root proposal PDF | `doc/Adversarial-Cooperation-Research-Proposal.pdf` |
+| Root proposal PDF; `doc/Adversarial-Cooperation-Research-Proposal.pdf` | `doc/Adversarial-Cooperation-White-Paper.pdf` |
+| `doc/research-proposal/` | `doc/white-paper/` |
 | `.temp/` | `.local/archive/session-work/` |
 | `.container-output/` | `.local/evidence/` |
 | `temp/`, `document/temp/` | `.local/archive/generated/root-temp/`, `document-temp/` |
 
 [organization-moves.json](organization-moves.json) records the first artifact
 cleanup; [structure-moves.json](structure-moves.json) records the author's
-subsequent explicit layout correction. Historical plans and archive source
-contents retain their original paths. Apply both maps when locating an older
-reference. Active README/build instructions use the current paths.
+subsequent explicit layout correction. The later white-paper filename changes
+are RN-022 through RN-024 in [RENAME_MAP.md](RENAME_MAP.md). Historical plans
+and archive source contents retain their original paths. Apply these records
+in order when locating an older reference. Active README/build instructions
+use the current paths.
 
 The first relocation verified 1,152 files. The second verified all 197 moved
 files before active path references were edited. Local inventories and reports

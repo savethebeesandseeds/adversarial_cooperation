@@ -1,5 +1,9 @@
 # Research records
 
+This folder holds the research program's working records. The evolving
+[white paper and its editable source](../white-paper/README.md) live separately
+in `doc/white-paper/`.
+
 Start with the [research charter](RESEARCH_CHARTER.md) and
 [edition map](EDITION_MAP.md). Current technical status is recorded in the
 [claim ledger](CLAIM_LEDGER.md), [assumption ledger](ASSUMPTION_LEDGER.md),

@@ -3,14 +3,15 @@
 Research into cryptographic cooperation between mutually distrustful parties,
 with a short book, a research companion, and educational implementations.
 
-[Read the research proposal](doc/Adversarial-Cooperation-Research-Proposal.pdf)
+[Read the evolving white paper](doc/Adversarial-Cooperation-White-Paper.pdf)
+([editable source](doc/white-paper/README.md))
 by Santiago Restrepo · contact@waajacu.com · [waajacu.com](https://waajacu.com/).
 
 ## Repository
 
 | Folder | Contents |
 |---|---|
-| [doc/](doc/README.md) | Books, proposal, research records, earlier writing, and document build tools |
+| [doc/](doc/README.md) | Books, white paper, research records, earlier writing, and document build tools |
 | [code/](code/README.md) | C sources, headers, build files, and tests |
 | [code/tests/](code/tests/) | Tests and their reference vectors in `vectors/` |
 | [web/](web/README.md) | Browser reader and interactive demonstrations |

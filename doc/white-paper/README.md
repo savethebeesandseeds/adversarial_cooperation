@@ -1,12 +1,23 @@
-# Adversarial Cooperation research proposal
+# Adversarial Cooperation white paper
 
 **Santiago Restrepo | contact@waajacu.com | https://waajacu.com/**
 
-Two-page research proposal, September 2026, prepared for professional
+An evolving white paper, presented as a research proposal for professional
 cryptographers and prospective research sponsors. The proposal presents the
-program and a bounded path from protocol specification to hardware evaluation.
+program and an intended research direction from protocol specification to
+hardware evaluation.
 It distinguishes existing educational software from proposed private proofs
 and synthesis. It does not introduce a theorem or claim novelty.
+
+**Revision status (2026-09-13):** the source and rebuilt PDF fit one page
+with standard IEEEtran 10-point type and margins. New Section II lists six
+research targets: Rock-Paper-Scissors, Tic-Tac-Toe, Poker, Chess, Stag Hunt,
+and Joint Optimization. Section I's author-intuition quotation and adjacent
+poker/chess explanation have been removed, and the abstract now refers to
+cooperation problems. The hardware and support sections, complete-demonstrator
+aim, and all five cited references remain. Source structure, scientific scope
+and the rendered page have been checked. The separate Scope and detailed
+Tic-Tac-Toe sections remain removed.
 
 Revised 2026-09-12 in response to the author's six PDF comments: the title is
 now simply "Adversarial Cooperation," the affiliation line is removed, the
@@ -27,31 +38,39 @@ is now stated as a research objective. The release mechanism and any reliance
 on another party's hardware remain to be justified; local fabrication alone
 is not presented as establishing those properties.
 
-The author's final naming revision on 2026-09-12 designates this document a
-research proposal, reflecting the beginning of the program. The delivered PDF
-is at the repository root; the editable source is this directory. The root
-README links both. The redundant source ZIP was archived locally during the
-repository cleanup. The scientific text and all author revisions are preserved.
+The author chose `white-paper` filenames on 2026-09-13 as a stable home for
+this developing document, distinct from the broader `doc/research/` records.
+Its text still identifies it as a research proposal, reflecting the beginning
+of the program. The [delivered PDF](../Adversarial-Cooperation-White-Paper.pdf)
+is directly in `doc/`; the editable source is this directory. The root README
+links both. The redundant source ZIP remains archived locally. The scientific
+text and all author revisions are preserved; this naming change did not
+regenerate the PDF or change its contents.
 
 ## Read and edit offline
 
-The delivered `Adversarial-Cooperation-Research-Proposal.pdf` is self-contained and
+The delivered `Adversarial-Cooperation-White-Paper.pdf` is self-contained and
 needs no internet connection to read. This directory contains the editable
 LaTeX, bibliography, build helper, and full unmodified IEEEtran distribution.
 The manuscript license is at the repository root. Internet access
 is needed only to follow external reference links or install a missing TeX
 toolchain. No reference is loaded over the network during compilation.
 
-Main source: `adversarial-cooperation-research-proposal.tex`.
+Main source: `adversarial-cooperation-white-paper.tex`.
 References: `references.bib`.
 
 The proposal uses the official IEEEtran 1.8b conference class, US Letter pages,
 two columns, normal 10-point body type, and IEEEtran bibliography style.
 This is an independent research proposal using IEEE formatting, not an IEEE
 publication, acceptance, endorsement, or venue-specific compliance certificate.
-No margins or body font sizes were reduced to achieve the two-page length.
+No margins or body font sizes were reduced to achieve the one-page length.
 
 ## Rebuild
+
+The author's standing instruction is to rebuild the PDF whenever the manuscript
+changes. Use the existing project environment, inspect every rendered page,
+then update `doc/Adversarial-Cooperation-White-Paper.pdf` with the reviewed
+result. Source edits and PDF updates belong to the same revision.
 
 Required existing tools: Bash, pdfLaTeX, BibTeX, latexmk, and the usual TeX Live
 packages for Times fonts, amsmath/amssymb, cite, balance, and hyperref. IEEEtran
@@ -66,7 +85,7 @@ bash build.sh
 ```
 
 The result, relative to the repository root, is
-`.local/build/research-proposal/adversarial-cooperation-research-proposal.pdf`. An optional
+`.local/build/white-paper/adversarial-cooperation-white-paper.pdf`. An optional
 first argument selects another output directory. The helper does not install
 dependencies or manage containers.
 
@@ -74,10 +93,11 @@ From the repository root on the original Windows workstation, with the
 documented container already running:
 
 ```powershell
-docker exec adversarial-cooperation-dev /bin/bash doc/research-proposal/build.sh
+docker exec adversarial-cooperation-dev /bin/bash doc/white-paper/build.sh
 ```
 
-Refer to the root README for inspecting and reusing the existing container.
+Refer to the [container guide](../../.local/container/README.md) for inspecting
+and reusing the existing container.
 Do not create a replacement container or volume just to build this proposal.
 
 The `.bib` retains DOI fields and duplicates each DOI as a linked note because
@@ -96,7 +116,7 @@ The local implementation baseline is Git commit
 `9a919ed9a8cb3b44f93277c7e020bba96891797d`. The proposal describes that baseline;
 its editable source is provided with this repository.
 Supporting working artifacts can also be obtained from the author. The local audit trail
-retains its historical filename at
+is recorded at
 `doc/research/plans/adversarial-cooperation-white-paper.md`, with the baseline
 verification bundle now under `.local/evidence/white-paper-baseline-20260911/`.
 
