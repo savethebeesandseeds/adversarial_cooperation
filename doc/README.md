@@ -22,5 +22,6 @@ bash doc/white-paper/build.sh
 
 Generated PDFs go under `.local/build/`. The checked-in white-paper PDF is a
 deliberate reader-facing document; building does not silently replace it.
-Each proposal revision includes rebuilding, visually checking, and updating
-the reader-facing PDF from the revised source.
+Each proposal revision includes rebuilding and updating the reader-facing PDF
+from the revised source. Page-count and visual layout checks wait until the
+final review, as requested by the author.

@@ -931,3 +931,171 @@ this white paper using the existing environment. Verify its rendered layout.
 
 Final PDF: 71,559 bytes; SHA-256
 `817e4fbdec17765e941dfca5b85704b41451e159c3979d56f6a262abcb63e606`.
+
+## Remove annotated closing paragraph (2026-09-13)
+
+- Read: current source, annotated PDF, build helper and previous work record.
+  Baseline: clean master at e0fcc42 and previously checked one-page PDF.
+- Changed: remove only the final Resources and Support paragraph, beginning
+  "For funding, equipment access, or collaboration" and ending with the peace
+  motivation sentence. Rebuild delivered PDF and append this record.
+- Claims/assumptions: remove the closing motivation statement as requested;
+  introduce no claim or assumption. The author-block email remains. No other
+  manuscript content or list styling changed; independent source review passed.
+- Checks: latexmk build in the verified existing container; Poppler render;
+  full-page visual inspection; exact deletion comparison; one-page Letter size,
+  five references, five embedded fonts, retained header email and page bounds;
+  absence of removed text, unresolved references, missing glyphs and overfull
+  boxes; delivery hash comparison and Git whitespace check.
+- Result: one page, no clipping or overlap. Existing underfull paragraph notice
+  (badness 1810) is visually acceptable. No code build or software installation.
+- Limits: editorial removal establishes no research result. Next smallest step:
+  review the updated closing section. No commit or push in this revision.
+
+Evidence: `.local/white-paper-revision-20260913/remove-closing-paragraph/`.
+PDF: 71,449 bytes; SHA-256
+`44c0df1d3f48d6c242a145566430f47e3e2cabbf020711569df0acbdb4969e6c`.
+
+## Restore abstract wording and defer layout review (2026-09-13)
+
+- Read: current source, the two preserved abstracts before the game-list
+  follow-up, prior work record, build helper and active PDF workflow guidance.
+- Changed: restore the earlier abstract with only "classical and modern"
+  removed; retain "problems in game theory" and all other abstract wording.
+  Rebuild the public PDF. Update AGENTS.md and document READMEs to record the
+  author's instruction to defer page-count/layout verification until the end.
+- Claims/assumptions: restore the author's intended description; introduce no
+  technical claim or assumption. Preserve the earlier closing-paragraph removal.
+- Command/result: existing container's white-paper build.sh completed through
+  latexmk/pdfLaTeX/BibTeX; copied the resulting PDF to its public path. No other
+  build or software installation. No page-count assertion, PDF render or visual
+  inspection in this revision, following the author's new instruction.
+- Limits/next step: layout review remains pending until the author requests the
+  final review. Continue author-directed edits and rebuilds. No commit or push.
+
+Evidence: `.local/white-paper-revision-20260913/restore-abstract/`.
+
+## Restore opening and style the selected cases (2026-09-13)
+
+- Read: current manuscript and build helper; three preserved pre-condensation
+  openings (one-page/before.tex, remove-sections/before.tex, and
+  recompile/source-before.tex); primitives chapter, short edition, registry,
+  relevant chapter/appendix references and charter candidate list. An independent
+  read-only agent traced the primitive sources and their implementation status.
+- Changed: restore the earlier opening paragraph, correcting only "privitate"
+  to "private" and normalizing whitespace. Keep the removed author-intuition
+  and poker/chess paragraphs removed. Replace bullets with a breakable thin
+  gray left rule and six separate small-cap headings; retain all six case
+  descriptions. Remove the annotated final demonstrator paragraph. Change
+  "Evaluation must address" to "Evaluation would address." Rebuild delivered
+  PDF; update source README and this work record.
+- Claims/assumptions: the restored institutional-exposure sentence is the
+  author's assessment; no empirical validation was supplied. The demonstrator
+  aim and its adjacent qualification were removed by explicit author request.
+  No new construction, proof, composition result or technical assumption.
+- Formatting: existing installed color/framed packages implement a 0.4pt gray
+  rule, 7pt inset and small-cap game headings. No software installation or body
+  font/margin change. No table, arrows or asserted ordering of research cases.
+- Commands/results: only the white-paper build.sh/latexmk target was rebuilt;
+  latest "Evaluation would address" wording reached the PDF and the removed
+  demonstrator paragraph is absent. Both build commands completed. A source
+  follow-up arrived while a build was finishing; no compiler processes remained
+  afterward. Page-count and layout checks remain deferred as instructed.
+- Primitive lookup: the book's primitives chapter is an editorial placeholder.
+  PRIMITIVE_REGISTRY.md defines the educational BLAKE2b-256 hash profile and
+  AC Commitment v1. RESEARCH_CHARTER.md:348-367 contains the broader candidate
+  inventory. Other chapters discuss additional tools and open constructions;
+  they should not all be described as implemented primitives. No change to
+  the proposal's primitive paragraph was requested or made during this lookup.
+- Limits/next step: final visual review remains pending. The author can select
+  which additional primitive families belong in the proposal. No commit/push.
+
+Evidence: `.local/white-paper-revision-20260913/vertical-rule-opening/`.
+
+## Rule rendering repair and broader primitives (2026-09-13)
+
+- Read the source, charter's 18-family inventory, current PDF renders and
+  build output. Independent review confirmed the candidate inventory is
+  complete and does not claim implementation or production readiness.
+- Changed the primitive paragraph to include all 18 families as candidate
+  tools. Kept the established opening, abstract, six case descriptions,
+  hardware/support wording and references. Replaced framed/column-balancing
+  interaction with native rule-and-text boxes, compact spacing and normal
+  column flow; no font-size or margin changes. Removed the extra 3pt author
+  line gap. Updated the delivered PDF and this record.
+- Claims/assumptions: expanded candidate tools only; selection follows each
+  problem's requirements and assumptions. No new construction or result.
+- Rebuilt only the white paper in the existing environment. Rendered and
+  inspected intermediate layouts to diagnose large blank areas and entry
+  spacing. The author then requested an end to layout refinement and accepted
+  the appearance. Finished the in-progress rebuild and delivered it without
+  further layout iterations or final-render inspection.
+- Final layout review is deferred at the author's direction. No software
+  installation, code build, commit or push. The unrelated untracked
+  cryptographic-electronics PDF was left untouched. Next step: author review
+  or the next requested content edit.
+
+Evidence: `.local/white-paper-revision-20260913/repair-rule-and-primitives/`.
+
+## Remove Chess and bold game names (2026-09-13)
+
+- Read current source, pending changes and existing build configuration.
+- Removed only the Chess case; changed game-name formatting from small caps
+  to bold. Updated README case count and delivered PDF.
+- No new technical claim or assumption; other prose and five remaining case
+  descriptions are unchanged.
+- Rebuilt only the white paper in the existing environment. Confirmed exactly
+  one page and absence of Chess in the output; inspected its single render.
+  Names are bold, all five references fit, and no overlap/clipping is visible.
+- Remaining work: author review or next requested edit. No additional layout
+  refinement, installation, code build, commit or push.
+
+Evidence: `.local/white-paper-revision-20260913/remove-chess/`.
+
+## Increase game-entry spacing (2026-09-13)
+
+Read current source and build configuration. Increased the space after game
+entries from 2pt to 3pt; retained the bold headings and gray rule. No text,
+claim, assumption, font-size or margin change. Rebuilt only the white paper
+and confirmed one page. A 7pt trial exceeded one page and was not delivered.
+Updated the PDF and this record. No installation, code build, commit or push.
+Next step: author review. Evidence:
+`.local/white-paper-revision-20260913/game-spacing/`.
+
+## Move spacing before game titles (2026-09-13)
+
+Read the current gamecase macro and build configuration. At the author's
+clarification, moved the 3pt space from after each description to an explicit
+vspace before each bold title. No text, claim, assumption, font or margin
+changes. Rebuilt only the white paper; confirmed one page and updated the
+public PDF. No further layout refinement or commit/push. Next step: author
+review. Evidence: `.local/white-paper-revision-20260913/game-title-space/`.
+
+## Make space before game titles visible (2026-09-13)
+
+Read current source, build helper and pending changes. Increased the explicit
+space before every bold game title from 3pt to 0.65 baselineskip. No wording,
+claim, assumption, font-size or margin change. The first rebuild was blocked
+by the unavailable Docker engine; cancelled pending Docker Desktop commands
+when the author requested a pause. After the author repaired Docker and
+explicitly resumed the work, inspected and reused the existing unchanged
+project container, rebuilt only this white paper, and updated the public PDF.
+Compilation succeeded. Page-count and visual checks remain deferred as
+instructed. No installation, container recreation, commit or push. Next step:
+author review of the larger space before the titles.
+Evidence: `.local/white-paper-revision-20260913/visible-title-space/`.
+
+## Space around the list and its first entry (2026-09-13)
+
+Read the current author-edited source and existing build configuration.
+Applied the three PDF comments: add 0.65 baselineskip after the introductory
+sentence; give the first game title no internal top space; add 0.8 baselineskip
+after the list before "Each case requires...". Other titles retain their
+existing top space. Preserve all wording, including the author's latest
+Tic-Tac-Toe edit. No claim, assumption, font or margin change.
+Rebuilt only the white paper using the existing build cache and updated the
+public PDF. Compilation succeeded; further page-count/visual checks remain
+deferred as instructed. No installation, code build, commit or push.
+Next step: author review of the three spacing changes.
+Evidence: `.local/white-paper-revision-20260913/list-boundary-spacing/`;
+reused build cache: `visible-title-space/build/` under the same revision root.

@@ -9,15 +9,21 @@ hardware evaluation.
 It distinguishes existing educational software from proposed private proofs
 and synthesis. It does not introduce a theorem or claim novelty.
 
-**Revision status (2026-09-13):** the source and rebuilt PDF fit one page
-with standard IEEEtran 10-point type and margins. New Section II lists six
-research targets: Rock-Paper-Scissors, Tic-Tac-Toe, Poker, Chess, Stag Hunt,
+**Revision status (2026-09-13):** the source and PDF use standard IEEEtran
+10-point type and margins. New Section II lists five
+research targets: Rock-Paper-Scissors, Tic-Tac-Toe, Poker, Stag Hunt,
 and Joint Optimization. Section I's author-intuition quotation and adjacent
-poker/chess explanation have been removed, and the abstract now refers to
-cooperation problems. The hardware and support sections, complete-demonstrator
-aim, and all five cited references remain. Source structure, scientific scope
-and the rendered page have been checked. The separate Scope and detailed
-Tic-Tac-Toe sections remain removed.
+poker/chess explanation have been removed. The earlier abstract is restored
+with only "classical and modern" removed. The closing contact/peace paragraph
+and the final demonstrator paragraph are removed; the author-block contact
+remains. Section I's earlier opening is restored, and its candidate-tool
+paragraph includes the charter's broader inventory. The five cases use a thin
+gray vertical rule with individual bold headings and normal column flow.
+Hardware evaluation
+uses "would address." All five cited references remain.
+The separate Scope and detailed Tic-Tac-Toe sections remain removed. Page-count
+and visual layout checks are deferred until the final review at the author's
+request.
 
 Revised 2026-09-12 in response to the author's six PDF comments: the title is
 now simply "Adversarial Cooperation," the affiliation line is removed, the
@@ -68,12 +74,15 @@ No margins or body font sizes were reduced to achieve the one-page length.
 ## Rebuild
 
 The author's standing instruction is to rebuild the PDF whenever the manuscript
-changes. Use the existing project environment, inspect every rendered page,
-then update `doc/Adversarial-Cooperation-White-Paper.pdf` with the reviewed
-result. Source edits and PDF updates belong to the same revision.
+changes. Use the existing project environment, then update
+`doc/Adversarial-Cooperation-White-Paper.pdf` with the rebuilt result. Source
+edits and PDF updates belong to the same revision. During iterative edits,
+defer page-count and visual layout checks until the final review, as the
+author clarified on 2026-09-13.
 
 Required existing tools: Bash, pdfLaTeX, BibTeX, latexmk, and the usual TeX Live
-packages for Times fonts, amsmath/amssymb, cite, balance, and hyperref. IEEEtran
+packages for Times fonts, amsmath/amssymb, cite, color, and
+hyperref. IEEEtran
 is supplied locally. The repository's provisioned development container has
 the other requirements already installed.
 
@@ -102,7 +111,7 @@ Do not create a replacement container or volume just to build this proposal.
 
 The `.bib` retains DOI fields and duplicates each DOI as a linked note because
 the unmodified IEEEtran 1.14 bibliography style does not print the DOI field.
-The `balance` package balances the final page's columns.
+The document uses normal IEEEtran column flow.
 
 ## Evidence and scope
 
