@@ -80,6 +80,17 @@ directly in `doc/` and linked from the root README. Build products will use
 | RN-023 | `doc/white-paper/adversarial-cooperation-research-proposal.tex` | `doc/white-paper/adversarial-cooperation-white-paper.tex` | Complete; manuscript bytes unchanged. |
 | RN-024 | `doc/Adversarial-Cooperation-Research-Proposal.pdf` | `doc/Adversarial-Cooperation-White-Paper.pdf` | Complete; existing PDF moved and byte-verified without regeneration. |
 
+## Lowercase white-paper filename (2026-09-16)
+
+The author requested a lowercase delivered PDF filename. Two sequential
+`git mv` operations through a temporary name preserve the case-only rename on
+Windows. Active links and delivery instructions use the new path; historical
+records retain their original paths. PDF content and research claims are unchanged.
+
+| ID | Original path | Authorized destination | Status |
+|---|---|---|---|
+| RN-025 | `doc/Adversarial-Cooperation-White-Paper.pdf` | `doc/adversarial-cooperation-white-paper.pdf` | Complete; existing PDF renamed without regeneration and SHA-256 verified unchanged. |
+
 ## Empty Directory Preservation
 
 The list below records the Phase 0 inspection. The 2026-09-12 audit found

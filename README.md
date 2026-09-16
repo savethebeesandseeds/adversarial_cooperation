@@ -3,7 +3,7 @@
 Research into cryptographic cooperation between mutually distrustful parties,
 with a short book, a research companion, and educational implementations.
 
-[Read the evolving white paper](doc/Adversarial-Cooperation-White-Paper.pdf)
+[Read the evolving white paper](doc/adversarial-cooperation-white-paper.pdf)
 ([editable source](doc/white-paper/README.md))
 by Santiago Restrepo · contact@waajacu.com · [waajacu.com](https://waajacu.com/).
 

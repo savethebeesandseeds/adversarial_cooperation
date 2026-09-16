@@ -8,7 +8,7 @@ doc/
   white-paper/                  editable evolving white paper
   research/                     charter, registers, plans, earlier writing
   tools/                        book and LaTeX build helpers
-  Adversarial-Cooperation-White-Paper.pdf
+  adversarial-cooperation-white-paper.pdf
 code/
   src/                          C implementations
   include/                      public headers
@@ -69,7 +69,7 @@ that status; they are not presented as a new build of the reorganized sources.
 | `Makefile.config` | `code/Makefile.config` |
 | `book`, `compile_latex.sh` | `doc/tools/book.sh`, `doc/tools/compile_latex.sh` |
 | `container/` | `.local/container/` |
-| Root proposal PDF; `doc/Adversarial-Cooperation-Research-Proposal.pdf` | `doc/Adversarial-Cooperation-White-Paper.pdf` |
+| Root proposal PDF; `doc/Adversarial-Cooperation-Research-Proposal.pdf` | `doc/adversarial-cooperation-white-paper.pdf` |
 | `doc/research-proposal/` | `doc/white-paper/` |
 | `.temp/` | `.local/archive/session-work/` |
 | `.container-output/` | `.local/evidence/` |
@@ -78,7 +78,7 @@ that status; they are not presented as a new build of the reorganized sources.
 [organization-moves.json](organization-moves.json) records the first artifact
 cleanup; [structure-moves.json](structure-moves.json) records the author's
 subsequent explicit layout correction. The later white-paper filename changes
-are RN-022 through RN-024 in [RENAME_MAP.md](RENAME_MAP.md). Historical plans
+are RN-022 through RN-025 in [RENAME_MAP.md](RENAME_MAP.md). Historical plans
 and archive source contents retain their original paths. Apply these records
 in order when locating an older reference. Active README/build instructions
 use the current paths.

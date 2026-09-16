@@ -1,6 +1,6 @@
 # Documents
 
-- [Evolving white paper](Adversarial-Cooperation-White-Paper.pdf), with
+- [Evolving white paper](adversarial-cooperation-white-paper.pdf), with
   [editable source and build instructions](white-paper/README.md).
 - [Short book](adversarial_cooperation_short.tex): the brief reading edition.
 - [Research companion](adversarial_cooperation.tex): expanded chapters.

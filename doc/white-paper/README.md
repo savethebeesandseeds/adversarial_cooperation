@@ -47,7 +47,7 @@ is not presented as establishing those properties.
 The author chose `white-paper` filenames on 2026-09-13 as a stable home for
 this developing document, distinct from the broader `doc/research/` records.
 Its text still identifies it as a research proposal, reflecting the beginning
-of the program. The [delivered PDF](../Adversarial-Cooperation-White-Paper.pdf)
+of the program. The [delivered PDF](../adversarial-cooperation-white-paper.pdf)
 is directly in `doc/`; the editable source is this directory. The root README
 links both. The redundant source ZIP remains archived locally. The scientific
 text and all author revisions are preserved; this naming change did not
@@ -55,7 +55,7 @@ regenerate the PDF or change its contents.
 
 ## Read and edit offline
 
-The delivered `Adversarial-Cooperation-White-Paper.pdf` is self-contained and
+The delivered `adversarial-cooperation-white-paper.pdf` is self-contained and
 needs no internet connection to read. This directory contains the editable
 LaTeX, bibliography, build helper, and full unmodified IEEEtran distribution.
 The manuscript license is at the repository root. Internet access
@@ -75,7 +75,7 @@ No margins or body font sizes were reduced to achieve the one-page length.
 
 The author's standing instruction is to rebuild the PDF whenever the manuscript
 changes. Use the existing project environment, then update
-`doc/Adversarial-Cooperation-White-Paper.pdf` with the rebuilt result. Source
+`doc/adversarial-cooperation-white-paper.pdf` with the rebuilt result. Source
 edits and PDF updates belong to the same revision. During iterative edits,
 defer page-count and visual layout checks until the final review, as the
 author clarified on 2026-09-13.
