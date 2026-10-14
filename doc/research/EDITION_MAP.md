@@ -6,9 +6,13 @@ Both editions retain the same 22 chapters and five appendices. Chapter numbers
 and appendix letters correspond. Every short chapter points to the expanded
 PDF's named destination and gives its evidence status in plain language.
 
-The short edition is a first contemplative draft. Existing expanded chapter
-bodies, code, bibliography, and backups are preserved. Many companion entries
-remain open research; their short counterparts do not supply missing proofs.
+The short edition is a first editorial assembly of contemplative drafts.
+As the author clarified on 2026-10-14, most chapters remain names and small
+notes that have not yet been revisited. Expanded prose does not settle their
+intended meaning. The chapter count records correspondence between editions;
+author development and technical evidence are separate questions. Existing
+chapter bodies, code, bibliography, and backups are preserved. Open research
+in the companion remains open in its short counterpart.
 
 ## Source correspondence
 
@@ -65,7 +69,7 @@ private-proof, fairness, collusion, or institutional questions.
 
 ## Editorial and research next step
 
-Review Defining Victory as a complete short chapter and identify the smallest
-concrete companion example that illuminates its question. Preserve a separate
-judgment about what should count as victory; a protocol cannot choose that
-ethical objective on the reader's behalf.
+Return to the Defining Victory notes with the author, clarify the intended
+question, and develop the short chapter alongside one concrete companion
+example. Preserve a separate judgment about what should count as victory;
+a protocol cannot choose that ethical objective on the reader's behalf.

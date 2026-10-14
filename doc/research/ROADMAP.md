@@ -7,6 +7,18 @@ state machine, transcript, tests, attacks, limitations, and citations agree.
 Do not polish every fragment in parallel and do not use a green demo as a
 substitute for a security argument.
 
+## Manuscript Development Status - 2026-10-14
+
+The author clarified that most chapters have not yet been revisited and
+remain mainly names and small notes. The assembled editions place those
+starting points alongside a few developed technical studies. Editorial
+coverage and expanded prose do not establish that the author has developed
+each idea or settled its intended meaning. Technical results retain only
+their recorded, specific evidence.
+
+Track the author's return to an idea separately from editorial assembly and
+implementation milestones; a chapter count cannot measure that development.
+
 ## Short Book and Research Companion - 2026-09-05
 
 The author's reading direction is now a short, contemplative book with a
@@ -15,22 +27,26 @@ doc/adversarial_cooperation_short.tex; the existing
 doc/adversarial_cooperation.tex remains the companion entry.
 
 Both follow the same 22 chapters and five appendices. The companion's research
-maturity is unchanged by this separation. The short book is a complete first
-editorial pass across that existing corpus, not completion of the research
-phases below. doc/research/EDITION_MAP.md connects the two sources for each chapter
-and identifies the currently available executable work.
+maturity is unchanged by this separation. The short book is a first editorial
+assembly across those entries. It does not establish that the author has
+revisited them or completed the research phases below.
+doc/research/EDITION_MAP.md connects the two sources for each chapter and
+identifies the currently available executable work.
 
 Continue in two coordinated passes: refine a short chapter's thought and
 language, then develop one bounded companion problem with its model, attacks,
 algorithm, evidence, and limitations. More pages are not an exit condition.
 
-## Complete Research Draft Assembly - 2026-08-01
+## Research Corpus Assembly - 2026-08-01
 
 The main manuscript now exposes every one of the repository's **27 live
 content sources**. The inclusive assembly contains 22 chapters and research
 notes across Foundations, Finite Games and Verifiable Commitment, Private
 Joint Action, and Institutions, Dynamics, and Repair, followed by five
 appendices.
+
+The historical label "Complete Research Draft" refers to inclusion of that
+source inventory. Most entries still await the author's return and development.
 
 This is an editorial and preservation milestone, not completion of the later
 research phases. A front-matter reading guide and chapter-local status notices

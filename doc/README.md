@@ -1,9 +1,16 @@
 # Documents
 
+Most chapters remain names and small notes that the author has not yet
+revisited. Both editions assemble these starting points alongside a few
+developed technical studies. A chapter's presence or length does not establish
+that the author has developed its intended meaning; technical evidence applies
+only to the specific work recorded in the research registers.
+
 - [Evolving white paper](adversarial-cooperation-white-paper.pdf), with
   [editable source and build instructions](white-paper/README.md).
 - [Short book](adversarial_cooperation_short.tex): the brief reading edition.
-- [Research companion](adversarial_cooperation.tex): expanded chapters.
+- [Research companion](adversarial_cooperation.tex): research notes and developed
+  technical studies, with their evidence and open questions.
 - [Edition map](research/EDITION_MAP.md): correspondence between both books,
   their chapters, and executable demonstrations.
 - [Research records](research/README.md): charter, claims, plans, open problems,

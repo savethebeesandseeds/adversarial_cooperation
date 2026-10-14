@@ -3,6 +3,12 @@
 Research into cryptographic cooperation between mutually distrustful parties,
 with a short book, a research companion, and educational implementations.
 
+The manuscript is a research notebook taking the shape of a book. Most
+chapters remain names and small notes that the author has not yet revisited.
+The two editions organize that material alongside a few developed technical
+studies. Editorial expansion and chapter coverage do not establish that an
+idea's intended meaning is settled or that its research is complete.
+
 [Read the evolving white paper](doc/adversarial-cooperation-white-paper.pdf)
 ([editable source](doc/white-paper/README.md))
 by Santiago Restrepo · contact@waajacu.com · [waajacu.com](https://waajacu.com/).

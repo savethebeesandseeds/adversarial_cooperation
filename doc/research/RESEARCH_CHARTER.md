@@ -20,13 +20,29 @@ The book should remain hospitable to philosophy, game theory, political
 economy, distributed systems, mechanism design, formal methods, and ethics.
 Cryptography is the principal instrument, not the only source of truth.
 
+## Current Manuscript State (Author Clarification, 2026-10-14)
+
+The manuscript is a research notebook taking the shape of a book. Most
+chapters remain names and small notes that the author has not yet revisited.
+A few technical studies have been developed alongside those starting points.
+Editorial assembly and expanded prose do not establish that the author has
+returned to an idea or that its intended meaning is settled. Evidence for a
+specific technical study does not establish the maturity of the other chapters.
+
+Progress reports must distinguish editorial coverage, the author's development
+of an idea, and the evidence for a technical result. Preserve ambiguities for
+the author's return; chapter titles and polished prose are insufficient grounds
+for inferring a finished argument. This general clarification does not assign
+an author-review status to individual chapters.
+
 ## Two Editions (Author Direction, 2026-09-05)
 
 The public work has two linked reading depths:
 
-- The short book contains every existing chapter and appendix, in brief,
-  contemplative prose. It carries the central insight and question, a concise
-  limit, and a reference to the matching research companion.
+- The short book has a brief reading entry for each chapter and appendix in
+  the edition map. Its contemplative drafts draw on the existing notes, give
+  a concise limit, and reference the matching research companion. They remain
+  open to revision as the author returns to the underlying ideas.
 - The research companion follows the same chapter order and contains detailed
   models, arguments, algorithms, citations, implementation mappings, and
   demonstrations where they exist. Incomplete work remains explicitly open.
